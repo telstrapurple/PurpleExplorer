@@ -10,11 +10,11 @@
         Title="PurpleExplorer">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
     <DockPanel Dock="Left">
-        <TreeView Items="{Binding ConnectedServiceBuses}" Width="300" >
+        <TreeView Items="{Binding ConnectedServiceBuses}" Width="300">
             <TreeView.DataTemplates>
                 <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                     <StackPanel Orientation="Horizontal">
@@ -35,7 +35,27 @@
                 </Style>
             </TreeView.Styles>
         </TreeView>
-        <TextBlock Text="temporary textblock" />
+
+        <Grid ColumnDefinitions="3*, 3*, 3*" RowDefinitions="*,20*" Margin="4">
+            <!-- side panel - top -->
+            <Button Name="RefreshButton" Grid.Row="0" Grid.Column="0">
+                <Image Source="/Assets/refresh.png" />
+            </Button>
+            <Button Name="AddButton" Grid.Row="0" Grid.Column="1">
+                <Image Source="/Assets/plus.png" />
+            </Button>
+            <Button Name="MinusButton" Grid.Row="0" Grid.Column="2">
+                <Image Source="/Assets/minus.png" />
+            </Button>
+
+            <!-- side panel - bottom -->
+            <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Items="{Binding Messages}" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </DockPanel>
 
 </Window>
