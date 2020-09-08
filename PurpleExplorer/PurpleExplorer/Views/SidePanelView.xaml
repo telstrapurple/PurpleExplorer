@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="PurpleExplorer.Views.SidePanelView">
+    
+    <Design.DataContext>
+        <vm:SidePanelViewModel />
+    </Design.DataContext>
+    
+    <Grid ColumnDefinitions="3*, 3*, 3*" RowDefinitions="1*,10*" Margin="4">
+        <!-- side panel - top -->
+        <Button Name="RefreshButton" Grid.Row="0" Grid.Column="0">
+            <Image Source="/Assets/refresh.png" />
+        </Button>
+        <Button Name="AddButton" Grid.Row="0" Grid.Column="1">
+            <Image Source="/Assets/plus.png" />
+        </Button>
+        <Button Name="MinusButton" Grid.Row="0" Grid.Column="2">
+            <Image Source="/Assets/minus.png" />
+        </Button>
+    
+        <!-- side panel - bottom -->
+        <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Items="{Binding Messages}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Content" Binding="{Binding Content}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Size" Binding="{Binding Size}"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+    </Grid>
+</UserControl>

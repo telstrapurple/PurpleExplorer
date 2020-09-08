@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7efcf655-7576-46e1-9b27-26811ea91c89" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/PurpleExplorer/Models/Message.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PurpleExplorer/ViewModels/SidePanelViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PurpleExplorer/App.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/PurpleExplorer/App.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PurpleExplorer/PurpleExplorer.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/PurpleExplorer/PurpleExplorer.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PurpleExplorer/Views/MainWindow.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/PurpleExplorer/Views/MainWindow.xaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3BCD765E-374A-4861-84D4-5086811C8076/25/Grid.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3BCD765E-374A-4861-84D4-5086811C8076/29/Image.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/E822D694-50B1-47E9-A169-3F337C645E8C/1/DataGrid.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3BCD765E-374A-4861-84D4-5086811C8076/A/Button.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/PurpleExplorer/Views/MainWindow.xaml.cs" />
+        <option value="$PROJECT_DIR$/PurpleExplorer/TodoListView.xaml" />
+        <option value="$PROJECT_DIR$/PurpleExplorer/Models/Message.cs" />
+        <option value="$PROJECT_DIR$/PurpleExplorer/PurpleExplorer.csproj" />
+        <option value="$PROJECT_DIR$/PurpleExplorer/ViewModels/SidePanelViewModel.cs" />
+        <option value="$PROJECT_DIR$/PurpleExplorer/Views/MainWindow.xaml" />
+        <option value="$PROJECT_DIR$/PurpleExplorer/App.xaml" />
+        <option value="$PROJECT_DIR$/PurpleExplorer/Views/SidePanelView.xaml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1hAZk7IzrtPjjupLhDDZHtoQtSz" />
+  <component name="ProjectReloadState">
+    <option name="STATE" value="1" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RunManager">
+    <configuration name="PurpleExplorer" type="DotNetProject" factoryName=".NET Project">
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <option name="PROJECT_PATH" value="$PROJECT_DIR$/PurpleExplorer/PurpleExplorer.csproj" />
+      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
+      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
+      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
+      <option name="PROJECT_KIND" value="DotNetCore" />
+      <option name="PROJECT_TFM" value="" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7efcf655-7576-46e1-9b27-26811ea91c89" name="Default Changelist" comment="" />
+      <created>1599456137264</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1599456137264</updated>
+      <workItem from="1599456140605" duration="5657000" />
+      <workItem from="1599524493709" duration="10864000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="EditMode" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="1398" height="231" key="GridCell.Tab.0.bottom" timestamp="1599541685971">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state width="1398" height="231" key="GridCell.Tab.0.bottom/0.23.1440.877/-210.-1057.1920.1057@0.23.1440.877" timestamp="1599540988036" />
+    <state width="1398" height="231" key="GridCell.Tab.0.bottom/0.23.1440.877@0.23.1440.877" timestamp="1599541685971" />
+    <state width="1398" height="231" key="GridCell.Tab.0.center" timestamp="1599541685970">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state width="1398" height="231" key="GridCell.Tab.0.center/0.23.1440.877/-210.-1057.1920.1057@0.23.1440.877" timestamp="1599540988035" />
+    <state width="1398" height="231" key="GridCell.Tab.0.center/0.23.1440.877@0.23.1440.877" timestamp="1599541685970" />
+    <state width="1398" height="231" key="GridCell.Tab.0.left" timestamp="1599541685969">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state width="1398" height="231" key="GridCell.Tab.0.left/0.23.1440.877/-210.-1057.1920.1057@0.23.1440.877" timestamp="1599540988034" />
+    <state width="1398" height="231" key="GridCell.Tab.0.left/0.23.1440.877@0.23.1440.877" timestamp="1599541685969" />
+    <state width="1398" height="231" key="GridCell.Tab.0.right" timestamp="1599541685971">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state width="1398" height="231" key="GridCell.Tab.0.right/0.23.1440.877/-210.-1057.1920.1057@0.23.1440.877" timestamp="1599540988035" />
+    <state width="1398" height="231" key="GridCell.Tab.0.right/0.23.1440.877@0.23.1440.877" timestamp="1599541685971" />
+    <state x="409" y="190" key="RollbackChangesDialog" timestamp="1599524532966">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state x="409" y="190" key="RollbackChangesDialog/0.23.1440.877/-210.-1057.1920.1057@0.23.1440.877" timestamp="1599524532966" />
+    <state x="383" y="216" width="673" height="490" key="find.popup" timestamp="1599535215525">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state x="383" y="216" width="673" height="490" key="find.popup/0.23.1440.877/-210.-1057.1920.1057@0.23.1440.877" timestamp="1599535215525" />
+    <state x="383" y="211" width="672" height="678" key="search.everywhere.popup" timestamp="1599537406183">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state x="383" y="211" width="672" height="678" key="search.everywhere.popup/0.23.1440.877/-210.-1057.1920.1057@0.23.1440.877" timestamp="1599537406183" />
+  </component>
+</project>
