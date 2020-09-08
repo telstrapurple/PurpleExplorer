@@ -3,18 +3,39 @@
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:PurpleExplorer.Views"
-        xmlns:purpleExplorer="clr-namespace:PurpleExplorer"
+        xmlns:models="clr-namespace:PurpleExplorer.Models"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="PurpleExplorer">
-    <views:SidePanelView/>
 
-    <!-- <Design.DataContext> -->
-    <!--     <vm:MainWindowViewModel/> -->
-    <!-- </Design.DataContext> -->
-    <!-- -->
-    <!-- <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/> -->
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <DockPanel Dock="Left">
+        <TreeView Items="{Binding ConnectedServiceBuses}" Width="300" >
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/service-bus.png" />
+                        <TextBlock Foreground="Purple" Margin="4" VerticalAlignment="Center" Text="{Binding Name}" />
+                    </StackPanel>
+                </TreeDataTemplate>
+                <TreeDataTemplate DataType="models:ServiceBusTopic" ItemsSource="{Binding Subscriptions}">
+                    <TextBlock Foreground="Purple" Text="{Binding Name}" />
+                </TreeDataTemplate>
+                <DataTemplate DataType="models:ServiceBusSubscription">
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </TreeView.DataTemplates>
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+            </TreeView.Styles>
+        </TreeView>
+        <TextBlock Text="temporary textblock" />
+    </DockPanel>
 
 </Window>
