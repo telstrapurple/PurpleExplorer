@@ -9,9 +9,14 @@
         <e p="App.xaml.cs" t="Include" />
         <e p="Assets" t="Include">
           <e p="avalonia-logo.ico" t="Include" />
+          <e p="service-bus.png" t="Include" />
         </e>
         <e p="bin" t="ExcludeRecursive" />
-        <e p="Models" t="Include" />
+        <e p="Models" t="Include">
+          <e p="ServiceBusResource.cs" t="Include" />
+          <e p="ServiceBusSubscription.cs" t="Include" />
+          <e p="ServiceBusTopic.cs" t="Include" />
+        </e>
         <e p="nuget.config" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
