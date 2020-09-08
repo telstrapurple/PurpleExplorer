@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using PurpleExplorer.Models;
 
 namespace PurpleExplorer.ViewModels
@@ -9,6 +7,7 @@ namespace PurpleExplorer.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
+        public ObservableCollection<Message> Messages { get; }
 
         public MainWindowViewModel()
         {
@@ -32,6 +31,30 @@ namespace PurpleExplorer.ViewModels
                         })
                     }
                 });
+            
+            Messages = new ObservableCollection<Message>(GenerateMockMessages());
+        }
+        private IEnumerable<Message> GenerateMockMessages()
+        {
+            var mockMessages = new List<Message>()
+            {
+                new Message()
+                {
+                    Content = "Test Message 1",
+                    Size = 1
+                },
+                new Message()
+                {
+                    Content = "Test Message 2",
+                    Size = 2
+                },
+                new Message()
+                {
+                    Content = "Test Message 3",
+                    Size = 3
+                }
+            };
+            return mockMessages;
         }
     }
 }
