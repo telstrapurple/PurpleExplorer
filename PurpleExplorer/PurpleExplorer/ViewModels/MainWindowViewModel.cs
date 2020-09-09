@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Microsoft.Azure.ServiceBus.Management;
+using System.Linq;
+using System.Threading.Tasks;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
-using MessageBox.Avalonia;
 using MessageBox.Avalonia.Enums;
-using MessageBox.Avalonia.DTO;
-using Avalonia;
-using Avalonia.Controls;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -19,27 +16,7 @@ namespace PurpleExplorer.ViewModels
         public string ConnectionString { get; set; }
         public MainWindowViewModel()
         {
-            ConnectedServiceBuses =
-                new ObservableCollection<ServiceBusResource>(new[]
-                {
-                    new ServiceBusResource
-                    {
-                        Name = "ServiceBus1",
-                        Topics = new ObservableCollection<ServiceBusTopic>(new []
-                        {
-                            new ServiceBusTopic
-                            {
-                                Name = "Topic1-1",
-                                Subscriptions = new ObservableCollection<ServiceBusSubscription>(new []
-                                {
-                                    new ServiceBusSubscription {Name = "Subscription-1"},
-                                    new ServiceBusSubscription {Name = "Subscription-2"}
-                                })
-                            }
-                        })
-                    }
-                });
-            
+            ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             Messages = new ObservableCollection<Message>(GenerateMockMessages());
         }
         private IEnumerable<Message> GenerateMockMessages()
@@ -72,18 +49,16 @@ namespace PurpleExplorer.ViewModels
                 try
                 {
                     ServiceBusHelper helper = new ServiceBusHelper(ConnectionString);
-
+                    
+                    var namespaceInfo = await helper.GetNamespaceInfo();
                     var topics = await helper.GetTopics();
 
-                    ConnectedServiceBuses[0].Topics.Clear();
-
-                    foreach (var obj in topics)
+                    ServiceBusResource newResource = new ServiceBusResource(topics)
                     {
-                        ConnectedServiceBuses[0].Topics.Add(new ServiceBusTopic()
-                        {
-                            Name = obj.Name
-                        });
-                    }
+                        Name = namespaceInfo.Name,
+                    };
+                    
+                   ConnectedServiceBuses.Add(newResource);
                 }
                 catch (Exception ex)
                 {

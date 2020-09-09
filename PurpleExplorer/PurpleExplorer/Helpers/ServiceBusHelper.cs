@@ -2,7 +2,6 @@
 using PurpleExplorer.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PurpleExplorer.Helpers
@@ -27,18 +26,20 @@ namespace PurpleExplorer.Helpers
                 {
                     _client = new ManagementClient(_connectionString);
                 }
-
-                var namespaceInfo = _client.GetNamespaceInfoAsync().Result;
+                
                 var busTopics = await _client.GetTopicsAsync();
-
-                foreach (var obj in busTopics)
+                foreach (var topic in busTopics)
                 {
-                    topics.Add(new ServiceBusTopic()
+                    var topicName = topic.Path;
+                    var subscriptions = await GetSubscriptions(topicName);
+                    
+                    ServiceBusTopic newTopic = new ServiceBusTopic(subscriptions)
                     {
-                        Name = obj.Path
-                    });
+                        Name = topicName
+                    };
+                    topics.Add(newTopic);
                 }
-
+                // TODO Task.WhenAll(topics.Select(t => helper.GetSubscriptions(t.Name))) ??
             }
 
             catch (Exception ex)
@@ -48,6 +49,38 @@ namespace PurpleExplorer.Helpers
             }
 
             return topics;
+        }
+
+        public async Task<IList<ServiceBusSubscription>> GetSubscriptions(string topicPath)
+        {
+            IList<ServiceBusSubscription> subscriptions = new List<ServiceBusSubscription>();
+            //TODO: check if it is fine to use private classfield instantiated in constructor - need to handle exception in case connection string is wrong
+
+            try
+            {
+                if (_client == null)
+                {
+                    _client = new ManagementClient(_connectionString);
+                }
+
+                var topicSubscription = await _client.GetSubscriptionsRuntimeInfoAsync(topicPath);
+                foreach (var sub in topicSubscription)
+                {
+                    subscriptions.Add(
+                        new ServiceBusSubscription()
+                        {
+                            Name = sub.SubscriptionName,
+                            MessageCount = sub.MessageCount
+                        }
+                    );
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO.  Add error handling.
+            }
+
+            return subscriptions;
         }
 
         public async Task<NamespaceInfo> GetNamespaceInfo()
