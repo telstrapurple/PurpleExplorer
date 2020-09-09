@@ -60,9 +60,13 @@ namespace PurpleExplorer.ViewModels
                     
                    ConnectedServiceBuses.Add(newResource);
                 }
-                catch (Exception ex)
+                catch (ArgumentException)
                 {
                     await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "The connection string is invalid.", Icon.Error);
+                }
+                catch (Exception)
+                {
+                    await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "An error has occurred. Please try again.", Icon.Error);
                 }
             }
             else

@@ -2,18 +2,18 @@
 using PurpleExplorer.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PurpleExplorer.Helpers
 {
     public class ServiceBusHelper
     {
-        private string _connectionString;
-        private ManagementClient _client;
+        private readonly ManagementClient _client;
 
         public ServiceBusHelper(string connectionString)
         {
-            this._connectionString = connectionString;
+            _client = new ManagementClient(connectionString);
         }
 
         public async Task<IList<ServiceBusTopic>> GetTopics()
@@ -22,29 +22,23 @@ namespace PurpleExplorer.Helpers
 
             try
             {
-                if (_client == null)
-                {
-                    _client = new ManagementClient(_connectionString);
-                }
-                
                 var busTopics = await _client.GetTopicsAsync();
-                foreach (var topic in busTopics)
+
+                await Task.WhenAll(busTopics.Select(async t =>
                 {
-                    var topicName = topic.Path;
+                    var topicName = t.Path;
                     var subscriptions = await GetSubscriptions(topicName);
-                    
+
                     ServiceBusTopic newTopic = new ServiceBusTopic(subscriptions)
                     {
                         Name = topicName
                     };
                     topics.Add(newTopic);
-                }
-                // TODO Task.WhenAll(topics.Select(t => helper.GetSubscriptions(t.Name))) ??
+                }));
             }
 
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
                 // Logging here.
             }
 
@@ -54,15 +48,8 @@ namespace PurpleExplorer.Helpers
         public async Task<IList<ServiceBusSubscription>> GetSubscriptions(string topicPath)
         {
             IList<ServiceBusSubscription> subscriptions = new List<ServiceBusSubscription>();
-            //TODO: check if it is fine to use private classfield instantiated in constructor - need to handle exception in case connection string is wrong
-
             try
             {
-                if (_client == null)
-                {
-                    _client = new ManagementClient(_connectionString);
-                }
-
                 var topicSubscription = await _client.GetSubscriptionsRuntimeInfoAsync(topicPath);
                 foreach (var sub in topicSubscription)
                 {
@@ -75,7 +62,7 @@ namespace PurpleExplorer.Helpers
                     );
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //TODO.  Add error handling.
             }
@@ -85,22 +72,7 @@ namespace PurpleExplorer.Helpers
 
         public async Task<NamespaceInfo> GetNamespaceInfo()
         {
-            try
-            {
-                if (_client == null)
-                {
-                    _client = new ManagementClient(_connectionString);
-                }
-                
-                return await _client.GetNamespaceInfoAsync();
-            }
-
-            catch (Exception ex)
-            {
-                //TODO.  Add error handling.
-            }
-
-            return null;
+            return await _client.GetNamespaceInfoAsync();
         }
     }
 }
