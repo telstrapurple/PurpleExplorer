@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Microsoft.Azure.ServiceBus.Management;
+using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 
 namespace PurpleExplorer.ViewModels
@@ -8,7 +11,7 @@ namespace PurpleExplorer.ViewModels
     {
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; }
-
+        public string ConnectionString { get; set; }
         public MainWindowViewModel()
         {
             ConnectedServiceBuses =
@@ -55,6 +58,36 @@ namespace PurpleExplorer.ViewModels
                 }
             };
             return mockMessages;
+        }
+
+        public async void BtnConnectCommand()
+        {
+            if (!string.IsNullOrEmpty(ConnectionString))
+            {
+                try
+                {
+                    ServiceBusHelper helper = new ServiceBusHelper(ConnectionString);
+
+                    var nameSpaceInfo = await helper.GetNamespaceInfo();
+                    var topics = await helper.GetTopics();
+
+                    ConnectedServiceBuses[0].Name = nameSpaceInfo.Name;
+                    ConnectedServiceBuses[0].Topics.Clear();
+
+                    foreach (var obj in topics)
+                    {
+                        ConnectedServiceBuses[0].Topics.Add(new ServiceBusTopic()
+                        {
+                            Name = obj.Name
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //Invalid connection string.  
+                    // TODO Need to show a messagebox there.
+                }
+            }
         }
     }
 }
