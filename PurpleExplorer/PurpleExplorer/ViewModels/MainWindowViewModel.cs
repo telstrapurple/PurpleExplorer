@@ -4,6 +4,11 @@ using System.Collections.ObjectModel;
 using Microsoft.Azure.ServiceBus.Management;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
+using MessageBox.Avalonia;
+using MessageBox.Avalonia.Enums;
+using MessageBox.Avalonia.DTO;
+using Avalonia;
+using Avalonia.Controls;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -82,9 +87,12 @@ namespace PurpleExplorer.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    //Invalid connection string.  
-                    // TODO Need to show a messagebox there.
+                    await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "The connection string is invalid.", Icon.Error);
                 }
+            }
+            else
+            {
+                await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "The connection string is missing.", Icon.Error);
             }
         }
     }
