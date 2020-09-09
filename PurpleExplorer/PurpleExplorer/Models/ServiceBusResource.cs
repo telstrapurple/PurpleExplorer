@@ -6,16 +6,9 @@ using ReactiveUI;
 
 namespace PurpleExplorer.Models
 {
-    public class ServiceBusResource : ReactiveObject
+    public class ServiceBusResource 
     {
-        private string name;
+        public string Name;
         public ObservableCollection<ServiceBusTopic> Topics { get; set; }
-
-        public string Name
-        {
-            get => name;
-
-            set => this.RaiseAndSetIfChanged(ref name, value);
-        }
     }
 }

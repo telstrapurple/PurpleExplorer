@@ -68,10 +68,8 @@ namespace PurpleExplorer.ViewModels
                 {
                     ServiceBusHelper helper = new ServiceBusHelper(ConnectionString);
 
-                    var nameSpaceInfo = await helper.GetNamespaceInfo();
                     var topics = await helper.GetTopics();
 
-                    ConnectedServiceBuses[0].Name = nameSpaceInfo.Name;
                     ConnectedServiceBuses[0].Topics.Clear();
 
                     foreach (var obj in topics)
