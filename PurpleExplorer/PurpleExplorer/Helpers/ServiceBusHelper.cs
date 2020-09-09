@@ -43,7 +43,8 @@ namespace PurpleExplorer.Helpers
 
             catch (Exception ex)
             {
-                //TODO.  Add error handling.
+                throw ex;
+                // Logging here.
             }
 
             return topics;
