@@ -8,25 +8,37 @@ namespace PurpleExplorer.Helpers
 {
     public class MessageBoxHelper
     {
-        public static async Task<ButtonResult> ShowMessageBox(ButtonEnum buttons, string title, string message, Icon icon, bool modal)
+        public static async Task<ButtonResult> ShowError(ButtonEnum buttons, string title, string message)
         {
             var msBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
             {
                 ButtonDefinitions = buttons,
                 ContentTitle = title, 
                 ContentMessage = message,
-                Icon = icon,
+                Icon = Icon.Error,
                 CanResize = false,
                 WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen
             });
 
-            if (modal)
+            var applicationLifeTime = Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+            return await msBoxStandardWindow.ShowDialog(applicationLifeTime.MainWindow);
+           
+        }
+
+        public static async Task<ButtonResult> ShowMessage(string title, string message)
+        {
+            var msBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
             {
-                var applicationLifeTime = Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-                return await msBoxStandardWindow.ShowDialog(applicationLifeTime.MainWindow);
-            }
-            else
-                return await msBoxStandardWindow.Show();
+                ButtonDefinitions = ButtonEnum.Ok,
+                ContentTitle = title,
+                ContentMessage = message,
+                Icon = Icon.Info,
+                CanResize = false,
+                WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen
+            });
+
+            var applicationLifeTime = Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+            return await msBoxStandardWindow.ShowDialog(applicationLifeTime.MainWindow);
         }
     }
 }
