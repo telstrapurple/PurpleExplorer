@@ -62,15 +62,28 @@
                 <Button Name="MinusButton" Grid.Row="0" Grid.Column="2" Height="30">
                     <Image Source="/Assets/minus.png" />
                 </Button>
-
-                <!-- side panel - bottom -->
-                <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Items="{Binding Messages}" IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
-                        <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />
-                    </DataGrid.Columns>
-                </DataGrid>
             </Grid>
+
+            <TabControl>
+                <TabItem Header="Messages" VerticalContentAlignment="Center">
+                    <DataGrid Items="{Binding Messages}"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
+                            <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="Dead Letter Queue" VerticalContentAlignment="Center">
+                    <DataGrid IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
+                            <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+
         </StackPanel>
     </DockPanel>
 
