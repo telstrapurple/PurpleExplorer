@@ -5,6 +5,7 @@ using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using MessageBox.Avalonia.Enums;
 using PurpleExplorer.Views;
+using Splat;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -12,9 +13,11 @@ namespace PurpleExplorer.ViewModels
     {
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; }
+        private IServiceBusHelper ServiceBusHelper { get; }
         public string ConnectionString { get; set; }
-        public MainWindowViewModel()
+        public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
+            ServiceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             Messages = new ObservableCollection<Message>(GenerateMockMessages());
         }
@@ -47,10 +50,8 @@ namespace PurpleExplorer.ViewModels
             {
                 try
                 {
-                    ServiceBusHelper helper = new ServiceBusHelper(ConnectionString);
-                    
-                    var namespaceInfo = await helper.GetNamespaceInfo();
-                    var topics = await helper.GetTopics();
+                    var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(ConnectionString);
+                    var topics = await ServiceBusHelper.GetTopics(ConnectionString);
 
                     ServiceBusResource newResource = new ServiceBusResource()
                     {
@@ -86,10 +87,8 @@ namespace PurpleExplorer.ViewModels
             {
                 try
                 {
-                    ServiceBusHelper helper = new ServiceBusHelper(ConnectionString);
-
-                    var topics = await helper.GetTopics();
-                    var namespaceInfo = await helper.GetNamespaceInfo();
+                    var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(ConnectionString);
+                    var topics = await ServiceBusHelper.GetTopics(ConnectionString);
 
                     ServiceBusResource newResource = new ServiceBusResource()
                     {
