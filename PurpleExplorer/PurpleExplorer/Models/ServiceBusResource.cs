@@ -7,10 +7,5 @@ namespace PurpleExplorer.Models
     {
         public string Name { get; set; }
         public ObservableCollection<ServiceBusTopic> Topics { get; set; }
-
-        public ServiceBusResource(IEnumerable<ServiceBusTopic> topics)
-        {
-            Topics = new ObservableCollection<ServiceBusTopic>(topics);
-        }
     }
 }
