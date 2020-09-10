@@ -14,27 +14,7 @@ namespace PurpleExplorer.ViewModels
         public string ConnectionString { get; set; }
         public MainWindowViewModel()
         {
-            ConnectedServiceBuses =
-                new ObservableCollection<ServiceBusResource>(new[]
-                {
-                    new ServiceBusResource
-                    {
-                        Name = "ServiceBus1",
-                        Topics = new ObservableCollection<ServiceBusTopic>(new []
-                        {
-                            new ServiceBusTopic
-                            {
-                                Name = "Topic1-1",
-                                Subscriptions = new ObservableCollection<ServiceBusSubscription>(new []
-                                {
-                                    new ServiceBusSubscription {Name = "Subscription-1"},
-                                    new ServiceBusSubscription {Name = "Subscription-2"}
-                                })
-                            }
-                        })
-                    }
-                });
-            
+            ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             Messages = new ObservableCollection<Message>(GenerateMockMessages());
         }
         private IEnumerable<Message> GenerateMockMessages()
@@ -67,22 +47,24 @@ namespace PurpleExplorer.ViewModels
                 try
                 {
                     ServiceBusHelper helper = new ServiceBusHelper(ConnectionString);
-
+                    
+                    var namespaceInfo = await helper.GetNamespaceInfo();
                     var topics = await helper.GetTopics();
 
-                    ConnectedServiceBuses[0].Topics.Clear();
-
-                    foreach (var obj in topics)
+                    ServiceBusResource newResource = new ServiceBusResource(topics)
                     {
-                        ConnectedServiceBuses[0].Topics.Add(new ServiceBusTopic()
-                        {
-                            Name = obj.Name
-                        });
-                    }
+                        Name = namespaceInfo.Name,
+                    };
+                    
+                   ConnectedServiceBuses.Add(newResource);
                 }
-                catch (Exception ex)
+                catch (ArgumentException)
                 {
                     await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
+                }
+                catch (Exception e)
+                {
+                    await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}");
                 }
             }
             else

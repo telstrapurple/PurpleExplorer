@@ -2,19 +2,18 @@
 using PurpleExplorer.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PurpleExplorer.Helpers
 {
     public class ServiceBusHelper
     {
-        private string _connectionString;
-        private ManagementClient _client;
+        private readonly ManagementClient _client;
 
         public ServiceBusHelper(string connectionString)
         {
-            this._connectionString = connectionString;
+            _client = new ManagementClient(connectionString);
         }
 
         public async Task<IList<ServiceBusTopic>> GetTopics()
@@ -23,51 +22,58 @@ namespace PurpleExplorer.Helpers
 
             try
             {
-                if (_client == null)
-                {
-                    _client = new ManagementClient(_connectionString);
-                }
-
-                var namespaceInfo = _client.GetNamespaceInfoAsync().Result;
                 var busTopics = await _client.GetTopicsAsync();
 
-                foreach (var obj in busTopics)
+                await Task.WhenAll(busTopics.Select(async t =>
                 {
-                    topics.Add(new ServiceBusTopic()
-                    {
-                        Name = obj.Path
-                    });
-                }
+                    var topicName = t.Path;
+                    var subscriptions = await GetSubscriptions(topicName);
 
+                    ServiceBusTopic newTopic = new ServiceBusTopic(subscriptions)
+                    {
+                        Name = topicName
+                    };
+                    topics.Add(newTopic);
+                }));
             }
 
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
                 // Logging here.
             }
 
             return topics;
         }
 
-        public async Task<NamespaceInfo> GetNamespaceInfo()
+        public async Task<IList<ServiceBusSubscription>> GetSubscriptions(string topicPath)
         {
+            IList<ServiceBusSubscription> subscriptions = new List<ServiceBusSubscription>();
             try
             {
-                if (_client == null)
+                var topicSubscription = await _client.GetSubscriptionsRuntimeInfoAsync(topicPath);
+                foreach (var sub in topicSubscription)
                 {
-                    _client = new ManagementClient(_connectionString);
+                    subscriptions.Add(
+                        new ServiceBusSubscription()
+                        {
+                            Name = sub.SubscriptionName,
+                            MessageCount = sub.MessageCountDetails.ActiveMessageCount,
+                            DLQCount = sub.MessageCountDetails.DeadLetterMessageCount
+                        }
+                    );
                 }
-                
-                return await _client.GetNamespaceInfoAsync();
             }
-
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO.  Add error handling.
             }
 
-            return null;
+            return subscriptions;
+        }
+
+        public async Task<NamespaceInfo> GetNamespaceInfo()
+        {
+            return await _client.GetNamespaceInfoAsync();
         }
     }
 }
