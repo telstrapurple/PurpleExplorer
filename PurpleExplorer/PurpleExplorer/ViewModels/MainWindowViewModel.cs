@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using MessageBox.Avalonia.Enums;
+using PurpleExplorer.Views;
 using Splat;
 
 namespace PurpleExplorer.ViewModels
@@ -52,12 +53,13 @@ namespace PurpleExplorer.ViewModels
                     var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(ConnectionString);
                     var topics = await ServiceBusHelper.GetTopics(ConnectionString);
 
-                    ServiceBusResource newResource = new ServiceBusResource(topics)
+                    ServiceBusResource newResource = new ServiceBusResource()
                     {
                         Name = namespaceInfo.Name,
+                        Topics = new ObservableCollection<ServiceBusTopic>(topics)
                     };
                     
-                   ConnectedServiceBuses.Add(newResource);
+                    ConnectedServiceBuses.Add(newResource);
                 }
                 catch (ArgumentException)
                 {
@@ -71,6 +73,35 @@ namespace PurpleExplorer.ViewModels
             else
             {
                 await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is missing.");
+            }
+        }
+
+        public async void BtnPopupCommand()
+        {
+            ConnectionStringWindowViewModel viewModel = new ConnectionStringWindowViewModel();
+
+            var returnedViewModel = await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(viewModel, 700, 100);
+            ConnectionString = returnedViewModel.ConnectionString;
+
+            if (!string.IsNullOrEmpty((ConnectionString)))
+            {
+                try
+                {
+                    var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(ConnectionString);
+                    var topics = await ServiceBusHelper.GetTopics(ConnectionString);
+
+                    ServiceBusResource newResource = new ServiceBusResource()
+                    {
+                        Name = namespaceInfo.Name,
+                        Topics = new ObservableCollection<ServiceBusTopic>(topics)
+                    };
+
+                    ConnectedServiceBuses.Add(newResource);
+                }
+                catch (Exception ex)
+                {
+                    await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
+                }
             }
         }
     }

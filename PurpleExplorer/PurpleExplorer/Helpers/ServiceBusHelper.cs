@@ -29,10 +29,12 @@ namespace PurpleExplorer.Helpers
                     var topicName = t.Path;
                     var subscriptions = await GetSubscriptions(connectionString, topicName);
 
-                    ServiceBusTopic newTopic = new ServiceBusTopic(subscriptions)
+                    ServiceBusTopic newTopic = new ServiceBusTopic()
                     {
-                        Name = topicName
+                        Name = topicName, 
+                        Subscriptions = new System.Collections.ObjectModel.ObservableCollection<ServiceBusSubscription>(subscriptions)
                     };
+
                     topics.Add(newTopic);
                 }));
             }
