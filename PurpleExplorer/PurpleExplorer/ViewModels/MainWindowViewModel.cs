@@ -60,7 +60,7 @@ namespace PurpleExplorer.ViewModels
                 }
                 catch (ArgumentException)
                 {
-                    await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "The connection string is invalid.", Icon.Error);
+                    await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
                 }
                 catch (Exception e)
                 {
@@ -69,7 +69,7 @@ namespace PurpleExplorer.ViewModels
             }
             else
             {
-                await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "The connection string is missing.", Icon.Error);
+                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is missing.");
             }
         }
     }
