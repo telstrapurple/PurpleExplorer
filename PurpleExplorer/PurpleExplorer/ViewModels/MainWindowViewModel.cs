@@ -64,7 +64,7 @@ namespace PurpleExplorer.ViewModels
                 }
                 catch (Exception e)
                 {
-                    await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}", Icon.Error);
+                    await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}");
                 }
             }
             else
