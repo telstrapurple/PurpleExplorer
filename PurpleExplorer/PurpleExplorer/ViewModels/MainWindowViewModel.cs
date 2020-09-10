@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using MessageBox.Avalonia.Enums;
@@ -64,9 +62,9 @@ namespace PurpleExplorer.ViewModels
                 {
                     await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "The connection string is invalid.", Icon.Error);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", "An error has occurred. Please try again.", Icon.Error);
+                    await MessageBoxHelper.ShowMessageBox(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}", Icon.Error);
                 }
             }
             else

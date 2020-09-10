@@ -57,7 +57,8 @@ namespace PurpleExplorer.Helpers
                         new ServiceBusSubscription()
                         {
                             Name = sub.SubscriptionName,
-                            MessageCount = sub.MessageCount
+                            MessageCount = sub.MessageCountDetails.ActiveMessageCount,
+                            DLQCount = sub.MessageCountDetails.DeadLetterMessageCount
                         }
                     );
                 }
