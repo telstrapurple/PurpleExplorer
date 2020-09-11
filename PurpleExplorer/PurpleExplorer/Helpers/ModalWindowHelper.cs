@@ -19,9 +19,7 @@ namespace PurpleExplorer.Helpers
             T window = new T();
             window.Width = width;
             window.Height = height;
-            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             window.DataContext = viewModel;
-            window.CanResize = false;
 
             await window.ShowDialog(mainWindow);
             return window.DataContext as U;
