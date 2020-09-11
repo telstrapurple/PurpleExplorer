@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input;
-using Avalonia.Native.Interop;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using MessageBox.Avalonia.Enums;
@@ -68,15 +63,20 @@ namespace PurpleExplorer.ViewModels
                 var newResource = new ServiceBusResource
                 {
                     Name = namespaceInfo.Name,
+                    ConnectionString = connectionString,
                     Topics = new ObservableCollection<ServiceBusTopic>(topics)
                 };
 
                 ConnectedServiceBuses.Add(newResource);
                 GenerateMockMessages(8, 2);
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
                 await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
+            }
+            catch (Exception e)
+            {
+                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}");
             }
         }
     }
