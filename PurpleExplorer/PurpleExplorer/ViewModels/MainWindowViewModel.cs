@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
+using Avalonia.Native.Interop;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using MessageBox.Avalonia.Enums;
@@ -13,62 +17,66 @@ namespace PurpleExplorer.ViewModels
     {
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; }
+        public ObservableCollection<Message> DlqMessages { get; }
         private IServiceBusHelper ServiceBusHelper { get; }
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
             ServiceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
-            Messages = new ObservableCollection<Message>(GenerateMockMessages());
+            Messages = new ObservableCollection<Message>();
+            DlqMessages = new ObservableCollection<Message>();
         }
-        private IEnumerable<Message> GenerateMockMessages()
+        private void GenerateMockMessages(int count, int dlqCount)
         {
-            var mockMessages = new List<Message>()
+            Random random = new Random();
+            for (int i = 0; i < count; i++)
             {
-                new Message()
+                Messages.Add(new Message()
                 {
-                    Content = "Test Message 1",
-                    Size = 1
-                },
-                new Message()
+                    Content = "Mocked Message " + i,
+                    Size = random.Next(1, 1024)
+                });
+            }
+            
+            for (int i = 0; i < dlqCount; i++)
+            {
+                DlqMessages.Add(new Message()
                 {
-                    Content = "Test Message 2",
-                    Size = 2
-                },
-                new Message()
-                {
-                    Content = "Test Message 3",
-                    Size = 3
-                }
-            };
-            return mockMessages;
+                    Content = "Mocked Message " + i,
+                    Size = random.Next(1, 1024)
+                });
+            }
         }
 
         public async void BtnPopupCommand()
         {
-            ConnectionStringWindowViewModel viewModel = new ConnectionStringWindowViewModel();
+            var viewModel = new ConnectionStringWindowViewModel();
 
             var returnedViewModel = await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(viewModel, 700, 100);
             var connectionString = returnedViewModel.ConnectionString;
 
-            if (!string.IsNullOrEmpty((connectionString)))
+            if (string.IsNullOrEmpty(connectionString))
             {
-                try
-                {
-                    var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(connectionString);
-                    var topics = await ServiceBusHelper.GetTopics(connectionString);
+                return;
+            }
 
-                    ServiceBusResource newResource = new ServiceBusResource()
-                    {
-                        Name = namespaceInfo.Name,
-                        Topics = new ObservableCollection<ServiceBusTopic>(topics)
-                    };
+            try
+            {
+                var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(connectionString);
+                var topics = await ServiceBusHelper.GetTopics(connectionString);
 
-                    ConnectedServiceBuses.Add(newResource);
-                }
-                catch (Exception ex)
+                var newResource = new ServiceBusResource
                 {
-                    await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
-                }
+                    Name = namespaceInfo.Name,
+                    Topics = new ObservableCollection<ServiceBusTopic>(topics)
+                };
+
+                ConnectedServiceBuses.Add(newResource);
+                GenerateMockMessages(8, 2);
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
             }
         }
     }
