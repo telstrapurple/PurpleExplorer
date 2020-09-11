@@ -57,7 +57,7 @@ namespace PurpleExplorer.ViewModels
             var returnedViewModel = await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(viewModel, 700, 100);
             ConnectionString = returnedViewModel.ConnectionString;
 
-            if (string.IsNullOrEmpty((ConnectionString)))
+            if (string.IsNullOrEmpty(ConnectionString))
             {
                 return;
             }
@@ -74,13 +74,12 @@ namespace PurpleExplorer.ViewModels
                 };
 
                 ConnectedServiceBuses.Add(newResource);
+                GenerateMockMessages(8, 2);
             }
             catch (Exception ex)
             {
                 await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
             }
-
-            GenerateMockMessages(8, 2);
         }
     }
 }
