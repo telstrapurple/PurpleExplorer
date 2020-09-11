@@ -14,7 +14,6 @@ namespace PurpleExplorer.ViewModels
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; }
         private IServiceBusHelper ServiceBusHelper { get; }
-        public string ConnectionString { get; set; }
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
             ServiceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
@@ -44,51 +43,19 @@ namespace PurpleExplorer.ViewModels
             return mockMessages;
         }
 
-        public async void BtnConnectCommand()
-        {
-            if (!string.IsNullOrEmpty(ConnectionString))
-            {
-                try
-                {
-                    var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(ConnectionString);
-                    var topics = await ServiceBusHelper.GetTopics(ConnectionString);
-
-                    ServiceBusResource newResource = new ServiceBusResource()
-                    {
-                        Name = namespaceInfo.Name,
-                        Topics = new ObservableCollection<ServiceBusTopic>(topics)
-                    };
-                    
-                    ConnectedServiceBuses.Add(newResource);
-                }
-                catch (ArgumentException)
-                {
-                    await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is invalid.");
-                }
-                catch (Exception e)
-                {
-                    await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}");
-                }
-            }
-            else
-            {
-                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", "The connection string is missing.");
-            }
-        }
-
         public async void BtnPopupCommand()
         {
             ConnectionStringWindowViewModel viewModel = new ConnectionStringWindowViewModel();
 
             var returnedViewModel = await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(viewModel, 700, 100);
-            ConnectionString = returnedViewModel.ConnectionString;
+            var connectionString = returnedViewModel.ConnectionString;
 
-            if (!string.IsNullOrEmpty((ConnectionString)))
+            if (!string.IsNullOrEmpty((connectionString)))
             {
                 try
                 {
-                    var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(ConnectionString);
-                    var topics = await ServiceBusHelper.GetTopics(ConnectionString);
+                    var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(connectionString);
+                    var topics = await ServiceBusHelper.GetTopics(connectionString);
 
                     ServiceBusResource newResource = new ServiceBusResource()
                     {
