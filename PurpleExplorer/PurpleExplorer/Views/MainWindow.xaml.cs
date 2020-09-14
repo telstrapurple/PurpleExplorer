@@ -1,11 +1,5 @@
-using System.Collections.ObjectModel;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using PurpleExplorer.Helpers;
-using PurpleExplorer.Models;
-using PurpleExplorer.ViewModels;
-using DynamicData;
 using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
 

@@ -8,12 +8,10 @@ using Avalonia.Native.Interop;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
-using MessageBox.Avalonia.Enums;
 using PurpleExplorer.Views;
 using Splat;
 using ReactiveUI;
 using System.Threading.Tasks;
-using DynamicData;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -105,7 +103,7 @@ namespace PurpleExplorer.ViewModels
         public async void FillMessages(string subscriptionName, string topicName)
         {
             DlqMessages.Clear();
-            var dlqMessages = await ServiceBusHelper.GetDlqMessages(ConnectionString, subscriptionName, topicName);
+            var dlqMessages = await ServiceBusHelper.GetDlqMessages(_connectionString, subscriptionName, topicName);
             DlqMessages.AddRange(dlqMessages);
         }
 
