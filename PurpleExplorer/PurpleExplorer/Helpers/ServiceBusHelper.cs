@@ -5,6 +5,7 @@ using PurpleExplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PurpleExplorer.Helpers
@@ -60,7 +61,7 @@ namespace PurpleExplorer.Helpers
                             MessageCount = sub.MessageCountDetails.ActiveMessageCount,
                             DLQCount = sub.MessageCountDetails.DeadLetterMessageCount,
                             
-                            Parent = topicPath
+                            ServiceBusTopic = topicPath
                         }
                     );
                 }
@@ -75,10 +76,10 @@ namespace PurpleExplorer.Helpers
 
         public async Task<IList<Models.Message>> GetMessagesBySubscription(string connectionString, string topicName, string subscriptionName)
         {
-            var messageReceiver = new MessageReceiver(connectionString, GetSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
+            var messageReceiver = new MessageReceiver(connectionString, EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
             var subscriptionMessages = await messageReceiver.PeekAsync(100);
 
-            var messageList = (from o in subscriptionMessages select new Models.Message() { Content = o.ContentType, Size = o.Size }).ToList();
+            var messageList = (from o in subscriptionMessages select new Models.Message() { Content = Encoding.UTF8.GetString(o.Body), Size = o.Size }).ToList();
             return messageList;
         }
         public async Task<NamespaceInfo> GetNamespaceInfo(string connectionString)
@@ -87,9 +88,5 @@ namespace PurpleExplorer.Helpers
             return await client.GetNamespaceInfoAsync();
         }
 
-        public string GetSubscriptionPath(string topicName, string subscriptionName)
-        {
-            return string.Concat(topicName, "/Subscriptions/", subscriptionName);
-        }
     }
 }

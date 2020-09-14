@@ -7,6 +7,7 @@ using PurpleExplorer.Views;
 using Splat;
 using ReactiveUI;
 using System.Threading.Tasks;
+using DynamicData;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -101,12 +102,10 @@ namespace PurpleExplorer.ViewModels
 
         public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
         {
-            var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Parent, subscription.Name);
+            var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.ServiceBusTopic, subscription.Name);
             Messages.Clear();
-            foreach (var message in messages)
-            {
-                Messages.Add(message);
-            }
+            Messages.AddRange(messages);
+
             this.MessagesTabHeader = "Messages (" + messages.Count.ToString() + ")";            
         }
     }
