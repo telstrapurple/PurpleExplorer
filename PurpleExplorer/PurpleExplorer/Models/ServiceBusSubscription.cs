@@ -5,6 +5,6 @@ namespace PurpleExplorer.Models
         public string Name { get; set; }
         public long MessageCount { get; set; }
         public long DLQCount { get; set; }
-        public string ServiceBusTopic { get; set; }
+        public ServiceBusTopic Topic { get; set; }
     }
 }

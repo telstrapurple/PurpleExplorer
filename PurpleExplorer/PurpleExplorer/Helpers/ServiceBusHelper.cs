@@ -32,6 +32,11 @@ namespace PurpleExplorer.Helpers
                         Subscriptions = new System.Collections.ObjectModel.ObservableCollection<ServiceBusSubscription>(subscriptions)
                     };
 
+                    foreach (var sub in newTopic.Subscriptions)
+                    {
+                        sub.Topic = newTopic;
+                    }
+
                     topics.Add(newTopic);
                 }));
             }
@@ -60,8 +65,6 @@ namespace PurpleExplorer.Helpers
                             Name = sub.SubscriptionName,
                             MessageCount = sub.MessageCountDetails.ActiveMessageCount,
                             DLQCount = sub.MessageCountDetails.DeadLetterMessageCount,
-                            
-                            ServiceBusTopic = topicPath
                         }
                     );
                 }

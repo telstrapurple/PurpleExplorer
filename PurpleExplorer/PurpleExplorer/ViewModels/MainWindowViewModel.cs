@@ -102,7 +102,7 @@ namespace PurpleExplorer.ViewModels
 
         public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
         {
-            var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.ServiceBusTopic, subscription.Name);
+            var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name, subscription.Name);
             Messages.Clear();
             Messages.AddRange(messages);
 
