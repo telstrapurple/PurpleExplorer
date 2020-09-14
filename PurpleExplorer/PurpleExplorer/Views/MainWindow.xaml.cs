@@ -1,6 +1,6 @@
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
 
@@ -20,14 +20,19 @@ namespace PurpleExplorer.Views
 
         private async void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var mainWindowViewModel = this.DataContext as MainWindowViewModel;
+            var mainWindowViewModel = DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
+
+            mainWindowViewModel.ClearAllMessages();
+            mainWindowViewModel.SetTabHeaders();
+            
             if (treeView.SelectedItem is ServiceBusSubscription)
             {
                 var selectedItem = treeView.SelectedItem as ServiceBusSubscription;
-                await mainWindowViewModel.SetSubscripitonMessages(selectedItem);
+                await Task.WhenAll(
+                    mainWindowViewModel.SetSubscripitonMessages(selectedItem),
+                    mainWindowViewModel.SetDlqMessages(selectedItem));
             }
-
         }
     }
 }
