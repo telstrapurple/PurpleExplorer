@@ -2,6 +2,9 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using PurpleExplorer.Helpers;
+using PurpleExplorer.Models;
+using PurpleExplorer.ViewModels;
 using DynamicData;
 using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
@@ -19,19 +22,17 @@ namespace PurpleExplorer.Views
         {
             AvaloniaXamlLoader.Load(this);
         }
-        
-        public void tv_tapped(object sender, RoutedEventArgs e)
+
+        private async void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var mainWindowViewModel = this.DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
-            var selectedItem = treeView.SelectedItem;
-
-            //mainWindowViewModel.ClearMessages();
-            if (selectedItem != null && selectedItem is ServiceBusSubscription)
+            if (treeView.SelectedItem is ServiceBusSubscription)
             {
-                var subscription = selectedItem as ServiceBusSubscription;
-                mainWindowViewModel.FillMessages(subscription.Name, subscription.Topic.Name);
+                var selectedItem = treeView.SelectedItem as ServiceBusSubscription;
+                await mainWindowViewModel.SetSubscripitonMessages(selectedItem);
             }
+
         }
     }
 }

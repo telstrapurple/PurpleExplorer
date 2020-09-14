@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.ServiceBus.Management;
+﻿using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
+using Microsoft.Azure.ServiceBus.Management;
 using PurpleExplorer.Models;
 using System;
 using System.Collections.Generic;
@@ -31,8 +33,14 @@ namespace PurpleExplorer.Helpers
 
                     ServiceBusTopic newTopic = new ServiceBusTopic
                     {
-                        Name = topicName
+                        Name = topicName, 
+                        Subscriptions = new System.Collections.ObjectModel.ObservableCollection<ServiceBusSubscription>(subscriptions)
                     };
+
+                    foreach (var sub in newTopic.Subscriptions)
+                    {
+                        sub.Topic = newTopic;
+                    }
 
                     newTopic.AddSubscriptions(subscriptions.ToArray());
                     topics.Add(newTopic);
@@ -62,19 +70,27 @@ namespace PurpleExplorer.Helpers
                         {
                             Name = sub.SubscriptionName,
                             MessageCount = sub.MessageCountDetails.ActiveMessageCount,
-                            DLQCount = sub.MessageCountDetails.DeadLetterMessageCount
+                            DLQCount = sub.MessageCountDetails.DeadLetterMessageCount,
                         }
                     );
                 }
             }
             catch (Exception)
             {
-                //TODO. Add error handling.
+                //TODO.  Add error handling.
             }
 
             return subscriptions;
         }
 
+        public async Task<IList<Models.Message>> GetMessagesBySubscription(string connectionString, string topicName, string subscriptionName)
+        {
+            var messageReceiver = new MessageReceiver(connectionString, EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
+            var subscriptionMessages = await messageReceiver.PeekAsync(100);
+
+            var messageList = (from o in subscriptionMessages select new Models.Message() { Content = Encoding.UTF8.GetString(o.Body), Size = o.Size }).ToList();
+            return messageList;
+        }
         public async Task<IList<Message>> GetDlqMessages(string connectionString, string subscription, string topic)
         {
             IList<Message> messages = new List<Message>();
@@ -99,5 +115,6 @@ namespace PurpleExplorer.Helpers
             ManagementClient client = new ManagementClient(connectionString);
             return await client.GetNamespaceInfoAsync();
         }
+
     }
 }

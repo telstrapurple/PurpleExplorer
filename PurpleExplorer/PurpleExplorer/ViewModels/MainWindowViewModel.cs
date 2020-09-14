@@ -11,23 +11,41 @@ using PurpleExplorer.Models;
 using MessageBox.Avalonia.Enums;
 using PurpleExplorer.Views;
 using Splat;
+using ReactiveUI;
+using System.Threading.Tasks;
+using DynamicData;
 
 namespace PurpleExplorer.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
-        public ObservableCollection<Message> Messages { get; }
+        public ObservableCollection<Message> Messages { get; set; }
         public ObservableCollection<Message> DlqMessages { get; }
         private IServiceBusHelper ServiceBusHelper { get; }
-        public string ConnectionString { get; set; }
-        
+        private string _connectionString { get; set; }
+        public string _messageTabHeader;
+        public string MessagesTabHeader
+        {
+            get => _messageTabHeader;
+            set => this.RaiseAndSetIfChanged(ref _messageTabHeader, value);
+        }
+        public string _dlqTabHeader;
+
+        public string DLQTabHeader 
+        {
+            get => _dlqTabHeader;
+            set => this.RaiseAndSetIfChanged(ref _dlqTabHeader, value);
+        }
+
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
             ServiceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             Messages = new ObservableCollection<Message>();
             DlqMessages = new ObservableCollection<Message>();
+            MessagesTabHeader = "Messages";
+            DLQTabHeader = "Dead-letter";
         }
         private void GenerateMockMessages(int count, int dlqCount)
         {
@@ -56,27 +74,29 @@ namespace PurpleExplorer.ViewModels
             var viewModel = new ConnectionStringWindowViewModel();
 
             var returnedViewModel = await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(viewModel, 700, 100);
-            ConnectionString = returnedViewModel.ConnectionString;
+            _connectionString = returnedViewModel.ConnectionString;
 
-            if (string.IsNullOrEmpty(ConnectionString))
+            if (string.IsNullOrEmpty(_connectionString))
             {
                 return;
             }
 
             try
             {
-                var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(ConnectionString);
-                var topics = await ServiceBusHelper.GetTopics(ConnectionString);
+                var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(_connectionString);
+                var topics = await ServiceBusHelper.GetTopics(_connectionString);
 
                 var newResource = new ServiceBusResource
                 {
                     Name = namespaceInfo.Name,
+                    ConnectionString = _connectionString,
                     Topics = new ObservableCollection<ServiceBusTopic>(topics)
                 };
 
                 ConnectedServiceBuses.Add(newResource);
+                //GenerateMockMessages(8, 2);
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
                 await MessageBoxHelper.ShowError("The connection string is invalid.");
             }
@@ -87,6 +107,15 @@ namespace PurpleExplorer.ViewModels
             DlqMessages.Clear();
             var dlqMessages = await ServiceBusHelper.GetDlqMessages(ConnectionString, subscriptionName, topicName);
             DlqMessages.AddRange(dlqMessages);
+        }
+
+        public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
+        {
+            var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name, subscription.Name);
+            Messages.Clear();
+            Messages.AddRange(messages);
+
+            this.MessagesTabHeader = "Messages (" + messages.Count.ToString() + ")";            
         }
     }
 }
