@@ -40,8 +40,8 @@ namespace PurpleExplorer.ViewModels
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             Messages = new ObservableCollection<Message>();
             DlqMessages = new ObservableCollection<Message>();
-            MessagesTabHeader = "Messages";
-            DLQTabHeader = "Dead-letter";
+
+            SetTabHeaders();
         }
 
         public async void BtnPopupCommand()
@@ -91,7 +91,7 @@ namespace PurpleExplorer.ViewModels
                 await ServiceBusHelper.GetDlqMessages(_connectionString, subscription.Topic.Name, subscription.Name);
             DlqMessages.AddRange(dlqMessages);
 
-            DLQTabHeader = $"Dead-letter ({dlqMessages.Count})";
+            SetTabHeaders();
         }
 
         public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
@@ -102,7 +102,13 @@ namespace PurpleExplorer.ViewModels
                     subscription.Name);
             Messages.AddRange(messages);
 
-            MessagesTabHeader = $"Messages ({messages.Count})";
+            SetTabHeaders();
+        }
+
+        public void SetTabHeaders()
+        {
+            MessagesTabHeader = $"Messages ({Messages.Count})";
+            DLQTabHeader = $"Dead-letter ({DlqMessages.Count})";
         }
     }
 }

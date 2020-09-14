@@ -22,7 +22,9 @@ namespace PurpleExplorer.Views
         {
             var mainWindowViewModel = DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
+
             mainWindowViewModel.ClearAllMessages();
+            mainWindowViewModel.SetTabHeaders();
             
             if (treeView.SelectedItem is ServiceBusSubscription)
             {
