@@ -12,22 +12,19 @@ namespace PurpleExplorer.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private string _connectionString { get; set; }
-        private IServiceBusHelper ServiceBusHelper { get; }
+        private string _connectionString;
+        private readonly IServiceBusHelper _serviceBusHelper;
         private string _messageTabHeader;
+        private string _dlqTabHeader;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; set; }
         public ObservableCollection<Message> DlqMessages { get; }
-
         public string MessagesTabHeader
         {
             get => _messageTabHeader;
             set => this.RaiseAndSetIfChanged(ref _messageTabHeader, value);
         }
-
-        public string _dlqTabHeader;
-
         public string DLQTabHeader
         {
             get => _dlqTabHeader;
@@ -36,7 +33,7 @@ namespace PurpleExplorer.ViewModels
 
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
-            ServiceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
+            _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             Messages = new ObservableCollection<Message>();
             DlqMessages = new ObservableCollection<Message>();
@@ -60,8 +57,8 @@ namespace PurpleExplorer.ViewModels
 
             try
             {
-                var namespaceInfo = await ServiceBusHelper.GetNamespaceInfo(_connectionString);
-                var topics = await ServiceBusHelper.GetTopics(_connectionString);
+                var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(_connectionString);
+                var topics = await _serviceBusHelper.GetTopics(_connectionString);
 
                 var newResource = new ServiceBusResource
                 {
@@ -88,7 +85,7 @@ namespace PurpleExplorer.ViewModels
         {
             DlqMessages.Clear();
             var dlqMessages =
-                await ServiceBusHelper.GetDlqMessages(_connectionString, subscription.Topic.Name, subscription.Name);
+                await _serviceBusHelper.GetDlqMessages(_connectionString, subscription.Topic.Name, subscription.Name);
             DlqMessages.AddRange(dlqMessages);
 
             SetTabHeaders();
@@ -98,7 +95,7 @@ namespace PurpleExplorer.ViewModels
         {
             Messages.Clear();
             var messages =
-                await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name,
+                await _serviceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name,
                     subscription.Name);
             Messages.AddRange(messages);
 
