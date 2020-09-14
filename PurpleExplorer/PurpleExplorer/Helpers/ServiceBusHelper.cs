@@ -1,8 +1,11 @@
-﻿using Microsoft.Azure.ServiceBus.Management;
+﻿using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
+using Microsoft.Azure.ServiceBus.Management;
 using PurpleExplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PurpleExplorer.Helpers
@@ -28,6 +31,11 @@ namespace PurpleExplorer.Helpers
                         Name = topicName, 
                         Subscriptions = new System.Collections.ObjectModel.ObservableCollection<ServiceBusSubscription>(subscriptions)
                     };
+
+                    foreach (var sub in newTopic.Subscriptions)
+                    {
+                        sub.Topic = newTopic;
+                    }
 
                     topics.Add(newTopic);
                 }));
@@ -56,7 +64,7 @@ namespace PurpleExplorer.Helpers
                         {
                             Name = sub.SubscriptionName,
                             MessageCount = sub.MessageCountDetails.ActiveMessageCount,
-                            DLQCount = sub.MessageCountDetails.DeadLetterMessageCount
+                            DLQCount = sub.MessageCountDetails.DeadLetterMessageCount,
                         }
                     );
                 }
@@ -69,10 +77,19 @@ namespace PurpleExplorer.Helpers
             return subscriptions;
         }
 
+        public async Task<IList<Models.Message>> GetMessagesBySubscription(string connectionString, string topicName, string subscriptionName)
+        {
+            var messageReceiver = new MessageReceiver(connectionString, EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
+            var subscriptionMessages = await messageReceiver.PeekAsync(100);
+
+            var messageList = (from o in subscriptionMessages select new Models.Message() { Content = Encoding.UTF8.GetString(o.Body), Size = o.Size }).ToList();
+            return messageList;
+        }
         public async Task<NamespaceInfo> GetNamespaceInfo(string connectionString)
         {
             ManagementClient client = new ManagementClient(connectionString);
             return await client.GetNamespaceInfoAsync();
         }
+
     }
 }
