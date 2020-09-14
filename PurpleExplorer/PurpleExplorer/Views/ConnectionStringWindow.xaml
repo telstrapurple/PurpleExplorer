@@ -12,7 +12,7 @@
     </Design.DataContext>
     
     <StackPanel>
-        <TextBox Width="600" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding Path=ConnectionString, Mode=TwoWay}"></TextBox>
+        <TextBox Width="700" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding Path=ConnectionString, Mode=TwoWay}"></TextBox>
         <Button Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnSendClick">Connect to Service Bus</Button>
     </StackPanel>
 </Window>

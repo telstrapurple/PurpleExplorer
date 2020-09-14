@@ -21,7 +21,8 @@
                     <TextBlock VerticalAlignment="Center">Connect</TextBlock>
                 </StackPanel>
             </Button>
-            <TreeView Items="{Binding ConnectedServiceBuses}" Width="300" Height="500">
+            <TreeView Items="{Binding ConnectedServiceBuses}" Width="300" Height="500"
+                      Tapped="tv_tapped">
                 <TreeView.DataTemplates>
                     <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                         <StackPanel Orientation="Horizontal">

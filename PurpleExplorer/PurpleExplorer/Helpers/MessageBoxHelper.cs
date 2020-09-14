@@ -8,6 +8,10 @@ namespace PurpleExplorer.Helpers
 {
     public class MessageBoxHelper
     {
+        public static async Task<ButtonResult> ShowError(string message)
+        {
+            return await ShowError(ButtonEnum.Ok, "Error", message);
+        }
         public static async Task<ButtonResult> ShowError(ButtonEnum buttons, string title, string message)
         {
             var msBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
