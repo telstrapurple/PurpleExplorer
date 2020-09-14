@@ -66,33 +66,34 @@ namespace PurpleExplorer.Helpers
                 EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
             var subscriptionMessages = await messageReceiver.PeekAsync(_maxMessageCount);
 
-            var messageList = (from o in subscriptionMessages
-                select new Models.Message() {Content = Encoding.UTF8.GetString(o.Body), Size = o.Size}).ToList();
-            return messageList;
+            var result = subscriptionMessages.Select(message => new Message
+            {
+                Content = Encoding.UTF8.GetString(message.Body), 
+                Size = message.Size
+            }).ToList(); 
+               
+            return result;
         }
 
-        public async Task<IList<Message>> GetDlqMessages(string connectionString, string subscription, string topic)
+        public async Task<IList<Message>> GetDlqMessages(string connectionString, string topic, string subscription)
         {
-            IList<Message> messages = new List<Message>();
             var path = EntityNameHelper.FormatSubscriptionPath(topic, subscription);
             var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
-            foreach (var message in receivedMessages)
-            {
-                messages.Add(new Message
-                {
-                    Content = Encoding.UTF8.GetString(message.Body),
-                    Size = message.Size
-                });
-            }
 
-            return messages;
+            var result = receivedMessages.Select(message => new Message
+            {
+                Content = Encoding.UTF8.GetString(message.Body), 
+                Size = message.Size
+            }).ToList();
+            
+            return result;
         }
 
         public async Task<NamespaceInfo> GetNamespaceInfo(string connectionString)
         {
-            ManagementClient client = new ManagementClient(connectionString);
+            var client = new ManagementClient(connectionString);
             return await client.GetNamespaceInfoAsync();
         }
     }

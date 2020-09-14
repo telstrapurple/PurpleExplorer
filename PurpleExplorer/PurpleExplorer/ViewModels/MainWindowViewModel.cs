@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input;
-using Avalonia.Native.Interop;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
@@ -17,20 +12,23 @@ namespace PurpleExplorer.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        private string _connectionString { get; set; }
+        private IServiceBusHelper ServiceBusHelper { get; }
+        private string _messageTabHeader;
+
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; set; }
         public ObservableCollection<Message> DlqMessages { get; }
-        private IServiceBusHelper ServiceBusHelper { get; }
-        private string _connectionString { get; set; }
-        public string _messageTabHeader;
+
         public string MessagesTabHeader
         {
             get => _messageTabHeader;
             set => this.RaiseAndSetIfChanged(ref _messageTabHeader, value);
         }
+
         public string _dlqTabHeader;
 
-        public string DLQTabHeader 
+        public string DLQTabHeader
         {
             get => _dlqTabHeader;
             set => this.RaiseAndSetIfChanged(ref _dlqTabHeader, value);
@@ -45,33 +43,14 @@ namespace PurpleExplorer.ViewModels
             MessagesTabHeader = "Messages";
             DLQTabHeader = "Dead-letter";
         }
-        private void GenerateMockMessages(int count, int dlqCount)
-        {
-            Random random = new Random();
-            for (int i = 0; i < count; i++)
-            {
-                Messages.Add(new Message()
-                {
-                    Content = "Mocked Message " + i,
-                    Size = random.Next(1, 1024)
-                });
-            }
-            
-            for (int i = 0; i < dlqCount; i++)
-            {
-                DlqMessages.Add(new Message()
-                {
-                    Content = "Mocked Message " + i,
-                    Size = random.Next(1, 1024)
-                });
-            }
-        }
 
         public async void BtnPopupCommand()
         {
             var viewModel = new ConnectionStringWindowViewModel();
 
-            var returnedViewModel = await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(viewModel, 700, 100);
+            var returnedViewModel =
+                await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
+                    viewModel, 700, 100);
             _connectionString = returnedViewModel.ConnectionString;
 
             if (string.IsNullOrEmpty(_connectionString))
@@ -92,7 +71,6 @@ namespace PurpleExplorer.ViewModels
                 };
 
                 ConnectedServiceBuses.Add(newResource);
-                //GenerateMockMessages(8, 2);
             }
             catch (ArgumentException)
             {
@@ -100,20 +78,31 @@ namespace PurpleExplorer.ViewModels
             }
         }
 
-        public async void FillMessages(string subscriptionName, string topicName)
+        public void ClearAllMessages()
+        {
+            Messages.Clear();
+            DlqMessages.Clear();
+        }
+
+        public async Task SetDlqMessages(ServiceBusSubscription subscription)
         {
             DlqMessages.Clear();
-            var dlqMessages = await ServiceBusHelper.GetDlqMessages(_connectionString, subscriptionName, topicName);
+            var dlqMessages =
+                await ServiceBusHelper.GetDlqMessages(_connectionString, subscription.Topic.Name, subscription.Name);
             DlqMessages.AddRange(dlqMessages);
+
+            DLQTabHeader = $"Dead-letter ({dlqMessages.Count})";
         }
 
         public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
         {
-            var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name, subscription.Name);
             Messages.Clear();
+            var messages =
+                await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name,
+                    subscription.Name);
             Messages.AddRange(messages);
 
-            this.MessagesTabHeader = "Messages (" + messages.Count.ToString() + ")";            
+            MessagesTabHeader = $"Messages ({messages.Count})";
         }
     }
 }
