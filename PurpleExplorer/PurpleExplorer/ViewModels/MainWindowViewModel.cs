@@ -32,6 +32,14 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _dlqTabHeader, value);
         }
 
+        private ServiceBusSubscription _currentSubscription;
+
+        public ServiceBusSubscription CurrentSubscription
+        {
+            get => _currentSubscription;
+            set => this.RaiseAndSetIfChanged(ref _currentSubscription, value);
+        }
+
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
             ServiceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
@@ -40,7 +48,9 @@ namespace PurpleExplorer.ViewModels
             DlqMessages = new ObservableCollection<Message>();
             MessagesTabHeader = "Messages";
             DLQTabHeader = "Dead-letter";
+            CurrentSubscription = null;
         }
+
         private void GenerateMockMessages(int count, int dlqCount)
         {
             Random random = new Random();
@@ -52,7 +62,7 @@ namespace PurpleExplorer.ViewModels
                     Size = random.Next(1, 1024)
                 });
             }
-            
+
             for (int i = 0; i < dlqCount; i++)
             {
                 DlqMessages.Add(new Message()
@@ -63,7 +73,7 @@ namespace PurpleExplorer.ViewModels
             }
         }
 
-        public async void BtnPopupCommand()
+        public async void ConnectionBtnPopupCommand()
         {
             var viewModel = new ConnectionStringWindowViewModel();
 
@@ -96,17 +106,44 @@ namespace PurpleExplorer.ViewModels
             }
             catch (Exception e)
             {
-                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}");
+                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error",
+                    $"An error has occurred. Please try again. {e}");
             }
         }
 
         public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
         {
+            _currentSubscription = subscription;
             var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name, subscription.Name);
             Messages.Clear();
             Messages.AddRange(messages);
 
             this.MessagesTabHeader = "Messages (" + messages.Count.ToString() + ")";            
+        }
+
+        public async void AddMessageBtnPopupCommand()
+        {
+            var viewModal = new AddMessageWindowViewModal();
+
+            var returnedViewModal =
+                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal, 700,
+                    100);
+
+            var message = returnedViewModal.Message; 
+            
+            try
+            {
+                await ServiceBusHelper.SendTopicMessage(_connectionString, _currentSubscription.Topic.Name, message);
+            }
+            catch (NullReferenceException)
+            {
+                //TODO: temporary until we disable the Add button if a topic isn't selected
+                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"Please select a topic first.");
+            }
+            catch (Exception e)
+            {
+                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}");
+            }
         }
     }
 }
