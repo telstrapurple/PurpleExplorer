@@ -48,7 +48,14 @@ namespace PurpleExplorer.ViewModels
             DlqMessages = new ObservableCollection<Message>();
             MessagesTabHeader = "Messages";
             DLQTabHeader = "Dead-letter";
-            CurrentSubscription = null;
+            this.WhenAnyValue(x => x.CurrentSubscription)
+                .Subscribe(x =>
+                {
+                    if (x != null)
+                    {
+                        CurrentSubscriptionUpdated();
+                    }
+                });
         }
 
         private void GenerateMockMessages(int count, int dlqCount)
@@ -113,7 +120,6 @@ namespace PurpleExplorer.ViewModels
 
         public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
         {
-            _currentSubscription = subscription;
             var messages = await ServiceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name, subscription.Name);
             Messages.Clear();
             Messages.AddRange(messages);
@@ -121,8 +127,13 @@ namespace PurpleExplorer.ViewModels
             this.MessagesTabHeader = "Messages (" + messages.Count.ToString() + ")";            
         }
 
-        public async void AddMessageBtnPopupCommand()
+        public async void AddMessage()
         {
+            if (_currentSubscription == null)
+            {
+                return;
+            }
+
             var viewModal = new AddMessageWindowViewModal();
 
             var returnedViewModal =
@@ -131,19 +142,12 @@ namespace PurpleExplorer.ViewModels
 
             var message = returnedViewModal.Message; 
             
-            try
-            {
-                await ServiceBusHelper.SendTopicMessage(_connectionString, _currentSubscription.Topic.Name, message);
-            }
-            catch (NullReferenceException)
-            {
-                //TODO: temporary until we disable the Add button if a topic isn't selected
-                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"Please select a topic first.");
-            }
-            catch (Exception e)
-            {
-                await MessageBoxHelper.ShowError(ButtonEnum.Ok, "Error", $"An error has occurred. Please try again. {e}");
-            }
+            await ServiceBusHelper.SendTopicMessage(_connectionString, CurrentSubscription.Topic.Name, message);
+        }
+
+        public async void CurrentSubscriptionUpdated()
+        {
+            await SetSubscripitonMessages(CurrentSubscription);
         }
     }
 }

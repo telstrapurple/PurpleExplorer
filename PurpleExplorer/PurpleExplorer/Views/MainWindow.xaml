@@ -61,7 +61,7 @@
                         <TextBlock VerticalAlignment="Center">Refresh</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Name="AddButton" Grid.Row="0" Grid.Column="1" Command="{Binding AddMessageBtnPopupCommand}">
+                <Button Name="AddButton" Grid.Row="0" Grid.Column="1" Command="{Binding AddMessage}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Assets/plus.png" VerticalAlignment="Center" Height="24" />
                         <TextBlock VerticalAlignment="Center">Send new message</TextBlock>

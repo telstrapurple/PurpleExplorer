@@ -18,16 +18,15 @@ namespace PurpleExplorer.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        private async void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var mainWindowViewModel = this.DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
             if (treeView.SelectedItem is ServiceBusSubscription)
             {
                 var selectedItem = treeView.SelectedItem as ServiceBusSubscription;
-                await mainWindowViewModel.SetSubscripitonMessages(selectedItem);
+                mainWindowViewModel.CurrentSubscription = selectedItem;
             }
-
         }
     }
 }

@@ -95,7 +95,7 @@ namespace PurpleExplorer.Helpers
         public async Task SendTopicMessage(string connectionString, string topicPath, string message)
         {
             var topicClient = new TopicClient(connectionString, topicPath); 
-            await topicClient.SendAsync(new Message() {Body = Encoding.ASCII.GetBytes(message)});
+            await topicClient.SendAsync(new Message() {Body = Encoding.UTF8.GetBytes(message)});
             await topicClient.CloseAsync();
         }
     }
