@@ -21,11 +21,13 @@ namespace PurpleExplorer.ViewModels
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; set; }
         public ObservableCollection<Message> DlqMessages { get; }
+
         public string MessagesTabHeader
         {
             get => _messageTabHeader;
             set => this.RaiseAndSetIfChanged(ref _messageTabHeader, value);
         }
+
         public string DlqTabHeader
         {
             get => _dlqTabHeader;
@@ -52,7 +54,7 @@ namespace PurpleExplorer.ViewModels
                         CurrentSubscriptionUpdated();
                     }
                 });
-            
+
             SetTabHeaders();
         }
 
@@ -63,7 +65,7 @@ namespace PurpleExplorer.ViewModels
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
                     viewModel, 700, 100);
-            _connectionString = returnedViewModel.ConnectionString;
+            _connectionString = returnedViewModel.ConnectionString.Trim();
 
             if (string.IsNullOrEmpty(_connectionString))
             {
@@ -136,8 +138,8 @@ namespace PurpleExplorer.ViewModels
                 await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal, 700,
                     100);
 
-            var message = returnedViewModal.Message; 
-            
+            var message = returnedViewModal.Message.Trim();
+
             await _serviceBusHelper.SendTopicMessage(_connectionString, CurrentSubscription.Topic.Name, message);
         }
 
