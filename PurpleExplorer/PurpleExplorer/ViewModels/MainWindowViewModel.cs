@@ -16,6 +16,7 @@ namespace PurpleExplorer.ViewModels
         private readonly IServiceBusHelper _serviceBusHelper;
         private string _messageTabHeader;
         private string _dlqTabHeader;
+        private ServiceBusSubscription _currentSubscription;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         public ObservableCollection<Message> Messages { get; set; }
@@ -25,10 +26,16 @@ namespace PurpleExplorer.ViewModels
             get => _messageTabHeader;
             set => this.RaiseAndSetIfChanged(ref _messageTabHeader, value);
         }
-        public string DLQTabHeader
+        public string DlqTabHeader
         {
             get => _dlqTabHeader;
             set => this.RaiseAndSetIfChanged(ref _dlqTabHeader, value);
+        }
+
+        public ServiceBusSubscription CurrentSubscription
+        {
+            get => _currentSubscription;
+            set => this.RaiseAndSetIfChanged(ref _currentSubscription, value);
         }
 
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
@@ -37,11 +44,19 @@ namespace PurpleExplorer.ViewModels
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             Messages = new ObservableCollection<Message>();
             DlqMessages = new ObservableCollection<Message>();
-
+            this.WhenAnyValue(x => x.CurrentSubscription)
+                .Subscribe(x =>
+                {
+                    if (x != null)
+                    {
+                        CurrentSubscriptionUpdated();
+                    }
+                });
+            
             SetTabHeaders();
         }
 
-        public async void BtnPopupCommand()
+        public async void ConnectionBtnPopupCommand()
         {
             var viewModel = new ConnectionStringWindowViewModel();
 
@@ -105,7 +120,32 @@ namespace PurpleExplorer.ViewModels
         public void SetTabHeaders()
         {
             MessagesTabHeader = $"Messages ({Messages.Count})";
-            DLQTabHeader = $"Dead-letter ({DlqMessages.Count})";
+            DlqTabHeader = $"Dead-letter ({DlqMessages.Count})";
+        }
+
+        public async void AddMessage()
+        {
+            if (_currentSubscription == null)
+            {
+                return;
+            }
+
+            var viewModal = new AddMessageWindowViewModal();
+
+            var returnedViewModal =
+                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal, 700,
+                    100);
+
+            var message = returnedViewModal.Message; 
+            
+            await _serviceBusHelper.SendTopicMessage(_connectionString, CurrentSubscription.Topic.Name, message);
+        }
+
+        public async void CurrentSubscriptionUpdated()
+        {
+            await Task.WhenAll(
+                SetSubscripitonMessages(_currentSubscription),
+                SetDlqMessages(_currentSubscription));
         }
     }
 }

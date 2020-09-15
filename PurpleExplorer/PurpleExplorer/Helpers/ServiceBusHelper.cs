@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Message = PurpleExplorer.Models.Message;
+using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
 namespace PurpleExplorer.Helpers
 {
@@ -95,6 +96,13 @@ namespace PurpleExplorer.Helpers
         {
             var client = new ManagementClient(connectionString);
             return await client.GetNamespaceInfoAsync();
+        }
+
+        public async Task SendTopicMessage(string connectionString, string topicPath, string message)
+        {
+            var topicClient = new TopicClient(connectionString, topicPath); 
+            await topicClient.SendAsync(new AzureMessage() {Body = Encoding.UTF8.GetBytes(message)});
+            await topicClient.CloseAsync();
         }
     }
 }

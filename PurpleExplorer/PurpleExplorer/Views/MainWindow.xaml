@@ -15,7 +15,7 @@
 
     <DockPanel Dock="Left">
         <StackPanel>
-            <Button HorizontalAlignment="Left" Command="{Binding BtnPopupCommand}">
+            <Button HorizontalAlignment="Left" Command="{Binding ConnectionBtnPopupCommand}">
                 <StackPanel Orientation="Horizontal">
                     <Image Height="24" Width="24" VerticalAlignment="Center" Source="/Assets/service-bus-large.png" />
                     <TextBlock VerticalAlignment="Center">Connect</TextBlock>
@@ -61,7 +61,7 @@
                         <TextBlock VerticalAlignment="Center">Refresh</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Name="AddButton" Grid.Row="0" Grid.Column="1">
+                <Button Name="AddButton" Grid.Row="0" Grid.Column="1" Command="{Binding AddMessage}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Assets/plus.png" VerticalAlignment="Center" Height="24" />
                         <TextBlock VerticalAlignment="Center">Send new message</TextBlock>
@@ -84,7 +84,7 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>
-                <TabItem Header="{Binding DLQTabHeader}" VerticalContentAlignment="Center">
+                <TabItem Header="{Binding DlqTabHeader}" VerticalContentAlignment="Center">
                     <DataGrid Items="{Binding DlqMessages}" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />

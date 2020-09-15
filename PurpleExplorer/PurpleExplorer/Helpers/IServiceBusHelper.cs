@@ -12,5 +12,7 @@ namespace PurpleExplorer.Helpers
         public Task<IList<ServiceBusSubscription>> GetSubscriptions(string connectionString, string topicPath);
         public Task<IList<Message>> GetDlqMessages(string connectionString, string topic, string subscription);
         public Task<IList<Models.Message>> GetMessagesBySubscription(string connectionString, string topicName, string subscriptionName);
+        public Task SendTopicMessage(string connectionString, string topicPath, string message);
+
     }
 }

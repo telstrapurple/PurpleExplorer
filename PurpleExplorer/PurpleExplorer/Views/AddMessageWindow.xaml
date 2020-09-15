@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:PurpleExplorer.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="PurpleExplorer.Views.AddMessageWindow"
+        Title="AvaloniaAppTemplate">
+    <Design.DataContext>
+        <viewModels:AddMessageWindowViewModal />
+    </Design.DataContext>
+    
+    <StackPanel>
+        <TextBox Width="600" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding Path=Message, Mode=TwoWay}"></TextBox>
+        <Button Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnAddClick">Add Message</Button>
+    </StackPanel>
+</Window>
