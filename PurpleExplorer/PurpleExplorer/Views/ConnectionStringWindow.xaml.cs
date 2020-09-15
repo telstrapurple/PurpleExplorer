@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using PurpleExplorer.Helpers;
@@ -11,7 +10,7 @@ namespace PurpleExplorer.Views
     {
         public ConnectionStringWindow()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void InitializeComponent()

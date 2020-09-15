@@ -84,7 +84,7 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>
-                <TabItem Header="{Binding DLQTabHeader}" VerticalContentAlignment="Center">
+                <TabItem Header="{Binding DlqTabHeader}" VerticalContentAlignment="Center">
                     <DataGrid Items="{Binding DlqMessages}" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
