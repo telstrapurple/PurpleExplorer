@@ -1,6 +1,7 @@
 # Purple Explorer - cross platform Azure Service Bus explorer (Windows, MacOS, Linux)
 
 Purple Explorer is a cross platform desktop application build in DotNet Core. 
+
 It's a simple tool to help you to: 
 * connect to a Azure service bus
 * list topics and subscriptions
