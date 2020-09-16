@@ -137,6 +137,8 @@ namespace PurpleExplorer.ViewModels
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
         {
             CurrentSubscription = subscription;
+            CurrentTopic = subscription.Topic;
+
             await Task.WhenAll(
                 SetSubscripitonMessages(),
                 SetDlqMessages());
