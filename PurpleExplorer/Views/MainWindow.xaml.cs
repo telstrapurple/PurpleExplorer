@@ -24,7 +24,7 @@ namespace PurpleExplorer.Views
             var grid = sender as DataGrid;
             var viewModal = new MessageDetailsWindowViewModel() { Message = grid.SelectedItem as Message };
             
-            await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal, 700, 500);
+            await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal);
         }
 
         private void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -32,13 +32,11 @@ namespace PurpleExplorer.Views
             var mainWindowViewModel = DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
 
-            mainWindowViewModel.ClearAllMessages();
-            mainWindowViewModel.SetTabHeaders();
-            
+            mainWindowViewModel.ClearSelectedSubscription();
             if (treeView.SelectedItem is ServiceBusSubscription)
             {
                 var selectedItem = treeView.SelectedItem as ServiceBusSubscription;
-                mainWindowViewModel.CurrentSubscription = selectedItem;
+                mainWindowViewModel.SetSelectedSubscription(selectedItem);
             }
         }
     }
