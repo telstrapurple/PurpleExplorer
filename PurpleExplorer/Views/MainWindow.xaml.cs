@@ -24,7 +24,7 @@ namespace PurpleExplorer.Views
             var grid = sender as DataGrid;
             var viewModal = new MessageDetailsWindowViewModel() { Message = grid.SelectedItem as Message };
             
-            await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal, 700, 500);
+            await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal);
         }
 
         private void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)

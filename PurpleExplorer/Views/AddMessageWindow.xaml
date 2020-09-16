@@ -5,7 +5,7 @@
         xmlns:viewModels="clr-namespace:PurpleExplorer.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.AddMessageWindow"
-        Title="AvaloniaAppTemplate">
+        Title="AvaloniaAppTemplate" Width="700" Height="100">
     <Design.DataContext>
         <viewModels:AddMessageWindowViewModal />
     </Design.DataContext>

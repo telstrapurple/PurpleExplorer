@@ -42,14 +42,6 @@ namespace PurpleExplorer.ViewModels
         {
             _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
-            // this.WhenAnyValue(x => x.CurrentSubscription)
-            //     .Subscribe(x =>
-            //     {
-            //         if (x != null)
-            //         {
-            //             CurrentSubscriptionUpdated();
-            //         }
-            //     });
 
             SetTabHeaders();
         }
@@ -60,7 +52,7 @@ namespace PurpleExplorer.ViewModels
 
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
-                    viewModel, 700, 100);
+                    viewModel);
             _connectionString = returnedViewModel.ConnectionString.Trim();
 
             if (string.IsNullOrEmpty(_connectionString))
@@ -87,12 +79,6 @@ namespace PurpleExplorer.ViewModels
                 await MessageBoxHelper.ShowError("The connection string is invalid.");
             }
         }
-
-        // public void ClearAllMessages()
-        // {
-        //     Messages.Clear();
-        //     DlqMessages.Clear();
-        // }
 
         public async Task SetDlqMessages()
         {
@@ -127,7 +113,7 @@ namespace PurpleExplorer.ViewModels
 
         public async void AddMessage()
         {
-            if (_currentSubscription == null)
+            if (CurrentSubscription == null)
             {
                 return;
             }
@@ -135,18 +121,12 @@ namespace PurpleExplorer.ViewModels
             var viewModal = new AddMessageWindowViewModal();
 
             var returnedViewModal =
-                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal, 700,
-                    100);
+                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
 
             var message = returnedViewModal.Message.Trim();
 
             await _serviceBusHelper.SendTopicMessage(_connectionString, CurrentSubscription.Topic.Name, message);
         }
-
-        // public async void CurrentSubscriptionUpdated()
-        // {
-        //    
-        // }
 
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
         {
@@ -162,9 +142,6 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription = null;
             SetTabHeaders();
-
-            // mainWindowViewModel.ClearAllMessages();
-            // mainWindowViewModel.SetTabHeaders();
         }
     }
 }

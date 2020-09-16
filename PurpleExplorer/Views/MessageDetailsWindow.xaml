@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.MessageDetailsWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
-        Title="Message Details">
+        Title="Message Details" Width="700" Height="500">
 
     <Design.DataContext>
         <vm:MessageDetailsWindowViewModel />
