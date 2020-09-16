@@ -19,8 +19,6 @@ namespace PurpleExplorer.ViewModels
         private ServiceBusSubscription _currentSubscription;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
-        public ObservableCollection<Message> Messages { get; set; }
-        public ObservableCollection<Message> DlqMessages { get; }
 
         public string MessagesTabHeader
         {
@@ -44,16 +42,6 @@ namespace PurpleExplorer.ViewModels
         {
             _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
-            Messages = new ObservableCollection<Message>();
-            DlqMessages = new ObservableCollection<Message>();
-            this.WhenAnyValue(x => x.CurrentSubscription)
-                .Subscribe(x =>
-                {
-                    if (x != null)
-                    {
-                        CurrentSubscriptionUpdated();
-                    }
-                });
 
             SetTabHeaders();
         }
@@ -64,7 +52,7 @@ namespace PurpleExplorer.ViewModels
 
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
-                    viewModel, 700, 100);
+                    viewModel);
             _connectionString = returnedViewModel.ConnectionString.Trim();
 
             if (string.IsNullOrEmpty(_connectionString))
@@ -92,42 +80,40 @@ namespace PurpleExplorer.ViewModels
             }
         }
 
-        public void ClearAllMessages()
+        public async Task SetDlqMessages()
         {
-            Messages.Clear();
-            DlqMessages.Clear();
-        }
-
-        public async Task SetDlqMessages(ServiceBusSubscription subscription)
-        {
-            DlqMessages.Clear();
+            CurrentSubscription.DlqMessages.Clear();
             var dlqMessages =
-                await _serviceBusHelper.GetDlqMessages(_connectionString, subscription.Topic.Name, subscription.Name);
-            DlqMessages.AddRange(dlqMessages);
-
-            SetTabHeaders();
+                await _serviceBusHelper.GetDlqMessages(_connectionString, CurrentSubscription.Topic.Name, CurrentSubscription.Name);
+            CurrentSubscription.DlqMessages.AddRange(dlqMessages);
         }
 
-        public async Task SetSubscripitonMessages(ServiceBusSubscription subscription)
+        public async Task SetSubscripitonMessages()
         {
-            Messages.Clear();
+            CurrentSubscription.Messages.Clear();
             var messages =
-                await _serviceBusHelper.GetMessagesBySubscription(_connectionString, subscription.Topic.Name,
-                    subscription.Name);
-            Messages.AddRange(messages);
-
-            SetTabHeaders();
+                await _serviceBusHelper.GetMessagesBySubscription(_connectionString, CurrentSubscription.Topic.Name,
+                    CurrentSubscription.Name);
+            CurrentSubscription.Messages.AddRange(messages);
         }
 
         public void SetTabHeaders()
         {
-            MessagesTabHeader = $"Messages ({Messages.Count})";
-            DlqTabHeader = $"Dead-letter ({DlqMessages.Count})";
+            if (CurrentSubscription == null)
+            {
+                MessagesTabHeader = $"Messages";
+                DlqTabHeader = $"Dead-letter";
+            }
+            else
+            {
+                MessagesTabHeader = $"Messages ({CurrentSubscription.Messages.Count})";
+                DlqTabHeader = $"Dead-letter ({CurrentSubscription.DlqMessages.Count})";
+            }
         }
 
         public async void AddMessage()
         {
-            if (_currentSubscription == null)
+            if (CurrentSubscription == null)
             {
                 return;
             }
@@ -135,19 +121,27 @@ namespace PurpleExplorer.ViewModels
             var viewModal = new AddMessageWindowViewModal();
 
             var returnedViewModal =
-                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal, 700,
-                    100);
+                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
 
             var message = returnedViewModal.Message.Trim();
 
             await _serviceBusHelper.SendTopicMessage(_connectionString, CurrentSubscription.Topic.Name, message);
         }
 
-        public async void CurrentSubscriptionUpdated()
+        public async void SetSelectedSubscription(ServiceBusSubscription subscription)
         {
+            CurrentSubscription = subscription;
             await Task.WhenAll(
-                SetSubscripitonMessages(_currentSubscription),
-                SetDlqMessages(_currentSubscription));
+                SetSubscripitonMessages(),
+                SetDlqMessages());
+            
+            SetTabHeaders();
+        }
+        
+        public void ClearSelectedSubscription()
+        {
+            CurrentSubscription = null;
+            SetTabHeaders();
         }
     }
 }

@@ -76,7 +76,7 @@
             </Grid>
             <TabControl>
                 <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding Messages}" DoubleTapped="MessagesGrid_DoubleTapped"
+                    <DataGrid Items="{Binding CurrentSubscription.Messages}" DoubleTapped="MessagesGrid_DoubleTapped"
                               IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
@@ -85,7 +85,7 @@
                     </DataGrid>
                 </TabItem>
                 <TabItem Header="{Binding DlqTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding DlqMessages}" IsReadOnly="True">
+                    <DataGrid Items="{Binding CurrentSubscription.DlqMessages}" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
                             <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />

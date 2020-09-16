@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="200"
         x:Class="PurpleExplorer.Views.ConnectionStringWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
-        Title="ConnectionStringWindow">
+        Title="ConnectionStringWindow" Width="700" Height="100">
     
     <Design.DataContext>
         <vm:ConnectionStringWindowViewModel />
