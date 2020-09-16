@@ -28,7 +28,10 @@ namespace PurpleExplorer.Views
                 await MessageBoxHelper.ShowError(MessageBox.Avalonia.Enums.ButtonEnum.OkCancel, "Error",
                     "Please enter a message to be sent");
             else
+            {
+                dataContext.Cancel = false;
                 Close();
+            }
         }
     }
 }

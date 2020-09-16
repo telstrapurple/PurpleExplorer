@@ -1,7 +1,8 @@
 namespace PurpleExplorer.ViewModels
 {
-    public class AddMessageWindowViewModal : ViewModelBase
+    public class AddMessageWindowViewModal : DialogViewModelBase
     {
         public string Message { get; set; }
+        public AddMessageWindowViewModal() : base() { }
     }
 }  

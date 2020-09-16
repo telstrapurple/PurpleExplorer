@@ -23,7 +23,10 @@ namespace PurpleExplorer.Views
             if (string.IsNullOrEmpty(dataContext.ConnectionString))
                 await MessageBoxHelper.ShowError(MessageBox.Avalonia.Enums.ButtonEnum.OkCancel, "Error", "Please enter a service bus connection string.");
             else
+            {
+                dataContext.Cancel = false;
                 this.Close();
+            }
         }
     }
 }
