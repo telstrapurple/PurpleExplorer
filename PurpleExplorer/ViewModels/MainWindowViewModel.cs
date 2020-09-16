@@ -154,6 +154,7 @@ namespace PurpleExplorer.ViewModels
         {
             await _serviceBusHelper.DeleteMessage(_connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage);
+            CurrentMessage = null;
         }
 
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
@@ -182,6 +183,7 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription = null;
             CurrentTopic = null;
+            CurrentMessage = null;
             SetTabHeaders();
         }
     }

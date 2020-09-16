@@ -1,10 +1,12 @@
-﻿using Microsoft.Azure.ServiceBus;
+﻿using System;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Microsoft.Azure.ServiceBus.Management;
 using PurpleExplorer.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Message = PurpleExplorer.Models.Message;
 using AzureMessage = Microsoft.Azure.ServiceBus.Message;
@@ -80,7 +82,7 @@ namespace PurpleExplorer.Helpers
             var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
 
             var result = receivedMessages.Select(message => new Message(message)).ToList();
-            
+
             return result;
         }
 
@@ -102,8 +104,27 @@ namespace PurpleExplorer.Helpers
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
             var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
-            var peekedMessage = await receiver.PeekBySequenceNumberAsync(message.SequenceNumber, 1);
-            await receiver.CompleteAsync(peekedMessage.FirstOrDefault()?.SystemProperties.LockToken);
+
+            Func<AzureMessage, CancellationToken, Task> handler = (msg, token) =>
+            {
+                if (msg.MessageId.Equals(message.MessageId))
+                {
+                    receiver.CompleteAsync(msg.SystemProperties.LockToken);
+                }
+                return Task.CompletedTask;
+            };
+            Func<ExceptionReceivedEventArgs, Task> exceptionHandler = args =>
+            {
+                /*TODO add logging */
+                return Task.CompletedTask;
+            };
+            var messageHandlerOptions = new MessageHandlerOptions(exceptionHandler)
+            {
+                AutoComplete = false
+            };
+
+            receiver.RegisterMessageHandler(handler, messageHandlerOptions);
+            await receiver.PeekBySequenceNumberAsync(message.SequenceNumber, 1);
         }
     }
 }
