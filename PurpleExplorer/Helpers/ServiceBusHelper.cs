@@ -96,5 +96,14 @@ namespace PurpleExplorer.Helpers
             await topicClient.SendAsync(new AzureMessage() {Body = Encoding.UTF8.GetBytes(message)});
             await topicClient.CloseAsync();
         }
+
+        public async Task DeleteMessage(string connectionString, string topicPath, string subscriptionPath,
+            Message message)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
+            var peekedMessage = await receiver.PeekBySequenceNumberAsync(message.SequenceNumber, 1);
+            await receiver.CompleteAsync(peekedMessage.FirstOrDefault()?.SystemProperties.LockToken);
+        }
     }
 }
