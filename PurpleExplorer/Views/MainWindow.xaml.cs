@@ -22,13 +22,11 @@ namespace PurpleExplorer.Views
             var mainWindowViewModel = DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
 
-            mainWindowViewModel.ClearAllMessages();
-            mainWindowViewModel.SetTabHeaders();
-            
+            mainWindowViewModel.ClearSelectedSubscription();
             if (treeView.SelectedItem is ServiceBusSubscription)
             {
                 var selectedItem = treeView.SelectedItem as ServiceBusSubscription;
-                mainWindowViewModel.CurrentSubscription = selectedItem;
+                mainWindowViewModel.SetSelectedSubscription(selectedItem);
             }
         }
     }
