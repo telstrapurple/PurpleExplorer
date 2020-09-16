@@ -21,7 +21,8 @@
                     <TextBlock VerticalAlignment="Center">Connect</TextBlock>
                 </StackPanel>
             </Button>
-            <TreeView SelectionChanged ="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Width="300" Height="500" Name="tvServiceBus">
+            <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Width="300"
+                      Height="500" Name="tvServiceBus">
                 <TreeView.DataTemplates>
                     <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                         <StackPanel Orientation="Horizontal">
@@ -67,7 +68,7 @@
                         <TextBlock VerticalAlignment="Center">Send new message</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Name="MinusButton" Grid.Row="0" Grid.Column="2">
+                <Button Name="MinusButton" Grid.Row="0" Grid.Column="2" Command="{Binding Delete}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Assets/minus.png" VerticalAlignment="Center" Height="24" />
                         <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
@@ -77,7 +78,7 @@
             <TabControl>
                 <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
                     <DataGrid Items="{Binding CurrentSubscription.Messages}" DoubleTapped="MessagesGrid_DoubleTapped"
-                              IsReadOnly="True">
+                              Tapped="MessagesGrid_Tapped" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
                             <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />

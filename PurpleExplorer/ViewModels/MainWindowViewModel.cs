@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
@@ -18,6 +19,7 @@ namespace PurpleExplorer.ViewModels
         private string _dlqTabHeader;
         private ServiceBusSubscription _currentSubscription;
         private ServiceBusTopic _currentTopic;
+        private Message _currentMessage;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
 
@@ -45,10 +47,23 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _currentTopic, value);
         }
 
+        public Message CurrentMessage
+        {
+            get => _currentMessage;
+            set => this.RaiseAndSetIfChanged(ref _currentMessage, value);
+        }
+
+        public ReactiveCommand<Unit, Unit> Delete { get; }
+
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
             _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
+
+
+            var deleteEnabled =
+                this.WhenAnyValue<MainWindowViewModel, bool, Message>(x => x.CurrentMessage, x => x != null);
+            Delete = ReactiveCommand.Create(() => DeleteMessage(), deleteEnabled);
 
             SetTabHeaders();
         }
@@ -91,7 +106,8 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription.DlqMessages.Clear();
             var dlqMessages =
-                await _serviceBusHelper.GetDlqMessages(_connectionString, CurrentSubscription.Topic.Name, CurrentSubscription.Name);
+                await _serviceBusHelper.GetDlqMessages(_connectionString, CurrentSubscription.Topic.Name,
+                    CurrentSubscription.Name);
             CurrentSubscription.DlqMessages.AddRange(dlqMessages);
         }
 
@@ -134,6 +150,12 @@ namespace PurpleExplorer.ViewModels
                 await MessageBoxHelper.ShowError("Can't send a message to a Topic without any subscriptions.");
         }
 
+        public async void DeleteMessage()
+        {
+            await _serviceBusHelper.DeleteMessage(_connectionString, _currentTopic.Name, _currentSubscription.Name,
+                _currentMessage);
+        }
+
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
         {
             CurrentSubscription = subscription;
@@ -142,13 +164,18 @@ namespace PurpleExplorer.ViewModels
             await Task.WhenAll(
                 SetSubscripitonMessages(),
                 SetDlqMessages());
-            
+
             SetTabHeaders();
         }
 
         public void SetSelectedTopic(ServiceBusTopic selectedTopic)
         {
             CurrentTopic = selectedTopic;
+        }
+
+        public void SetSelectedMessage(Message message)
+        {
+            CurrentMessage = message;
         }
 
         public void ClearSelection()

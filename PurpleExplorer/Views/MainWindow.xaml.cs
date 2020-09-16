@@ -1,6 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Microsoft.Azure.ServiceBus.Core;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
@@ -19,12 +19,23 @@ namespace PurpleExplorer.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        private async void MessagesGrid_DoubleTapped(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private async void MessagesGrid_DoubleTapped(object sender, RoutedEventArgs e)
         {
             var grid = sender as DataGrid;
-            var viewModal = new MessageDetailsWindowViewModel() { Message = grid.SelectedItem as Message };
-            
+            var viewModal = new MessageDetailsWindowViewModel() {Message = grid.SelectedItem as Message};
+
             await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal);
+        }
+
+        private void MessagesGrid_Tapped(object sender, RoutedEventArgs e)
+        {
+            var grid = sender as DataGrid;
+            var mainWindowViewModel = DataContext as MainWindowViewModel;
+
+            if (grid.SelectedItem is Message message)
+            {
+                mainWindowViewModel.SetSelectedMessage(message);
+            }
         }
 
         private void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
