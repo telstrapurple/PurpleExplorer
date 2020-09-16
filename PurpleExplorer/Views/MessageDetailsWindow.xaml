@@ -1,0 +1,34 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="PurpleExplorer.Views.MessageDetailsWindow"
+        xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
+        Title="Message Details">
+
+    <Design.DataContext>
+        <vm:MessageDetailsWindowViewModel />
+    </Design.DataContext>
+    <Grid Height="200">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100" />
+            <RowDefinition Height="200" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="500"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="Content" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" />
+        <TextBlock Height="100" Width="100" Text="{Binding Message.Content}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" >
+        </TextBlock>
+        <TextBlock Text="MessageId" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" />
+        <TextBlock Height="100" Width="100" Text="{Binding Message.MessageId}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" />
+        <TextBlock Text="Content Type" Grid.Row="2" Grid.Column="0"></TextBlock>
+        <TextBlock Text="{Binding Message.ContentType}" Grid.Row="2" Grid.Column="1" />
+
+    </Grid>
+      
+</Window>
