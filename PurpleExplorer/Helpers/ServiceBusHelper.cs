@@ -67,12 +67,8 @@ namespace PurpleExplorer.Helpers
                 EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
             var subscriptionMessages = await messageReceiver.PeekAsync(_maxMessageCount);
 
-            var result = subscriptionMessages.Select(message => new Message
-            {
-                Content = Encoding.UTF8.GetString(message.Body), 
-                Size = message.Size
-            }).ToList(); 
-               
+            var result = subscriptionMessages.Select(message => new Message(message)).ToList();
+
             return result;
         }
 
@@ -83,11 +79,7 @@ namespace PurpleExplorer.Helpers
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
 
-            var result = receivedMessages.Select(message => new Message
-            {
-                Content = Encoding.UTF8.GetString(message.Body), 
-                Size = message.Size
-            }).ToList();
+            var result = receivedMessages.Select(message => new Message(message)).ToList();
             
             return result;
         }
