@@ -17,6 +17,7 @@ namespace PurpleExplorer.ViewModels
         private string _messageTabHeader;
         private string _dlqTabHeader;
         private ServiceBusSubscription _currentSubscription;
+        private ServiceBusTopic _currentTopic;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
 
@@ -36,6 +37,12 @@ namespace PurpleExplorer.ViewModels
         {
             get => _currentSubscription;
             set => this.RaiseAndSetIfChanged(ref _currentSubscription, value);
+        }
+
+        public ServiceBusTopic CurrentTopic
+        {
+            get => _currentTopic;
+            set => this.RaiseAndSetIfChanged(ref _currentTopic, value);
         }
 
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
@@ -113,19 +120,18 @@ namespace PurpleExplorer.ViewModels
 
         public async void AddMessage()
         {
-            if (CurrentSubscription == null)
+            if (CurrentSubscription != null || (CurrentTopic != null && CurrentTopic.Subscriptions.Count > 0))
             {
-                return;
+                var viewModal = new AddMessageWindowViewModal();
+                var topicName = CurrentSubscription == null ? CurrentTopic.Name : CurrentSubscription.Topic.Name;
+                var returnedViewModal =
+                    await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
+                var message = returnedViewModal.Message.Trim();
+                await _serviceBusHelper.SendTopicMessage(_connectionString, topicName, message);
             }
 
-            var viewModal = new AddMessageWindowViewModal();
-
-            var returnedViewModal =
-                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
-
-            var message = returnedViewModal.Message.Trim();
-
-            await _serviceBusHelper.SendTopicMessage(_connectionString, CurrentSubscription.Topic.Name, message);
+            if (CurrentTopic != null && CurrentTopic.Subscriptions.Count == 0)
+                await MessageBoxHelper.ShowError("Can't send a message to a Topic without any subscriptions.");
         }
 
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
@@ -137,10 +143,16 @@ namespace PurpleExplorer.ViewModels
             
             SetTabHeaders();
         }
-        
-        public void ClearSelectedSubscription()
+
+        public void SetSelectedTopic(ServiceBusTopic selectedTopic)
+        {
+            CurrentTopic = selectedTopic;
+        }
+
+        public void ClearSelection()
         {
             CurrentSubscription = null;
+            CurrentTopic = null;
             SetTabHeaders();
         }
     }
