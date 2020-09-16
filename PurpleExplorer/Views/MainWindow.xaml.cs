@@ -33,15 +33,13 @@ namespace PurpleExplorer.Views
             var treeView = sender as TreeView;
 
             mainWindowViewModel.ClearSelection();
-            if (treeView.SelectedItem is ServiceBusSubscription)
+            if (treeView.SelectedItem is ServiceBusSubscription selectedSubscription)
             {
-                var selectedSubscription = treeView.SelectedItem as ServiceBusSubscription;
                 mainWindowViewModel.SetSelectedSubscription(selectedSubscription);
             }
 
-            if (treeView.SelectedItem is ServiceBusTopic)
+            if (treeView.SelectedItem is ServiceBusTopic selectedTopic)
             {
-                var selectedTopic = treeView.SelectedItem as ServiceBusTopic;
                 mainWindowViewModel.SetSelectedTopic(selectedTopic);
             }
         }
