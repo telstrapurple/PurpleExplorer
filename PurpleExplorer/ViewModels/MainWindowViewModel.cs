@@ -10,18 +10,19 @@ using Splat;
 using ReactiveUI;
 using System.Threading.Tasks;
 using MessageBox.Avalonia.Enums;
+using PurpleExplorer.Services;
 
 namespace PurpleExplorer.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IServiceBusHelper _serviceBusHelper;
+        private ILoggingService _loggingService;
         private string _messageTabHeader;
         private string _dlqTabHeader;
         private ServiceBusSubscription _currentSubscription;
         private ServiceBusTopic _currentTopic;
         private Message _currentMessage;
-        private string _logText;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
 
@@ -57,17 +58,17 @@ namespace PurpleExplorer.ViewModels
 
         public string LogText
         {
-            get => _logText;
-            set => this.RaiseAndSetIfChanged(ref _logText, value);
+            get => _loggingService.Logs;
         }
 
         public ReactiveCommand<Unit, Unit> Delete { get; }
 
-        public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
+        public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
-            _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
-            ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
+            _loggingService = loggingService;
+            _serviceBusHelper = serviceBusHelper;
 
+            ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
 
             var deleteEnabled =
                 this.WhenAnyValue<MainWindowViewModel, bool, Message>(x => x.CurrentMessage, x => x != null);
@@ -108,12 +109,11 @@ namespace PurpleExplorer.ViewModels
 
                 newResource.AddTopics(topics.ToArray());
                 ConnectedServiceBuses.Add(newResource);
-                AddLogEntry("Connected to service bus " + connectionString);
+                Log("Connected to Service Bus: " + namespaceInfo.Name);
             }
             catch (ArgumentException)
             {
                 await MessageBoxHelper.ShowError("The connection string is invalid.");
-                AddLogEntry("Invalid connection string.");
             }
         }
 
@@ -134,6 +134,7 @@ namespace PurpleExplorer.ViewModels
                     CurrentSubscription.Topic.Name,
                     CurrentSubscription.Name);
             CurrentSubscription.Messages.AddRange(messages);
+            Log("Fetch messages.");
         }
 
         public void SetTabHeaders()
@@ -165,12 +166,21 @@ namespace PurpleExplorer.ViewModels
                     var messageText = returnedViewModal.Message.Trim();
                     var connectionString = CurrentTopic.ServiceBus.ConnectionString;
                     if (!string.IsNullOrEmpty(messageText))
+                    {
                         await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
+                        Log("Message added");
+                    }
                 }
             }
 
             if (CurrentTopic != null && CurrentTopic.Subscriptions.Count == 0)
                 await MessageBoxHelper.ShowError("Can't send a message to a Topic without any subscriptions.");
+        }
+
+        private void Log(string message)
+        {
+            _loggingService.Log(message);
+            this.RaisePropertyChanged("LogText");
         }
 
         public async void DeleteMessage()
@@ -189,6 +199,7 @@ namespace PurpleExplorer.ViewModels
             await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
             CurrentMessage = null;
+            Log("Message deleted.");
         }
 
         public async void RefreshMessages()
@@ -206,20 +217,20 @@ namespace PurpleExplorer.ViewModels
             CurrentTopic = subscription.Topic;
 
             RefreshMessages();
-            AddLogEntry("Subscription selected: " + subscription.Name);
+            Log("Subscription selected: " + subscription.Name);
         }
 
         public void SetSelectedTopic(ServiceBusTopic selectedTopic)
         {
             CurrentTopic = selectedTopic;
-            AddLogEntry("Topic selected: " + selectedTopic.Name);
+            Log("Topic selected: " + selectedTopic.Name);
         }
 
         public void SetSelectedMessage(Message message)
         {
             CurrentMessage = message;
-            AddLogEntry("Message selected: " + message.MessageId);
-        }
+            Log("Message selected: " + message.MessageId);
+        } 
 
         public void ClearSelection()
         {
@@ -229,9 +240,5 @@ namespace PurpleExplorer.ViewModels
             SetTabHeaders();
         }
 
-        public void AddLogEntry(string log)
-        {
-            this.LogText += string.Concat(log, "\n");
-        }
     }
-}
+}   
