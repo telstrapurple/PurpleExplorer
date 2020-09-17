@@ -21,13 +21,15 @@
                         <TextBlock VerticalAlignment="Center">Connect</TextBlock>
                     </StackPanel>
                 </Button>
-                <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Width="300"
+                <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}"
+                          Width="300"
                           Height="500" Name="tvServiceBus">
                     <TreeView.DataTemplates>
                         <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="/Assets/service-bus.png" />
-                                <TextBlock Foreground="Purple" Margin="4" VerticalAlignment="Center" Text="{Binding Name}" />
+                                <TextBlock Foreground="Purple" Margin="4" VerticalAlignment="Center"
+                                           Text="{Binding Name}" />
                             </StackPanel>
                         </TreeDataTemplate>
                         <TreeDataTemplate DataType="models:ServiceBusTopic" ItemsSource="{Binding Subscriptions}">
@@ -56,7 +58,9 @@
             <StackPanel>
                 <Grid ColumnDefinitions="3*, 3*, 3*" RowDefinitions="*,20*" Margin="4">
                     <!-- side panel - top -->
-                    <Button Name="RefreshButton" Grid.Row="0" Grid.Column="0">
+                    <Button Name="RefreshButton" Grid.Row="0" Grid.Column="0"
+                            IsEnabled="{Binding !!CurrentSubscription}"
+                            Command="{Binding RefreshMessages}">
                         <StackPanel Orientation="Horizontal">
                             <Image Height="24" VerticalAlignment="Center" Source="/Assets/refresh.png" />
                             <TextBlock VerticalAlignment="Center">Refresh</TextBlock>
@@ -77,7 +81,8 @@
                 </Grid>
                 <TabControl>
                     <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
-                        <DataGrid Items="{Binding CurrentSubscription.Messages}" DoubleTapped="MessagesGrid_DoubleTapped"
+                        <DataGrid Items="{Binding CurrentSubscription.Messages}"
+                                  DoubleTapped="MessagesGrid_DoubleTapped"
                                   Tapped="MessagesGrid_Tapped" IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
@@ -98,7 +103,8 @@
             </StackPanel>
         </DockPanel>
         <DockPanel Dock="Bottom">
-            <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="150" Name="LogBox" Text="{Binding LogText}"></TextBlock>
+            <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="150" Name="LogBox"
+                       Text="{Binding LogText}" />
         </DockPanel>
     </StackPanel>
 

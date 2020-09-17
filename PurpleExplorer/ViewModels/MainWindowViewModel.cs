@@ -126,7 +126,7 @@ namespace PurpleExplorer.ViewModels
             CurrentSubscription.DlqMessages.AddRange(dlqMessages);
         }
 
-        public async Task SetSubscripitonMessages()
+        public async Task SetSubscriptionMessages()
         {
             CurrentSubscription.Messages.Clear();
             var messages =
@@ -191,16 +191,21 @@ namespace PurpleExplorer.ViewModels
             CurrentMessage = null;
         }
 
+        public async void RefreshMessages()
+        {
+            await Task.WhenAll(
+                SetSubscriptionMessages(),
+                SetDlqMessages());
+
+            SetTabHeaders();
+        }
+
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
         {
             CurrentSubscription = subscription;
             CurrentTopic = subscription.Topic;
 
-            await Task.WhenAll(
-                SetSubscripitonMessages(),
-                SetDlqMessages());
-
-            SetTabHeaders();
+            RefreshMessages();
             AddLogEntry("Subscription selected: " + subscription.Name);
         }
 
@@ -214,7 +219,7 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentMessage = message;
             AddLogEntry("Message selected: " + message.MessageId);
-        } 
+        }
 
         public void ClearSelection()
         {
