@@ -39,7 +39,8 @@
                     <TextBlock VerticalAlignment="Center">Connect</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Name="RefreshButton" Classes="topButton">
+            <Button Name="RefreshButton" Classes="topButton" IsEnabled="{Binding !!CurrentSubscription}"
+                    Command="{Binding RefreshMessages}">
                 <StackPanel Orientation="Horizontal">
                     <DrawingPresenter Drawing="{DynamicResource Material.Refresh}" />
                     <TextBlock VerticalAlignment="Center">Refresh</TextBlock>
@@ -52,7 +53,7 @@
                     <TextBlock VerticalAlignment="Center">New message</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Name="MinusButton" Classes="topButton">
+            <Button Name="MinusButton" Classes="topButton" Command="{Binding Delete}">
                 <StackPanel Orientation="Horizontal">
                     <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
                     <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
@@ -65,7 +66,7 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="1" Dock="Left">
-            <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" 
+            <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}"
                       Width="300" Name="tvServiceBus">
                 <TreeView.DataTemplates>
                     <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
@@ -103,7 +104,7 @@
             </TreeView>
             <TabControl>
                 <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding CurrentSubscription.Messages}" DoubleTapped="MessagesGrid_DoubleTapped"
+                    <DataGrid Items="{Binding CurrentSubscription.Messages}" Tapped="MessagesGrid_Tapped" DoubleTapped="MessagesGrid_DoubleTapped"
                               IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
@@ -112,7 +113,7 @@
                     </DataGrid>
                 </TabItem>
                 <TabItem Header="{Binding DlqTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding CurrentSubscription.DlqMessages}" IsReadOnly="True">
+                    <DataGrid Items="{Binding CurrentSubscription.DlqMessages}" Tapped="MessagesGrid_Tapped" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
                             <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />
@@ -123,7 +124,8 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">
-            <TextBox BorderThickness="0,3,0,0" HorizontalAlignment="Stretch" IsReadOnly="True" Name="LogBox" Watermark="logs ..." Text="{Binding LogText}"></TextBox>
+            <TextBox BorderThickness="0,3,0,0" HorizontalAlignment="Stretch" IsReadOnly="True" Name="LogBox"
+                     Watermark="logs ..." Text="{Binding LogText}" />
         </DockPanel>
     </Grid>
 </Window>

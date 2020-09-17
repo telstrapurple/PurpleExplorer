@@ -99,7 +99,7 @@ namespace PurpleExplorer.Helpers
             await topicClient.CloseAsync();
         }
 
-        public async Task DeleteMessage(string connectionString, string topicPath, string subscriptionPath,
+        public void DeleteMessage(string connectionString, string topicPath, string subscriptionPath,
             Message message, bool isDlq)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
