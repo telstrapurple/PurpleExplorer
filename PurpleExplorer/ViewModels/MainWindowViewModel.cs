@@ -75,30 +75,33 @@ namespace PurpleExplorer.ViewModels
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
                     viewModel);
-            _connectionString = returnedViewModel.ConnectionString.Trim();
+            _connectionString = returnedViewModel.ConnectionString?.Trim();
 
-            if (string.IsNullOrEmpty(_connectionString))
+            if (!returnedViewModel.Cancel)
             {
-                return;
-            }
-
-            try
-            {
-                var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(_connectionString);
-                var topics = await _serviceBusHelper.GetTopics(_connectionString);
-
-                var newResource = new ServiceBusResource
+                if (string.IsNullOrEmpty(_connectionString))
                 {
-                    Name = namespaceInfo.Name,
-                    ConnectionString = _connectionString,
-                    Topics = new ObservableCollection<ServiceBusTopic>(topics)
-                };
+                    return;
+                }
 
-                ConnectedServiceBuses.Add(newResource);
-            }
-            catch (ArgumentException)
-            {
-                await MessageBoxHelper.ShowError("The connection string is invalid.");
+                try
+                {
+                    var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(_connectionString);
+                    var topics = await _serviceBusHelper.GetTopics(_connectionString);
+
+                    var newResource = new ServiceBusResource
+                    {
+                        Name = namespaceInfo.Name,
+                        ConnectionString = _connectionString,
+                        Topics = new ObservableCollection<ServiceBusTopic>(topics)
+                    };
+
+                    ConnectedServiceBuses.Add(newResource);
+                }
+                catch (ArgumentException)
+                {
+                    await MessageBoxHelper.ShowError("The connection string is invalid.");
+                }
             }
         }
 
@@ -139,11 +142,18 @@ namespace PurpleExplorer.ViewModels
             if (CurrentSubscription != null || (CurrentTopic != null && CurrentTopic.Subscriptions.Count > 0))
             {
                 var viewModal = new AddMessageWindowViewModal();
+
                 var topicName = CurrentSubscription == null ? CurrentTopic.Name : CurrentSubscription.Topic.Name;
                 var returnedViewModal =
                     await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
-                var message = returnedViewModal.Message.Trim();
-                await _serviceBusHelper.SendTopicMessage(_connectionString, topicName, message);
+
+                if (!returnedViewModal.Cancel)
+                {
+                    var message = returnedViewModal.Message;
+
+                    if (!string.IsNullOrEmpty(message))
+                        await _serviceBusHelper.SendTopicMessage(_connectionString, topicName, message.Trim());
+                }            
             }
 
             if (CurrentTopic != null && CurrentTopic.Subscriptions.Count == 0)
