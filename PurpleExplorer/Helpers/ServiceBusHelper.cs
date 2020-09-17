@@ -107,14 +107,12 @@ namespace PurpleExplorer.Helpers
             
             var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
 
-            Task Handler(AzureMessage msg, CancellationToken token)
+            async Task Handler(AzureMessage msg, CancellationToken token)
             {
                 if (msg.MessageId.Equals(message.MessageId))
                 {
-                    receiver.CompleteAsync(msg.SystemProperties.LockToken);
+                    await receiver.CompleteAsync(msg.SystemProperties.LockToken);
                 }
-
-                return Task.CompletedTask;
             }
 
             Task ExceptionHandler(ExceptionReceivedEventArgs args)
@@ -130,7 +128,6 @@ namespace PurpleExplorer.Helpers
             };
 
             receiver.RegisterMessageHandler(Handler, messageHandlerOptions);
-            await receiver.PeekBySequenceNumberAsync(message.SequenceNumber, 1);
         }
     }
 }
