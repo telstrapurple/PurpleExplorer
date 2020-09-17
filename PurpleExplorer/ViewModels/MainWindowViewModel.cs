@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using DynamicData;
 using PurpleExplorer.Helpers;
@@ -13,7 +14,6 @@ namespace PurpleExplorer.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private string _connectionString;
         private readonly IServiceBusHelper _serviceBusHelper;
         private string _messageTabHeader;
         private string _dlqTabHeader;
@@ -75,33 +75,34 @@ namespace PurpleExplorer.ViewModels
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
                     viewModel);
-            _connectionString = returnedViewModel.ConnectionString?.Trim();
+            var connectionString = returnedViewModel.ConnectionString?.Trim();
 
-            if (!returnedViewModel.Cancel)
+            if (returnedViewModel.Cancel)
             {
-                if (string.IsNullOrEmpty(_connectionString))
-                {
-                    return;
-                }
+                return;
+            }
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                return;
+            }
 
-                try
-                {
-                    var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(_connectionString);
-                    var topics = await _serviceBusHelper.GetTopics(_connectionString);
+            try
+            {
+                var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(connectionString);
+                var topics = await _serviceBusHelper.GetTopics(connectionString);
 
-                    var newResource = new ServiceBusResource
-                    {
-                        Name = namespaceInfo.Name,
-                        ConnectionString = _connectionString,
-                        Topics = new ObservableCollection<ServiceBusTopic>(topics)
-                    };
-
-                    ConnectedServiceBuses.Add(newResource);
-                }
-                catch (ArgumentException)
+                var newResource = new ServiceBusResource
                 {
-                    await MessageBoxHelper.ShowError("The connection string is invalid.");
-                }
+                    Name = namespaceInfo.Name,
+                    ConnectionString = connectionString
+                };
+                    
+                newResource.AddTopics(topics.ToArray());
+                ConnectedServiceBuses.Add(newResource);
+            }
+            catch (ArgumentException)
+            {
+                await MessageBoxHelper.ShowError("The connection string is invalid.");
             }
         }
 
@@ -109,8 +110,7 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription.DlqMessages.Clear();
             var dlqMessages =
-                await _serviceBusHelper.GetDlqMessages(_connectionString, CurrentSubscription.Topic.Name,
-                    CurrentSubscription.Name);
+                await _serviceBusHelper.GetDlqMessages(CurrentSubscription.Topic.ServiceBus.ConnectionString, CurrentSubscription.Topic.Name, CurrentSubscription.Name);
             CurrentSubscription.DlqMessages.AddRange(dlqMessages);
         }
 
@@ -118,7 +118,7 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription.Messages.Clear();
             var messages =
-                await _serviceBusHelper.GetMessagesBySubscription(_connectionString, CurrentSubscription.Topic.Name,
+                await _serviceBusHelper.GetMessagesBySubscription(CurrentSubscription.Topic.ServiceBus.ConnectionString, CurrentSubscription.Topic.Name,
                     CurrentSubscription.Name);
             CurrentSubscription.Messages.AddRange(messages);
         }
@@ -149,10 +149,10 @@ namespace PurpleExplorer.ViewModels
 
                 if (!returnedViewModal.Cancel)
                 {
-                    var message = returnedViewModal.Message;
-
-                    if (!string.IsNullOrEmpty(message))
-                        await _serviceBusHelper.SendTopicMessage(_connectionString, topicName, message.Trim());
+                    var messageText = returnedViewModal.Message.Trim();
+                    var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+                    if (!string.IsNullOrEmpty(messageText))
+                        await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
                 }            
             }
 
@@ -162,7 +162,8 @@ namespace PurpleExplorer.ViewModels
 
         public async void DeleteMessage()
         {
-            await _serviceBusHelper.DeleteMessage(_connectionString, _currentTopic.Name, _currentSubscription.Name,
+            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+            await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
             CurrentMessage = null;
         }
