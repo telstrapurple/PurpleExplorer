@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="PurpleExplorer">
+        Title="PurpleExplorer - cross-platform Azure Service Bus explorer">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
@@ -123,8 +123,7 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">
-            <TextBlock HorizontalAlignment="Stretch" Background="gray" Foreground="White"
-                       Name="LogBox" Text="{Binding LogText}" />
+            <TextBox BorderThickness="0,3,0,0" HorizontalAlignment="Stretch" IsReadOnly="True" Name="LogBox" Watermark="logs ..." Text="{Binding LogText}"></TextBox>
         </DockPanel>
     </Grid>
 </Window>
