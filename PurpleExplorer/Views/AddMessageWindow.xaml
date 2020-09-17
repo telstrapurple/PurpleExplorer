@@ -5,14 +5,22 @@
         xmlns:viewModels="clr-namespace:PurpleExplorer.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.AddMessageWindow"
-        Title="AvaloniaAppTemplate" Width="700" Height="100">
-    
+        Title="Send message" Width="700" Height="200">
+
     <Design.DataContext>
         <viewModels:AddMessageWindowViewModal />
     </Design.DataContext>
 
-    <StackPanel>
-        <TextBox Width="600" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding Path=Message, Mode=TwoWay}"></TextBox>
-        <Button Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnAddClick">Add Message</Button>
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <TextBox MinWidth="600" MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 TextWrapping="Wrap" Text="{Binding Path=Message, Mode=TwoWay}" />
+        <Button Grid.Row="1" Width="200" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center"
+                Click="btnAddClick" Margin="0,0,5,0">
+            Send
+        </Button>
+    </Grid>
 </Window>

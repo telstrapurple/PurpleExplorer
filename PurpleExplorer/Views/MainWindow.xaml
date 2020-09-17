@@ -65,8 +65,8 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="1" Dock="Left">
-            <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Width="300"
-                      Name="tvServiceBus">
+            <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" 
+                      Width="300" Name="tvServiceBus">
                 <TreeView.DataTemplates>
                     <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                         <StackPanel Orientation="Horizontal">
