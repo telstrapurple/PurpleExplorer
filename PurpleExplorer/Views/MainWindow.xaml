@@ -25,8 +25,13 @@
         </Style>
     </Window.Styles>
 
-    <StackPanel Orientation="Vertical">
-        <DockPanel Dock="Left" Background="#4c4c4c">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Column="0" Grid.Row="0" Dock="Left" Background="#380f14">
             <Button HorizontalAlignment="Left" Command="{Binding ConnectionBtnPopupCommand}"
                     Classes="topButton">
                 <StackPanel Orientation="Horizontal">
@@ -59,9 +64,9 @@
             </TextBlock>
         </DockPanel>
 
-        <DockPanel Dock="Left">
+        <DockPanel Grid.Column="0" Grid.Row="1" Dock="Left">
             <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Width="300"
-                      Name="tvServiceBus" VerticalAlignment="Stretch" MinHeight="500">
+                      Name="tvServiceBus">
                 <TreeView.DataTemplates>
                     <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                         <StackPanel Orientation="Horizontal">
@@ -116,10 +121,10 @@
                 </TabItem>
             </TabControl>
         </DockPanel>
-        <DockPanel Dock="Bottom" Height="100">
-            <TextBlock HorizontalAlignment="Stretch" Background="gray"
+
+        <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">
+            <TextBlock HorizontalAlignment="Stretch" Background="gray" Foreground="White"
                        Name="LogBox" Text="{Binding LogText}" />
         </DockPanel>
-    </StackPanel>
-
+    </Grid>
 </Window>
