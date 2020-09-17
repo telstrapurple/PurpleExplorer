@@ -69,7 +69,7 @@ namespace PurpleExplorer.Helpers
                 EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
             var subscriptionMessages = await messageReceiver.PeekAsync(_maxMessageCount);
 
-            var result = subscriptionMessages.Select(message => new Message(message)).ToList();
+            var result = subscriptionMessages.Select(message => new Message(message, false)).ToList();
 
             return result;
         }
@@ -81,7 +81,7 @@ namespace PurpleExplorer.Helpers
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
 
-            var result = receivedMessages.Select(message => new Message(message)).ToList();
+            var result = receivedMessages.Select(message => new Message(message, true)).ToList();
 
             return result;
         }
@@ -100,30 +100,36 @@ namespace PurpleExplorer.Helpers
         }
 
         public async Task DeleteMessage(string connectionString, string topicPath, string subscriptionPath,
-            Message message)
+            Message message, bool isDlq)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
+            
             var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
 
-            Func<AzureMessage, CancellationToken, Task> handler = (msg, token) =>
+            Task Handler(AzureMessage msg, CancellationToken token)
             {
                 if (msg.MessageId.Equals(message.MessageId))
                 {
                     receiver.CompleteAsync(msg.SystemProperties.LockToken);
                 }
+
                 return Task.CompletedTask;
-            };
-            Func<ExceptionReceivedEventArgs, Task> exceptionHandler = args =>
+            }
+
+            Task ExceptionHandler(ExceptionReceivedEventArgs args)
             {
                 /*TODO add logging */
                 return Task.CompletedTask;
-            };
-            var messageHandlerOptions = new MessageHandlerOptions(exceptionHandler)
+            }
+
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionHandler)
             {
+                MaxConcurrentCalls = 1,    // For simplicity
                 AutoComplete = false
             };
 
-            receiver.RegisterMessageHandler(handler, messageHandlerOptions);
+            receiver.RegisterMessageHandler(Handler, messageHandlerOptions);
             await receiver.PeekBySequenceNumberAsync(message.SequenceNumber, 1);
         }
     }

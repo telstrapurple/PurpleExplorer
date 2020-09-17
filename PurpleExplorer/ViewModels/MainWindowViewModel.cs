@@ -153,7 +153,7 @@ namespace PurpleExplorer.ViewModels
         public async void DeleteMessage()
         {
             await _serviceBusHelper.DeleteMessage(_connectionString, _currentTopic.Name, _currentSubscription.Name,
-                _currentMessage);
+                _currentMessage, _currentMessage.IsDlq);
             CurrentMessage = null;
         }
 
