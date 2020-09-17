@@ -10,6 +10,7 @@ using Splat;
 using ReactiveUI;
 using System.Threading.Tasks;
 using MessageBox.Avalonia.Enums;
+using PurpleExplorer.Services;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -21,7 +22,8 @@ namespace PurpleExplorer.ViewModels
         private ServiceBusSubscription _currentSubscription;
         private ServiceBusTopic _currentTopic;
         private Message _currentMessage;
-        private string _logText;
+
+        private ILoggingService _loggingService;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
 
@@ -57,8 +59,7 @@ namespace PurpleExplorer.ViewModels
 
         public string LogText
         {
-            get => _logText;
-            set => this.RaiseAndSetIfChanged(ref _logText, value);
+            get => _loggingService.Logs;
         }
 
         public ReactiveCommand<Unit, Unit> Delete { get; }
@@ -68,6 +69,8 @@ namespace PurpleExplorer.ViewModels
             _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
 
+            _loggingService = Locator.Current.GetService<ILoggingService>();
+            _loggingService.Log("Some message");
 
             var deleteEnabled =
                 this.WhenAnyValue<MainWindowViewModel, bool, Message>(x => x.CurrentMessage, x => x != null);
