@@ -21,6 +21,7 @@ namespace PurpleExplorer.ViewModels
         private ServiceBusSubscription _currentSubscription;
         private ServiceBusTopic _currentTopic;
         private Message _currentMessage;
+        private string _logText;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
 
@@ -52,6 +53,12 @@ namespace PurpleExplorer.ViewModels
         {
             get => _currentMessage;
             set => this.RaiseAndSetIfChanged(ref _currentMessage, value);
+        }
+
+        public string LogText
+        {
+            get => _logText;
+            set => this.RaiseAndSetIfChanged(ref _logText, value);
         }
 
         public ReactiveCommand<Unit, Unit> Delete { get; }
@@ -101,10 +108,12 @@ namespace PurpleExplorer.ViewModels
 
                 newResource.AddTopics(topics.ToArray());
                 ConnectedServiceBuses.Add(newResource);
+                AddLogEntry("Connected to service bus " + connectionString);
             }
             catch (ArgumentException)
             {
                 await MessageBoxHelper.ShowError("The connection string is invalid.");
+                AddLogEntry("Invalid connection string.");
             }
         }
 
@@ -192,17 +201,20 @@ namespace PurpleExplorer.ViewModels
                 SetDlqMessages());
 
             SetTabHeaders();
+            AddLogEntry("Subscription selected: " + subscription.Name);
         }
 
         public void SetSelectedTopic(ServiceBusTopic selectedTopic)
         {
             CurrentTopic = selectedTopic;
+            AddLogEntry("Topic selected: " + selectedTopic.Name);
         }
 
         public void SetSelectedMessage(Message message)
         {
             CurrentMessage = message;
-        }
+            AddLogEntry("Message selected: " + message.MessageId);
+        } 
 
         public void ClearSelection()
         {
@@ -210,6 +222,11 @@ namespace PurpleExplorer.ViewModels
             CurrentTopic = null;
             CurrentMessage = null;
             SetTabHeaders();
+        }
+
+        public void AddLogEntry(string log)
+        {
+            this.LogText += string.Concat(log, "\n");
         }
     }
 }
