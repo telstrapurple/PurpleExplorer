@@ -25,7 +25,10 @@ namespace PurpleExplorer
             {
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(),
+                    DataContext = new MainWindowViewModel(
+                        Locator.Current.GetService<IServiceBusHelper>(),
+                        Locator.Current.GetService<ILoggingService>()
+                    ),
                 };
             }
 

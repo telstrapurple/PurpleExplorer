@@ -54,9 +54,5 @@ namespace PurpleExplorer.Views
                 mainWindowViewModel.SetSelectedTopic(selectedTopic);
             }
         }
-        public void AddLogEntry(string logEntry)
-        {
-            (this.DataContext as MainWindowViewModel).AddLogEntry(logEntry);
-        }
     }
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
+﻿using System.Text;
 
 namespace PurpleExplorer.Services
 {
-    public class LoggingService : ILoggingService
+    public class LoggingService : ILoggingService 
     {
         private StringBuilder _log;
 
