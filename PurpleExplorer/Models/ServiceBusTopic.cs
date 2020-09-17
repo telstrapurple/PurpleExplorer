@@ -6,6 +6,7 @@ namespace PurpleExplorer.Models
     {
         public string Name { get; set; }
         public ObservableCollection<ServiceBusSubscription> Subscriptions { get; private set; }
+        public ServiceBusResource ServiceBus { get; set; }
 
         public void AddSubscriptions(params ServiceBusSubscription[] subscriptions)
         {
