@@ -29,7 +29,7 @@ namespace PurpleExplorer.Helpers
 
                 var newTopic = new ServiceBusTopic
                 {
-                    Name = topicName,
+                    Name = topicName
                 };
 
                 newTopic.AddSubscriptions(subscriptions.ToArray());
@@ -48,7 +48,7 @@ namespace PurpleExplorer.Helpers
             foreach (var sub in topicSubscription)
             {
                 subscriptions.Add(
-                    new ServiceBusSubscription()
+                    new ServiceBusSubscription
                     {
                         Name = sub.SubscriptionName,
                         MessageCount = sub.MessageCountDetails.ActiveMessageCount,
