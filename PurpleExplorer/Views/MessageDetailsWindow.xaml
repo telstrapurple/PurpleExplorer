@@ -15,7 +15,7 @@
                         
         </Style>
     </Window.Styles>
-    <Grid Height="200" VerticalAlignment="Top">
+    <Grid Height="200" VerticalAlignment="Top" ShowGridLines="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />

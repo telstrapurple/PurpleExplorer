@@ -5,14 +5,19 @@
         mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="200"
         x:Class="PurpleExplorer.Views.ConnectionStringWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
-        Title="ConnectionStringWindow" Width="700" Height="100">
+        Title="Connect to Service Bus" Width="500" Height="200">
     
     <Design.DataContext>
         <vm:ConnectionStringWindowViewModel />
     </Design.DataContext>
     
-    <StackPanel>
-        <TextBox Width="700" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding Path=ConnectionString, Mode=TwoWay}"></TextBox>
-        <Button Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnSendClick">Connect to Service Bus</Button>
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        
+        <TextBox Grid.Row="0" MinWidth="500" MinHeight="150" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding Path=ConnectionString, Mode=TwoWay}"></TextBox>
+        <Button Grid.Row="1" Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center" Click="btnSendClick">Connect to Service Bus</Button>
+    </Grid>
 </Window>
