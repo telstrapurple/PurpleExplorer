@@ -8,35 +8,29 @@ namespace PurpleExplorer.Helpers
 {
     public class MessageBoxHelper
     {
+        public static async Task<ButtonResult> ShowConfirmation(string title, string message)
+        {
+            return await ShowMessageBox(ButtonEnum.YesNo, Icon.Warning, title, message);
+        }
+        
         public static async Task<ButtonResult> ShowError(string message)
         {
-            return await ShowError(ButtonEnum.Ok, "Error", message);
-        }
-        public static async Task<ButtonResult> ShowError(ButtonEnum buttons, string title, string message)
-        {
-            var msBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
-            {
-                ButtonDefinitions = buttons,
-                ContentTitle = title, 
-                ContentMessage = message,
-                Icon = Icon.Error,
-                CanResize = false,
-                WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen
-            });
-
-            var applicationLifeTime = Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-            return await msBoxStandardWindow.ShowDialog(applicationLifeTime.MainWindow);
-           
+            return await ShowMessageBox(ButtonEnum.Ok, Icon.Error, "Error", message);
         }
 
         public static async Task<ButtonResult> ShowMessage(string title, string message)
         {
+            return await ShowMessageBox(ButtonEnum.Ok, Icon.Info, title, message);
+        }
+        
+        public static async Task<ButtonResult> ShowMessageBox(ButtonEnum buttons, Icon icon, string title, string message)
+        {
             var msBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams
             {
-                ButtonDefinitions = ButtonEnum.Ok,
+                ButtonDefinitions = buttons,
                 ContentTitle = title,
                 ContentMessage = message,
-                Icon = Icon.Info,
+                Icon = icon,
                 CanResize = false,
                 WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen
             });
