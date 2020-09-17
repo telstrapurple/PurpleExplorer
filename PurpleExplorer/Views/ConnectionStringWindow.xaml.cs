@@ -21,7 +21,7 @@ namespace PurpleExplorer.Views
         {
             var dataContext = this.DataContext as ConnectionStringWindowViewModel;
             if (string.IsNullOrEmpty(dataContext.ConnectionString))
-                await MessageBoxHelper.ShowError(MessageBox.Avalonia.Enums.ButtonEnum.OkCancel, "Error", "Please enter a service bus connection string.");
+                await MessageBoxHelper.ShowError("Please enter a service bus connection string.");
             else
             {
                 dataContext.Cancel = false;

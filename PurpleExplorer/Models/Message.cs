@@ -15,8 +15,9 @@ namespace PurpleExplorer.Models
         public int DeliveryCount { get; set; }
         public long SequenceNumber { get; set; }
         public TimeSpan TimeToLive { get; set; }
+        public bool IsDlq { get; set; }
 
-        public Message(AzureMessage azureMessage)
+        public Message(AzureMessage azureMessage, bool isDlq)
         {
             this.Content = Encoding.UTF8.GetString(azureMessage.Body);
             this.MessageId = azureMessage.MessageId;
@@ -26,6 +27,7 @@ namespace PurpleExplorer.Models
             this.SequenceNumber = azureMessage.SystemProperties.SequenceNumber;
             this.Size = azureMessage.Size;
             this.TimeToLive = azureMessage.TimeToLive;
+            this.IsDlq = isDlq;
         }
     }
 }

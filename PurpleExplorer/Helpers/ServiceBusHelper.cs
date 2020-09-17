@@ -1,10 +1,12 @@
-﻿using Microsoft.Azure.ServiceBus;
+﻿using System;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Microsoft.Azure.ServiceBus.Management;
 using PurpleExplorer.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Message = PurpleExplorer.Models.Message;
 using AzureMessage = Microsoft.Azure.ServiceBus.Message;
@@ -67,7 +69,7 @@ namespace PurpleExplorer.Helpers
                 EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
             var subscriptionMessages = await messageReceiver.PeekAsync(_maxMessageCount);
 
-            var result = subscriptionMessages.Select(message => new Message(message)).ToList();
+            var result = subscriptionMessages.Select(message => new Message(message, false)).ToList();
 
             return result;
         }
@@ -79,8 +81,8 @@ namespace PurpleExplorer.Helpers
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
 
-            var result = receivedMessages.Select(message => new Message(message)).ToList();
-            
+            var result = receivedMessages.Select(message => new Message(message, true)).ToList();
+
             return result;
         }
 
@@ -95,6 +97,40 @@ namespace PurpleExplorer.Helpers
             var topicClient = new TopicClient(connectionString, topicPath);
             await topicClient.SendAsync(new AzureMessage() {Body = Encoding.UTF8.GetBytes(message)});
             await topicClient.CloseAsync();
+        }
+
+        public async Task DeleteMessage(string connectionString, string topicPath, string subscriptionPath,
+            Message message, bool isDlq)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
+            
+            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
+
+            Task Handler(AzureMessage msg, CancellationToken token)
+            {
+                if (msg.MessageId.Equals(message.MessageId))
+                {
+                    receiver.CompleteAsync(msg.SystemProperties.LockToken);
+                }
+
+                return Task.CompletedTask;
+            }
+
+            Task ExceptionHandler(ExceptionReceivedEventArgs args)
+            {
+                /*TODO add logging */
+                return Task.CompletedTask;
+            }
+
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionHandler)
+            {
+                MaxConcurrentCalls = 1,    // For simplicity
+                AutoComplete = false
+            };
+
+            receiver.RegisterMessageHandler(Handler, messageHandlerOptions);
+            await receiver.PeekBySequenceNumberAsync(message.SequenceNumber, 1);
         }
     }
 }

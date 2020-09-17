@@ -25,8 +25,7 @@ namespace PurpleExplorer.Views
         {
             var dataContext = DataContext as AddMessageWindowViewModal;
             if (string.IsNullOrEmpty(dataContext.Message))
-                await MessageBoxHelper.ShowError(MessageBox.Avalonia.Enums.ButtonEnum.OkCancel, "Error",
-                    "Please enter a message to be sent");
+                await MessageBoxHelper.ShowError("Please enter a message to be sent");
             else
             {
                 dataContext.Cancel = false;

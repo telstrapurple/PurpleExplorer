@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
@@ -8,6 +9,7 @@ using PurpleExplorer.Views;
 using Splat;
 using ReactiveUI;
 using System.Threading.Tasks;
+using MessageBox.Avalonia.Enums;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -18,6 +20,7 @@ namespace PurpleExplorer.ViewModels
         private string _dlqTabHeader;
         private ServiceBusSubscription _currentSubscription;
         private ServiceBusTopic _currentTopic;
+        private Message _currentMessage;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
 
@@ -45,10 +48,23 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _currentTopic, value);
         }
 
+        public Message CurrentMessage
+        {
+            get => _currentMessage;
+            set => this.RaiseAndSetIfChanged(ref _currentMessage, value);
+        }
+
+        public ReactiveCommand<Unit, Unit> Delete { get; }
+
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null)
         {
             _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
+
+
+            var deleteEnabled =
+                this.WhenAnyValue<MainWindowViewModel, bool, Message>(x => x.CurrentMessage, x => x != null);
+            Delete = ReactiveCommand.Create(() => DeleteMessage(), deleteEnabled);
 
             SetTabHeaders();
         }
@@ -66,6 +82,7 @@ namespace PurpleExplorer.ViewModels
             {
                 return;
             }
+
             if (string.IsNullOrEmpty(connectionString))
             {
                 return;
@@ -81,7 +98,7 @@ namespace PurpleExplorer.ViewModels
                     Name = namespaceInfo.Name,
                     ConnectionString = connectionString
                 };
-                    
+
                 newResource.AddTopics(topics.ToArray());
                 ConnectedServiceBuses.Add(newResource);
             }
@@ -95,7 +112,8 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription.DlqMessages.Clear();
             var dlqMessages =
-                await _serviceBusHelper.GetDlqMessages(CurrentSubscription.Topic.ServiceBus.ConnectionString, CurrentSubscription.Topic.Name, CurrentSubscription.Name);
+                await _serviceBusHelper.GetDlqMessages(CurrentSubscription.Topic.ServiceBus.ConnectionString,
+                    CurrentSubscription.Topic.Name, CurrentSubscription.Name);
             CurrentSubscription.DlqMessages.AddRange(dlqMessages);
         }
 
@@ -103,7 +121,8 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription.Messages.Clear();
             var messages =
-                await _serviceBusHelper.GetMessagesBySubscription(CurrentSubscription.Topic.ServiceBus.ConnectionString, CurrentSubscription.Topic.Name,
+                await _serviceBusHelper.GetMessagesBySubscription(CurrentSubscription.Topic.ServiceBus.ConnectionString,
+                    CurrentSubscription.Topic.Name,
                     CurrentSubscription.Name);
             CurrentSubscription.Messages.AddRange(messages);
         }
@@ -138,11 +157,29 @@ namespace PurpleExplorer.ViewModels
                     var connectionString = CurrentTopic.ServiceBus.ConnectionString;
                     if (!string.IsNullOrEmpty(messageText))
                         await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
-                }            
+                }
             }
 
             if (CurrentTopic != null && CurrentTopic.Subscriptions.Count == 0)
                 await MessageBoxHelper.ShowError("Can't send a message to a Topic without any subscriptions.");
+        }
+
+        public async void DeleteMessage()
+        {
+            var buttonResult = await MessageBoxHelper.ShowConfirmation(
+                $"Deleting message from {_currentTopic.Name}/{_currentSubscription.Name}",
+                $"Are you sure you would like to delete the message with the content: \n {_currentMessage.Content}");
+
+            if (buttonResult == ButtonResult.No)
+            {
+                CurrentMessage = null;
+                return;
+            }
+
+            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+            await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
+                _currentMessage, _currentMessage.IsDlq);
+            CurrentMessage = null;
         }
 
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
@@ -153,7 +190,7 @@ namespace PurpleExplorer.ViewModels
             await Task.WhenAll(
                 SetSubscripitonMessages(),
                 SetDlqMessages());
-            
+
             SetTabHeaders();
         }
 
@@ -162,10 +199,16 @@ namespace PurpleExplorer.ViewModels
             CurrentTopic = selectedTopic;
         }
 
+        public void SetSelectedMessage(Message message)
+        {
+            CurrentMessage = message;
+        }
+
         public void ClearSelection()
         {
             CurrentSubscription = null;
             CurrentTopic = null;
+            CurrentMessage = null;
             SetTabHeaders();
         }
     }
