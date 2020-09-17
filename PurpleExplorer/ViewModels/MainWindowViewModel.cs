@@ -196,13 +196,13 @@ namespace PurpleExplorer.ViewModels
             }
 
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-            await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
+             _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
             CurrentMessage = null;
             Log("Message deleted.");
         }
 
-        public async void RefreshMessages()
+        public async Task RefreshMessages()
         {
             await Task.WhenAll(
                 SetSubscriptionMessages(),
@@ -216,7 +216,7 @@ namespace PurpleExplorer.ViewModels
             CurrentSubscription = subscription;
             CurrentTopic = subscription.Topic;
 
-            RefreshMessages();
+            await RefreshMessages();
             Log("Subscription selected: " + subscription.Name);
         }
 
