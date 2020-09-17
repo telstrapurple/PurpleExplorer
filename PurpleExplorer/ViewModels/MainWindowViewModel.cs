@@ -180,7 +180,7 @@ namespace PurpleExplorer.ViewModels
         private void Log(string message)
         {
             _loggingService.Log(message);
-            this.RaisePropertyChanged("LogText");
+            this.RaisePropertyChanged(nameof(LogText));
         }
 
         public async void DeleteMessage()
