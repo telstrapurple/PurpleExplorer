@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace PurpleExplorer.Services
 {
@@ -15,7 +16,7 @@ namespace PurpleExplorer.Services
 
         public void Log(string message)
         {
-            _log.Append(message + "\n");
+            _log.Insert(0, "[" + DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt") + "] " + message + "\n");
         }
     }
 }
