@@ -19,6 +19,7 @@
         <TextBox MinWidth="600" MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                  TextWrapping="Wrap" Text="{Binding Path=Message, Mode=TwoWay}" />
         <Button Grid.Row="1" Width="200" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center"
+                IsEnabled="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                 Click="btnAddClick" Margin="0,0,5,0">
             Send
         </Button>

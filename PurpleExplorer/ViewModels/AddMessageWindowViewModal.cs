@@ -1,8 +1,19 @@
+using ReactiveUI;
+
 namespace PurpleExplorer.ViewModels
 {
     public class AddMessageWindowViewModal : DialogViewModelBase
     {
-        public string Message { get; set; }
-        public AddMessageWindowViewModal() : base() { }
+        private string _message;
+
+        public string Message
+        {
+            get => _message;
+            set => this.RaiseAndSetIfChanged(ref _message, value);
+        }
+
+        public AddMessageWindowViewModal() : base()
+        {
+        }
     }
-}  
+}

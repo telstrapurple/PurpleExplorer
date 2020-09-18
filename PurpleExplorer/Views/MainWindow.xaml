@@ -46,14 +46,15 @@
                     <TextBlock VerticalAlignment="Center">Refresh</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Name="AddButton" Command="{Binding AddMessage}"
-                    Classes="topButton">
+            <Button Name="AddButton" Classes="topButton" IsEnabled="{Binding !!CurrentSubscription}"
+                    Command="{Binding AddMessage}">
                 <StackPanel Orientation="Horizontal">
                     <DrawingPresenter Drawing="{DynamicResource Material.Send}" />
                     <TextBlock VerticalAlignment="Center">New message</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Name="MinusButton" Classes="topButton" Command="{Binding Delete}">
+            <Button Name="MinusButton" Classes="topButton" IsEnabled="{Binding !!CurrentMessage}"
+                    Command="{Binding DeleteMessage}">
                 <StackPanel Orientation="Horizontal">
                     <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
                     <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
@@ -104,7 +105,8 @@
             </TreeView>
             <TabControl>
                 <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding CurrentSubscription.Messages}" Tapped="MessagesGrid_Tapped" DoubleTapped="MessagesGrid_DoubleTapped"
+                    <DataGrid Items="{Binding CurrentSubscription.Messages}" Tapped="MessagesGrid_Tapped"
+                              DoubleTapped="MessagesGrid_DoubleTapped"
                               IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
@@ -113,7 +115,8 @@
                     </DataGrid>
                 </TabItem>
                 <TabItem Header="{Binding DlqTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding CurrentSubscription.DlqMessages}" Tapped="MessagesGrid_Tapped" IsReadOnly="True">
+                    <DataGrid Items="{Binding CurrentSubscription.DlqMessages}" Tapped="MessagesGrid_Tapped"
+                              IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
                             <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />

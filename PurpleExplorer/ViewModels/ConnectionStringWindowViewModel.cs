@@ -1,9 +1,19 @@
-﻿namespace PurpleExplorer.ViewModels
+﻿using ReactiveUI;
+
+namespace PurpleExplorer.ViewModels
 {
     public class ConnectionStringWindowViewModel : DialogViewModelBase
     {
-        public string ConnectionString { get; set; }
+        private string _connectionString;
 
-        public ConnectionStringWindowViewModel() : base() { }
+        public string ConnectionString
+        {
+            get => _connectionString;
+            set => this.RaiseAndSetIfChanged(ref _connectionString, value);
+        }
+
+        public ConnectionStringWindowViewModel() : base()
+        {
+        }
     }
 }

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.Views;
-using Splat;
 using ReactiveUI;
 using System.Threading.Tasks;
 using MessageBox.Avalonia.Enums;
@@ -61,18 +59,12 @@ namespace PurpleExplorer.ViewModels
             get => _loggingService.Logs;
         }
 
-        public ReactiveCommand<Unit, Unit> Delete { get; }
-
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
             _loggingService = loggingService;
             _serviceBusHelper = serviceBusHelper;
 
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
-
-            var deleteEnabled =
-                this.WhenAnyValue<MainWindowViewModel, bool, Message>(x => x.CurrentMessage, x => x != null);
-            Delete = ReactiveCommand.Create(() => DeleteMessage(), deleteEnabled);
 
             SetTabHeaders();
         }
@@ -196,7 +188,7 @@ namespace PurpleExplorer.ViewModels
             }
 
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-             _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
+            _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
             CurrentMessage = null;
             Log("Message deleted.");
@@ -230,7 +222,7 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentMessage = message;
             Log("Message selected: " + message.MessageId);
-        } 
+        }
 
         public void ClearSelection()
         {
@@ -239,6 +231,5 @@ namespace PurpleExplorer.ViewModels
             CurrentMessage = null;
             SetTabHeaders();
         }
-
     }
-}   
+}
