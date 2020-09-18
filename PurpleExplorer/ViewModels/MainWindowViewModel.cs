@@ -6,7 +6,6 @@ using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.Views;
-using Splat;
 using ReactiveUI;
 using System.Threading.Tasks;
 using MessageBox.Avalonia.Enums;
@@ -98,6 +97,8 @@ namespace PurpleExplorer.ViewModels
 
             try
             {
+                Log("Connecting...");
+
                 var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(connectionString);
                 var topics = await _serviceBusHelper.GetTopics(connectionString);
 
@@ -134,15 +135,14 @@ namespace PurpleExplorer.ViewModels
                     CurrentSubscription.Topic.Name,
                     CurrentSubscription.Name);
             CurrentSubscription.Messages.AddRange(messages);
-            Log("Fetch messages.");
         }
 
         public void SetTabHeaders()
         {
             if (CurrentSubscription == null)
             {
-                MessagesTabHeader = $"Messages";
-                DlqTabHeader = $"Dead-letter";
+                MessagesTabHeader = "Messages";
+                DlqTabHeader = "Dead-letter";
             }
             else
             {
@@ -204,9 +204,13 @@ namespace PurpleExplorer.ViewModels
 
         public async Task RefreshMessages()
         {
+            Log("Fetching messages...");
+
             await Task.WhenAll(
                 SetSubscriptionMessages(),
                 SetDlqMessages());
+
+            Log("Fetched messages");
 
             SetTabHeaders();
         }
