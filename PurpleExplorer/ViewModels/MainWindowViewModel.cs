@@ -98,6 +98,8 @@ namespace PurpleExplorer.ViewModels
 
             try
             {
+                Log("connecting...");
+
                 var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(connectionString);
                 var topics = await _serviceBusHelper.GetTopics(connectionString);
 

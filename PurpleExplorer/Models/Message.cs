@@ -15,6 +15,8 @@ namespace PurpleExplorer.Models
         public int DeliveryCount { get; set; }
         public long SequenceNumber { get; set; }
         public TimeSpan TimeToLive { get; set; }
+        public DateTime EnqueueTimeUtc { get; set; }
+        public string DeadLetterReason { get; set; }
         public bool IsDlq { get; set; }
 
         public Message(AzureMessage azureMessage, bool isDlq)
@@ -28,6 +30,10 @@ namespace PurpleExplorer.Models
             this.Size = azureMessage.Size;
             this.TimeToLive = azureMessage.TimeToLive;
             this.IsDlq = isDlq;
+            this.EnqueueTimeUtc = azureMessage.SystemProperties.EnqueuedTimeUtc;
+            this.DeadLetterReason = azureMessage.UserProperties.ContainsKey("DeadLetterReason")
+                ? azureMessage.UserProperties["DeadLetterReason"].ToString()
+                : string.Empty;
         }
     }
 }

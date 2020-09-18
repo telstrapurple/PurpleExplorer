@@ -105,18 +105,26 @@
             <TabControl>
                 <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
                     <DataGrid Items="{Binding CurrentSubscription.Messages}" Tapped="MessagesGrid_Tapped" DoubleTapped="MessagesGrid_DoubleTapped"
-                              IsReadOnly="True">
+                              IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
-                            <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />
+                            <DataGridTextColumn Header="Sequence Number" Binding="{Binding SequenceNumber}" />
+                            <DataGridTextColumn Header="Message Id" Binding="{Binding MessageId}" />
+                            <DataGridTextColumn Header="Content" Binding="{Binding Content}" />
+                            <DataGridTextColumn Header="Size" Binding="{Binding Size}" />
+                            <DataGridTextColumn Header="Delivery Count" Binding="{Binding DeliveryCount}" />
+                            <DataGridTextColumn Header="Enqueue time (UTC)" Binding="{Binding EnqueueTimeUtc}" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>
                 <TabItem Header="{Binding DlqTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding CurrentSubscription.DlqMessages}" Tapped="MessagesGrid_Tapped" IsReadOnly="True">
+                    <DataGrid Items="{Binding CurrentSubscription.DlqMessages}" Tapped="MessagesGrid_Tapped" DoubleTapped="MessagesGrid_DoubleTapped" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="5*" />
-                            <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" />
+                            <DataGridTextColumn Header="Sequence Number" Binding="{Binding SequenceNumber}" />
+                            <DataGridTextColumn Header="Message Id" Binding="{Binding MessageId}" />
+                            <DataGridTextColumn Header="Content" Binding="{Binding Content}" />
+                            <DataGridTextColumn Header="Size" Binding="{Binding Size}" />
+                            <DataGridTextColumn Header="Delivery Count" Binding="{Binding DeliveryCount}" />
+                            <DataGridTextColumn Header="Dead-letter reason" Binding="{Binding DeadLetterReason}" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>
