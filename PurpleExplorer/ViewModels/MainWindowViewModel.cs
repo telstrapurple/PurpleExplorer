@@ -15,7 +15,7 @@ namespace PurpleExplorer.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IServiceBusHelper _serviceBusHelper;
-        private ILoggingService _loggingService;
+        private readonly ILoggingService _loggingService;
         private string _messageTabHeader;
         private string _dlqTabHeader;
         private ServiceBusSubscription _currentSubscription;
@@ -192,12 +192,12 @@ namespace PurpleExplorer.ViewModels
                 return;
             }
 
-            Log($"Deleting message {_currentMessage.MessageId}...");
+            Log($"Deleting message {_currentMessage.MessageId}... (might take some seconds)");
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-            _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
+            await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
+            Log($"Message deleted, MessageId: {_currentMessage.MessageId}");
             CurrentMessage = null;
-            Log("Message deleted (might take some seconds to reflect)");
         }
 
         public async Task RefreshMessages()
