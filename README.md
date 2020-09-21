@@ -10,3 +10,19 @@ It's a simple tool to help you to:
 * delete a message
 * re-submit a message from DLQ
 * purge all messages
+
+## How to Download
+Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Actions](https://github.com/telstrapurple/PurpleExplorer/actions) page
+
+## How to run
+### Windows
+> _Right-click_ > Open
+
+You can allow windows defender to start this application:
+> click on _More Info_ -> Run anyway
+
+### macOS
+> _Right-click_ > Open
+
+You can allow macOS to start this application by enabling Developer tools for Terminal:
+> _System Preferences -> Security & Privacy -> Privacy_, select "Developer Tools" on the left, check terminal on the right.
