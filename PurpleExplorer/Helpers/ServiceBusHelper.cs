@@ -6,7 +6,6 @@ using PurpleExplorer.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Message = PurpleExplorer.Models.Message;
 using AzureMessage = Microsoft.Azure.ServiceBus.Message;
@@ -21,8 +20,8 @@ namespace PurpleExplorer.Helpers
         {
             IList<ServiceBusTopic> topics = new List<ServiceBusTopic>();
             var client = new ManagementClient(connectionString);
-
             var busTopics = await client.GetTopicsAsync();
+            await client.CloseAsync();
 
             await Task.WhenAll(busTopics.Select(async t =>
             {
@@ -44,9 +43,10 @@ namespace PurpleExplorer.Helpers
         public async Task<IList<ServiceBusSubscription>> GetSubscriptions(string connectionString, string topicPath)
         {
             IList<ServiceBusSubscription> subscriptions = new List<ServiceBusSubscription>();
-            ManagementClient client = new ManagementClient(connectionString);
-
+            var client = new ManagementClient(connectionString);
             var topicSubscription = await client.GetSubscriptionsRuntimeInfoAsync(topicPath);
+            await client.CloseAsync();
+
             foreach (var sub in topicSubscription)
             {
                 subscriptions.Add(
@@ -65,12 +65,13 @@ namespace PurpleExplorer.Helpers
         public async Task<IList<Message>> GetMessagesBySubscription(string connectionString, string topicName,
             string subscriptionName)
         {
-            var messageReceiver = new MessageReceiver(connectionString,
-                EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName), ReceiveMode.PeekLock);
+            var path = EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName);
+
+            var messageReceiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
             var subscriptionMessages = await messageReceiver.PeekAsync(_maxMessageCount);
-
+            await messageReceiver.CloseAsync();
+            
             var result = subscriptionMessages.Select(message => new Message(message, false)).ToList();
-
             return result;
         }
 
@@ -78,11 +79,12 @@ namespace PurpleExplorer.Helpers
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topic, subscription);
             var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
+            
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
+            await receiver.CloseAsync();
 
             var result = receivedMessages.Select(message => new Message(message, true)).ToList();
-
             return result;
         }
 
@@ -99,35 +101,31 @@ namespace PurpleExplorer.Helpers
             await topicClient.CloseAsync();
         }
 
-        public void DeleteMessage(string connectionString, string topicPath, string subscriptionPath,
+        public async void DeleteMessage(string connectionString, string topicPath, string subscriptionPath,
             Message message, bool isDlq)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
             path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
-            
-            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
 
-            async Task Handler(AzureMessage msg, CancellationToken token)
+            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
+            var timeout = TimeSpan.FromSeconds(30);
+            while (true)
             {
-                if (msg.MessageId.Equals(message.MessageId))
+                var messages = await receiver.ReceiveAsync(_maxMessageCount, timeout);
+                if (messages == null || messages.Count == 0)
                 {
-                    await receiver.CompleteAsync(msg.SystemProperties.LockToken);
+                    break;
+                }
+
+                var foundMessage = messages.FirstOrDefault(m => m.MessageId.Equals(message.MessageId));
+                if (foundMessage != null)
+                {
+                    await receiver.CompleteAsync(foundMessage.SystemProperties.LockToken);
+                    break;
                 }
             }
 
-            Task ExceptionHandler(ExceptionReceivedEventArgs args)
-            {
-                /*TODO add logging */
-                return Task.CompletedTask;
-            }
-
-            var messageHandlerOptions = new MessageHandlerOptions(ExceptionHandler)
-            {
-                MaxConcurrentCalls = 1,    // For simplicity
-                AutoComplete = false
-            };
-
-            receiver.RegisterMessageHandler(Handler, messageHandlerOptions);
+            await receiver.CloseAsync();
         }
     }
 }
