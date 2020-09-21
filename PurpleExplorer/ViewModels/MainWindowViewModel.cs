@@ -197,7 +197,7 @@ namespace PurpleExplorer.ViewModels
             _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
             CurrentMessage = null;
-            Log("Message deleted");
+            Log("Message deleted (might take some seconds to reflect)");
         }
 
         public async Task RefreshMessages()
