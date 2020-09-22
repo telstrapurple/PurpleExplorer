@@ -26,7 +26,6 @@ namespace PurpleExplorer.ViewModels
         private ServiceBusTopic _currentTopic;
         private Message _currentMessage;
         private string _connectionString;
-        private IList<string> _savedConnectionStrings;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         

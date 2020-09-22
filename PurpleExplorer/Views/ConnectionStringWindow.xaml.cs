@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.ViewModels;
+using System.Linq;
 
 namespace PurpleExplorer.Views
 {
@@ -30,10 +31,14 @@ namespace PurpleExplorer.Views
             }
         }
 
-        public void btnSaveConnectionString(object sender, RoutedEventArgs e)
+        public async void btnSaveConnectionString(object sender, RoutedEventArgs e)
         {
             var dataContext = this.DataContext as ConnectionStringWindowViewModel;
-            dataContext.SavedConnectionStrings.Add(dataContext.ConnectionString);
+            
+            if (dataContext.SavedConnectionStrings.FirstOrDefault(x => x == dataContext.ConnectionString) != null)
+                await MessageBoxHelper.ShowMessage("Duplicate connection string", "This connection string is already saved.");
+            else
+                dataContext.SavedConnectionStrings.Add(dataContext.ConnectionString);
         }
 
         private void lsbConnectionStringSelectionChanged(object sender, SelectionChangedEventArgs e)

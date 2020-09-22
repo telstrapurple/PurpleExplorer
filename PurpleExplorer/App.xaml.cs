@@ -31,14 +31,6 @@ namespace PurpleExplorer
 
             new MainWindow { DataContext = state }.Show();
 
-            //if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            //{
-            //    desktop.MainWindow = new MainWindow
-            //    {
-            //        DataContext = new MainWindowViewModel()
-            //    };
-            //}
-
             base.OnFrameworkInitializationCompleted();
         }
     }
