@@ -28,14 +28,13 @@ namespace PurpleExplorer.Models
             Messages = new ObservableCollection<Message>();
             DlqMessages = new ObservableCollection<Message>();
             Name = subscription.SubscriptionName;
-            MessageCount = subscription.MessageCountDetails.ActiveMessageCount;
-            DlqCount = subscription.MessageCountDetails.DeadLetterMessageCount;
+            UpdateMessageCountDetails(subscription.MessageCountDetails);
         }
 
-        public void UpdateMessageDlqCount(SubscriptionRuntimeInfo subscription)
+        public void UpdateMessageCountDetails(MessageCountDetails messageCountDetails)
         {
-            MessageCount = subscription.MessageCountDetails.ActiveMessageCount;
-            DlqCount = subscription.MessageCountDetails.DeadLetterMessageCount;
+            MessageCount = messageCountDetails.ActiveMessageCount;
+            DlqCount = messageCountDetails.DeadLetterMessageCount;
         }
     }
 }

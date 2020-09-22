@@ -137,7 +137,7 @@ namespace PurpleExplorer.ViewModels
             var subscriptionName = CurrentSubscription.Name;
             var runtimeInfo = await _serviceBusHelper.GetSubscriptionRuntimeInfo(connectionString, topicPath, subscriptionName);
             
-            CurrentSubscription.UpdateMessageDlqCount(runtimeInfo);
+            CurrentSubscription.UpdateMessageCountDetails(runtimeInfo.MessageCountDetails);
             SetTabHeaders();   
         }
 
