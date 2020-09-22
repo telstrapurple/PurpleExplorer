@@ -11,7 +11,7 @@ namespace PurpleExplorer.Helpers
         public static async Task<U> ShowModalWindow<T, U>(ViewModelBase viewModel) where T : Window, new() where U : ViewModelBase
         {
             var mainWindow = (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
-                .MainWindow;
+                .Windows[0];
 
             T window = new T();
             window.DataContext = viewModel;

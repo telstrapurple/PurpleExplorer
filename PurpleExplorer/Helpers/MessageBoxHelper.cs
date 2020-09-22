@@ -35,8 +35,8 @@ namespace PurpleExplorer.Helpers
                 WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen
             });
 
-            var applicationLifeTime = Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-            return await msBoxStandardWindow.ShowDialog(applicationLifeTime.MainWindow);
+            return await msBoxStandardWindow.ShowDialog((Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
+                .Windows[0]);
         }
     }
 }

@@ -21,4 +21,9 @@
         <PackageReference Include="MessageBox.Avalonia" Version="0.9.6.1" />
         <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.1.3" />
     </ItemGroup>
+    <ItemGroup>
+      <None Update="appstate.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>
