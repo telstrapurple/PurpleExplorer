@@ -151,7 +151,7 @@ namespace PurpleExplorer.ViewModels
             else
             {
                 MessagesTabHeader = $"Messages ({CurrentSubscription.MessageCount})";
-                DlqTabHeader = $"Dead-letter ({CurrentSubscription.DLQCount})";
+                DlqTabHeader = $"Dead-letter ({CurrentSubscription.DlqCount})";
             }
         }
 
