@@ -41,6 +41,16 @@ namespace PurpleExplorer.Helpers
             return topics;
         }
 
+        public async Task<SubscriptionRuntimeInfo> GetSubscriptionRuntimeInfo(string connectionString,
+            string topicPath, string subscriptionName)
+        {
+            ManagementClient client = new ManagementClient(connectionString);
+            var runtimeInfo = await client.GetSubscriptionRuntimeInfoAsync(topicPath, subscriptionName);
+            await client.CloseAsync();
+
+            return runtimeInfo;
+        }
+
         public async Task<IList<ServiceBusSubscription>> GetSubscriptions(string connectionString, string topicPath)
         {
             IList<ServiceBusSubscription> subscriptions = new List<ServiceBusSubscription>();
@@ -49,14 +59,7 @@ namespace PurpleExplorer.Helpers
             var topicSubscription = await client.GetSubscriptionsRuntimeInfoAsync(topicPath);
             foreach (var sub in topicSubscription)
             {
-                subscriptions.Add(
-                    new ServiceBusSubscription
-                    {
-                        Name = sub.SubscriptionName,
-                        MessageCount = sub.MessageCountDetails.ActiveMessageCount,
-                        DLQCount = sub.MessageCountDetails.DeadLetterMessageCount,
-                    }
-                );
+                subscriptions.Add(new ServiceBusSubscription(sub));
             }
 
             return subscriptions;
@@ -104,7 +107,7 @@ namespace PurpleExplorer.Helpers
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
             path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
-            
+
             var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
 
             async Task Handler(AzureMessage msg, CancellationToken token)
@@ -123,7 +126,7 @@ namespace PurpleExplorer.Helpers
 
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionHandler)
             {
-                MaxConcurrentCalls = 1,    // For simplicity
+                MaxConcurrentCalls = 1, // For simplicity
                 AutoComplete = false
             };
 
