@@ -15,7 +15,7 @@ namespace PurpleExplorer.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IServiceBusHelper _serviceBusHelper;
-        private ILoggingService _loggingService;
+        private readonly ILoggingService _loggingService;
         private string _messageTabHeader;
         private string _dlqTabHeader;
         private ServiceBusSubscription _currentSubscription;
@@ -165,15 +165,18 @@ namespace PurpleExplorer.ViewModels
                 var returnedViewModal =
                     await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
 
-                if (!returnedViewModal.Cancel)
+                if (returnedViewModal.Cancel)
                 {
-                    var messageText = returnedViewModal.Message.Trim();
-                    var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-                    if (!string.IsNullOrEmpty(messageText))
-                    {
-                        await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
-                        Log("Message added");
-                    }
+                    return;
+                }
+
+                var messageText = returnedViewModal.Message.Trim();
+                var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+                if (!string.IsNullOrEmpty(messageText))
+                {
+                    Log("Sending message...");
+                    await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
+                    Log("Message sent");
                 }
             }
 
@@ -191,19 +194,21 @@ namespace PurpleExplorer.ViewModels
         {
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
                 $"Deleting message from {_currentTopic.Name}/{_currentSubscription.Name}",
-                $"Are you sure you would like to delete the message with the content: \n {_currentMessage.Content}");
+                $"Are you sure you would like to delete the message with ID: {_currentMessage.MessageId}");
 
-            if (buttonResult == ButtonResult.No)
+            // Because buttonResult can be None or No
+            if (buttonResult != ButtonResult.Yes)
             {
                 CurrentMessage = null;
                 return;
             }
 
+            Log($"Deleting message {_currentMessage.MessageId}... (might take some seconds)");
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-            _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
+            await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
+            Log($"Message deleted, MessageId: {_currentMessage.MessageId}");
             CurrentMessage = null;
-            Log("Message deleted.");
         }
 
         public async Task RefreshMessages()

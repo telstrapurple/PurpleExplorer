@@ -17,8 +17,8 @@ namespace PurpleExplorer.Models
         public TimeSpan TimeToLive { get; set; }
         public DateTime EnqueueTimeUtc { get; set; }
         public string DeadLetterReason { get; set; }
-        public bool IsDlq { get; set; }
-
+        public bool IsDlq { get; }
+        
         public Message(AzureMessage azureMessage, bool isDlq)
         {
             this.Content = Encoding.UTF8.GetString(azureMessage.Body);

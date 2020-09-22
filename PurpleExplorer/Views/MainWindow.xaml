@@ -54,7 +54,7 @@
                 </StackPanel>
             </Button>
             <Button Name="MinusButton" Classes="topButton" IsEnabled="{Binding !!CurrentMessage}"
-                    Command="{Binding DeleteMessage}">
+                    Command="{Binding DeleteMessage}" IsVisible="False">
                 <StackPanel Orientation="Horizontal">
                     <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
                     <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
