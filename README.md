@@ -12,7 +12,7 @@ It's a simple tool to help you to:
 * purge all messages
 
 ## How to Download
-Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Actions](https://github.com/telstrapurple/PurpleExplorer/actions) page
+Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Actions](https://github.com/telstrapurple/PurpleExplorer/actions?query=workflow%3A%22.NET+Core%22+branch%3Amaster) page
 
 ## How to run
 ### Windows
