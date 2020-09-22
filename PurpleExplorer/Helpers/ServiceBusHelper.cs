@@ -108,10 +108,10 @@ namespace PurpleExplorer.Helpers
             path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
 
             var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
-            var timeout = TimeSpan.FromSeconds(30);
+            
             while (true)
             {
-                var messages = await receiver.ReceiveAsync(_maxMessageCount, timeout);
+                var messages = await receiver.PeekAsync(_maxMessageCount);
                 if (messages == null || messages.Count == 0)
                 {
                     break;
