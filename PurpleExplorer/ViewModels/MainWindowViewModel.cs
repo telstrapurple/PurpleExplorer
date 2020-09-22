@@ -9,9 +9,13 @@ using ReactiveUI;
 using System.Threading.Tasks;
 using MessageBox.Avalonia.Enums;
 using PurpleExplorer.Services;
+using Splat;
+using System.Runtime.Serialization;
+using System.Collections.Generic;
 
 namespace PurpleExplorer.ViewModels
 {
+    [DataContract]
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IServiceBusHelper _serviceBusHelper;
@@ -21,8 +25,20 @@ namespace PurpleExplorer.ViewModels
         private ServiceBusSubscription _currentSubscription;
         private ServiceBusTopic _currentTopic;
         private Message _currentMessage;
+        private string _connectionString;
+        private IList<string> _savedConnectionStrings;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
+        
+        [DataMember]
+        public ObservableCollection<string> SavedConnectionStrings { get; set; }
+        
+        [DataMember]
+        public string ConnectionString
+        {
+            get => _connectionString;
+            set => this.RaiseAndSetIfChanged(ref _connectionString, value);
+        }
 
         public string MessagesTabHeader
         {
@@ -58,32 +74,34 @@ namespace PurpleExplorer.ViewModels
         {
             get => _loggingService.Logs;
         }
-
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
-            _loggingService = loggingService;
-            _serviceBusHelper = serviceBusHelper;
+            _loggingService = loggingService ?? Locator.Current.GetService<ILoggingService>();
+            _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
 
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
-
+            SavedConnectionStrings = new ObservableCollection<string>();
+            
             SetTabHeaders();
         }
 
         public async void ConnectionBtnPopupCommand()
         {
-            var viewModel = new ConnectionStringWindowViewModel();
+            var viewModel = new ConnectionStringWindowViewModel() { ConnectionString = this.ConnectionString, SavedConnectionStrings = this.SavedConnectionStrings };
 
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
                     viewModel);
-            var connectionString = returnedViewModel.ConnectionString?.Trim();
 
             if (returnedViewModel.Cancel)
             {
                 return;
             }
 
-            if (string.IsNullOrEmpty(connectionString))
+            ConnectionString = returnedViewModel.ConnectionString?.Trim();
+            SavedConnectionStrings = returnedViewModel.SavedConnectionStrings;
+
+            if (string.IsNullOrEmpty(ConnectionString))
             {
                 return;
             }
@@ -92,13 +110,13 @@ namespace PurpleExplorer.ViewModels
             {
                 Log("Connecting...");
 
-                var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(connectionString);
-                var topics = await _serviceBusHelper.GetTopics(connectionString);
+                var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(ConnectionString);
+                var topics = await _serviceBusHelper.GetTopics(ConnectionString);
 
                 var newResource = new ServiceBusResource
                 {
                     Name = namespaceInfo.Name,
-                    ConnectionString = connectionString
+                    ConnectionString = this.ConnectionString
                 };
 
                 newResource.AddTopics(topics.ToArray());
