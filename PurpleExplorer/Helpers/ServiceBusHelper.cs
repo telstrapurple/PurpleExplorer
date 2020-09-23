@@ -73,7 +73,7 @@ namespace PurpleExplorer.Helpers
             var messageReceiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
             var subscriptionMessages = await messageReceiver.PeekAsync(_maxMessageCount);
             await messageReceiver.CloseAsync();
-            
+
             var result = subscriptionMessages.Select(message => new Message(message, false)).ToList();
             return result;
         }
@@ -82,7 +82,7 @@ namespace PurpleExplorer.Helpers
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topic, subscription);
             var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
-            
+
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
             await receiver.CloseAsync();
@@ -96,7 +96,7 @@ namespace PurpleExplorer.Helpers
             var client = new ManagementClient(connectionString);
             return await client.GetNamespaceInfoAsync();
         }
-        
+
         public async Task SendTopicMessage(string connectionString, string topicPath, string content)
         {
             var message = new AzureMessage() {Body = Encoding.UTF8.GetBytes(content)};
@@ -107,7 +107,7 @@ namespace PurpleExplorer.Helpers
         {
             await SendTopicClientMessage(connectionString, topicPath, message);
         }
-        
+
         async Task SendTopicClientMessage(string connectionString, string topicPath, AzureMessage messageToSend)
         {
             var topicClient = new TopicClient(connectionString, topicPath);
@@ -122,7 +122,7 @@ namespace PurpleExplorer.Helpers
             path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
 
             var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
-            
+
             while (true)
             {
                 var messages = await receiver.ReceiveAsync(_maxMessageCount);
@@ -142,11 +142,12 @@ namespace PurpleExplorer.Helpers
             await receiver.CloseAsync();
         }
 
-        public async Task<long> PurgeMessages(string connectionString, string topicPath, string subscriptionPath, bool isDlq)
+        public async Task<long> PurgeMessages(string connectionString, string topicPath, string subscriptionPath,
+            bool isDlq)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
             path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
-            
+
             long purgedCount = 0;
             var receiver = new MessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
             var operationTimeout = TimeSpan.FromSeconds(5);
@@ -160,26 +161,34 @@ namespace PurpleExplorer.Helpers
 
                 purgedCount += messages.Count;
             }
-            
+
             await receiver.CloseAsync();
             return purgedCount;
         }
 
-        public async Task ResendDlqMessage(string connectionString, string topicPath, string subscriptionPath, Message message)
+        async Task<AzureMessage> GetMessageBySequenceNumber(string connectionString, string topicPath,
+            string subscriptionPath,
+            long sequenceNumber)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
-            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);        
-            
-            //get message
+            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
+
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
-            var azureMessage = await receiver.PeekBySequenceNumberAsync(message.SequenceNumber);
-            var clonedMessage = azureMessage.Clone();
+            var azureMessage = await receiver.PeekBySequenceNumberAsync(sequenceNumber);
             await receiver.CloseAsync();
 
-            //send message
+            return azureMessage;
+        }
+
+        public async Task ResendDlqMessage(string connectionString, string topicPath, string subscriptionPath,
+            Message message)
+        {
+            var azureMessage = await GetMessageBySequenceNumber(connectionString, topicPath, subscriptionPath,
+                message.SequenceNumber);
+            var clonedMessage = azureMessage.Clone();
+
             await SendTopicMessage(connectionString, topicPath, clonedMessage);
 
-            //delete message
             await DeleteMessage(connectionString, topicPath, subscriptionPath, message, true);
         }
     }
