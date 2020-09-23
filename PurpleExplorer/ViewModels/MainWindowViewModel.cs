@@ -11,7 +11,6 @@ using MessageBox.Avalonia.Enums;
 using PurpleExplorer.Services;
 using Splat;
 using System.Runtime.Serialization;
-using System.Collections.Generic;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -69,10 +68,11 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _currentMessage, value);
         }
 
-        public string LogText
+        public ILoggingService LoggingService
         {
-            get => _loggingService.Logs;
+            get => _loggingService;
         }
+
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
             _loggingService = loggingService ?? Locator.Current.GetService<ILoggingService>();
@@ -107,7 +107,7 @@ namespace PurpleExplorer.ViewModels
 
             try
             {
-                Log("Connecting...");
+                LoggingService.Log("Connecting...");
 
                 var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(ConnectionString);
                 var topics = await _serviceBusHelper.GetTopics(ConnectionString);
@@ -120,7 +120,7 @@ namespace PurpleExplorer.ViewModels
 
                 newResource.AddTopics(topics.ToArray());
                 ConnectedServiceBuses.Add(newResource);
-                Log("Connected to Service Bus: " + namespaceInfo.Name);
+                LoggingService.Log("Connected to Service Bus: " + namespaceInfo.Name);
             }
             catch (ArgumentException)
             {
@@ -191,20 +191,14 @@ namespace PurpleExplorer.ViewModels
                 var connectionString = CurrentTopic.ServiceBus.ConnectionString;
                 if (!string.IsNullOrEmpty(messageText))
                 {
-                    Log("Sending message...");
+                    LoggingService.Log("Sending message...");
                     await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
-                    Log("Message sent");
+                    LoggingService.Log("Message sent");
                 }
             }
 
             if (CurrentTopic != null && CurrentTopic.Subscriptions.Count == 0)
                 await MessageBoxHelper.ShowError("Can't send a message to a Topic without any subscriptions.");
-        }
-
-        private void Log(string message)
-        {
-            _loggingService.Log(message);
-            this.RaisePropertyChanged(nameof(LogText));
         }
 
         public async void DeleteMessage()
@@ -220,11 +214,11 @@ namespace PurpleExplorer.ViewModels
                 return;
             }
 
-            Log($"Deleting message {_currentMessage.MessageId}... (might take some seconds)");
+            LoggingService.Log($"Deleting message {_currentMessage.MessageId}... (might take some seconds)");
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
             await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,
                 _currentMessage, _currentMessage.IsDlq);
-            Log($"Message deleted, MessageId: {_currentMessage.MessageId}");
+            LoggingService.Log($"Message deleted, MessageId: {_currentMessage.MessageId}");
             CurrentMessage = null;
         }
 
@@ -247,15 +241,15 @@ namespace PurpleExplorer.ViewModels
                 return;
             }
 
-            Log($"Purging ALL messages in {subscriptionPathText}... (might take some time)");
+            LoggingService.Log($"Purging ALL messages in {subscriptionPathText}... (might take some time)");
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
             var purgedCount = await _serviceBusHelper.PurgeMessages(connectionString, _currentTopic.Name, _currentSubscription.Name, isDlq);
-            Log($"Purged {purgedCount} messages in {subscriptionPathText}");
+            LoggingService.Log($"Purged {purgedCount} messages in {subscriptionPathText}");
         }
         
         public async Task RefreshMessages()
         {
-            Log("Fetching messages...");
+            LoggingService.Log("Fetching messages...");
 
             await Task.WhenAll(
                 SetSubscriptionMessages(),
@@ -263,7 +257,7 @@ namespace PurpleExplorer.ViewModels
                 RefreshMessageCount()
                 );
 
-            Log("Fetched messages");
+            LoggingService.Log("Fetched messages");
         }
 
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)
@@ -272,19 +266,19 @@ namespace PurpleExplorer.ViewModels
             CurrentTopic = subscription.Topic;
 
             await RefreshMessages();
-            Log("Subscription selected: " + subscription.Name);
+            LoggingService.Log("Subscription selected: " + subscription.Name);
         }
 
         public void SetSelectedTopic(ServiceBusTopic selectedTopic)
         {
             CurrentTopic = selectedTopic;
-            Log("Topic selected: " + selectedTopic.Name);
+            LoggingService.Log("Topic selected: " + selectedTopic.Name);
         }
 
         public void SetSelectedMessage(Message message)
         {
             CurrentMessage = message;
-            Log("Message selected: " + message.MessageId);
+            LoggingService.Log("Message selected: " + message.MessageId);
         }
 
         public void ClearSelection()
