@@ -142,6 +142,29 @@ namespace PurpleExplorer.Helpers
             await receiver.CloseAsync();
         }
 
+        public async Task<long> PurgeMessages(string connectionString, string topicPath, string subscriptionPath, bool isDlq)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            path = isDlq ? EntityNameHelper.FormatDeadLetterPath(path) : path;
+            
+            long purgedCount = 0;
+            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
+            var operationTimeout = TimeSpan.FromSeconds(5);
+            while (true)
+            {
+                var messages = await receiver.ReceiveAsync(_maxMessageCount, operationTimeout);
+                if (messages == null || messages.Count == 0)
+                {
+                    break;
+                }
+
+                purgedCount += messages.Count;
+            }
+            
+            await receiver.CloseAsync();
+            return purgedCount;
+        }
+
         public async Task ResendDlqMessage(string connectionString, string topicPath, string subscriptionPath, Message message)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
