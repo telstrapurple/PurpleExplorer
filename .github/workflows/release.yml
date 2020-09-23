@@ -12,7 +12,7 @@ on:
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/master'
+    #if: github.ref == 'refs/heads/master'
     runs-on: macos-latest
     env:
       applicationVersion: ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
