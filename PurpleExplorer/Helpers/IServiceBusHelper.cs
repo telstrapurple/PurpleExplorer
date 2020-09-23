@@ -16,5 +16,6 @@ namespace PurpleExplorer.Helpers
         public Task DeleteMessage(string connectionString, string topicPath, string subscriptionPath, Message message, bool isDlq);
         public Task<SubscriptionRuntimeInfo> GetSubscriptionRuntimeInfo(string connectionString, string topicPath,
             string subscriptionName);
+        public Task<long> PurgeMessages(string connectionString, string topicPath, string subscriptionPath, bool isDlq);
     }
 }

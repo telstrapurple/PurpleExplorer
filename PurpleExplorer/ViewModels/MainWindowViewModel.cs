@@ -228,6 +228,31 @@ namespace PurpleExplorer.ViewModels
             CurrentMessage = null;
         }
 
+        public async void PurgeMessages(string isDlqText)
+        {
+            var isDlq = Convert.ToBoolean(isDlqText);
+            var subscriptionPathText =
+                isDlq
+                    ? $"{_currentTopic.Name}/{_currentSubscription.Name}/$DeadLetterQueue"
+                    : $"{_currentTopic.Name}/{_currentSubscription.Name}";
+            
+            var buttonResult = await MessageBoxHelper.ShowConfirmation(
+                $"Purging messages from {subscriptionPathText}",
+                $"Are you sure you would like to purge ALL the messages?");
+
+            // Because buttonResult can be None or No
+            if (buttonResult != ButtonResult.Yes)
+            {
+                CurrentMessage = null;
+                return;
+            }
+
+            Log($"Purging ALL messages in {subscriptionPathText}... (might take some time)");
+            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+            var purgedCount = await _serviceBusHelper.PurgeMessages(connectionString, _currentTopic.Name, _currentSubscription.Name, isDlq);
+            Log($"Purged {purgedCount} messages in {subscriptionPathText}");
+        }
+        
         public async Task RefreshMessages()
         {
             Log("Fetching messages...");
