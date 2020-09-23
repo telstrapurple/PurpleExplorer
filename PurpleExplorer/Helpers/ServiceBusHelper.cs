@@ -185,11 +185,23 @@ namespace PurpleExplorer.Helpers
         {
             var azureMessage = await GetMessageBySequenceNumber(connectionString, topicPath, subscriptionPath,
                 message.SequenceNumber);
-            var clonedMessage = azureMessage.Clone();
+            var clonedMessage = CloneMessage(azureMessage);
 
             await SendTopicMessage(connectionString, topicPath, clonedMessage);
 
             await DeleteMessage(connectionString, topicPath, subscriptionPath, message, true);
+        }
+
+        AzureMessage CloneMessage(AzureMessage original)
+        {
+            return new AzureMessage
+            {
+                Body = original.Body,
+                Label = original.Label,
+                To = original.To,
+                SessionId = original.SessionId,
+                ContentType = original.ContentType
+            };
         }
     }
 }
