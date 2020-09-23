@@ -22,7 +22,15 @@ namespace PurpleExplorer.Views
         private async void MessagesGrid_DoubleTapped(object sender, RoutedEventArgs e)
         {
             var grid = sender as DataGrid;
-            var viewModal = new MessageDetailsWindowViewModel {Message = grid.SelectedItem as Message};
+            var mainWindowViewModel = DataContext as MainWindowViewModel;
+            var connectionString = mainWindowViewModel.ConnectionString;
+            var subscription = mainWindowViewModel.CurrentSubscription;
+            var viewModal = new MessageDetailsWindowViewModel
+            {
+                Message = grid.SelectedItem as Message, 
+                ConnectionString = connectionString, 
+                Subscription = subscription
+            };
 
             await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal);
         }

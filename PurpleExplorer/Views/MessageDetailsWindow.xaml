@@ -11,12 +11,11 @@
         <vm:MessageDetailsWindowViewModel />
     </Design.DataContext>
     <Window.Styles>
-        <Style Selector="TextBlock#ContentTextBlock" >
-                        
-        </Style>
+        <Style Selector="TextBlock#ContentTextBlock" />
     </Window.Styles>
     <Grid Height="200" VerticalAlignment="Top" ShowGridLines="True">
         <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="200" />
@@ -28,24 +27,33 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150" />
-            <ColumnDefinition Width="500"/>
+            <ColumnDefinition Width="500" />
         </Grid.ColumnDefinitions>
-        <TextBlock Text="MessageId" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding Message.MessageId}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" />
-        <TextBlock Text="Content Type" Grid.Row="1" Grid.Column="0"></TextBlock>
-        <TextBlock Text="{Binding Message.ContentType}" Grid.Row="1" Grid.Column="1" />
-        <TextBlock Text="Content" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" />
-        <TextBlock Height="100" Width="100" Name="ContentTextBlock" Text="{Binding Message.Content}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Sequence Number" />
-        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Message.SequenceNumber}" />
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Size" />
-        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Message.Size}" />
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="Delivery Count" />
-        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Message.DeliveryCount}" />
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="Correlation Id" />
-        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Message.CorrelationId}" />
-        <TextBlock Grid.Row="7" Grid.Column="0" Text="Time To Live" />
-        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Message.TimeToLive}" />
+        <DockPanel Grid.Row="0" Grid.Column="0" >
+            <Button Name="ResendButton" Command="{Binding ResendMessage}" IsVisible="{Binding !!Message.IsDlq}">
+                <StackPanel Orientation="Horizontal">
+                    <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
+                    <TextBlock VerticalAlignment="Center">Resend</TextBlock>
+                </StackPanel>
+            </Button>
+        </DockPanel>
+        <TextBlock Text="MessageId" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding Message.MessageId}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" />
+        <TextBlock Text="Content Type" Grid.Row="2" Grid.Column="0" />
+        <TextBlock Text="{Binding Message.ContentType}" Grid.Row="2" Grid.Column="1" />
+        <TextBlock Text="Content" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" />
+        <TextBlock Height="100" Width="100" Name="ContentTextBlock" Text="{Binding Message.Content}" Grid.Row="3"
+                   Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Sequence Number" />
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Message.SequenceNumber}" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Size" />
+        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Message.Size}" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Delivery Count" />
+        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Message.DeliveryCount}" />
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Correlation Id" />
+        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Message.CorrelationId}" />
+        <TextBlock Grid.Row="8" Grid.Column="0" Text="Time To Live" />
+        <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding Message.TimeToLive}" />
     </Grid>
-      
+
 </Window>

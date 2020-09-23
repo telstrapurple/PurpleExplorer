@@ -96,11 +96,22 @@ namespace PurpleExplorer.Helpers
             var client = new ManagementClient(connectionString);
             return await client.GetNamespaceInfoAsync();
         }
+        
+        public async Task SendTopicMessage(string connectionString, string topicPath, string content)
+        {
+            var message = new AzureMessage() {Body = Encoding.UTF8.GetBytes(content)};
+            await SendTopicClientMessage(connectionString, topicPath, message);
+        }
 
-        public async Task SendTopicMessage(string connectionString, string topicPath, string message)
+        public async Task SendTopicMessage(string connectionString, string topicPath, AzureMessage message)
+        {
+            await SendTopicClientMessage(connectionString, topicPath, message);
+        }
+        
+        async Task SendTopicClientMessage(string connectionString, string topicPath, AzureMessage messageToSend)
         {
             var topicClient = new TopicClient(connectionString, topicPath);
-            await topicClient.SendAsync(new AzureMessage() {Body = Encoding.UTF8.GetBytes(message)});
+            await topicClient.SendAsync(messageToSend);
             await topicClient.CloseAsync();
         }
 
@@ -114,7 +125,7 @@ namespace PurpleExplorer.Helpers
             
             while (true)
             {
-                var messages = await receiver.PeekAsync(_maxMessageCount);
+                var messages = await receiver.ReceiveAsync(_maxMessageCount);
                 if (messages == null || messages.Count == 0)
                 {
                     break;
@@ -129,6 +140,24 @@ namespace PurpleExplorer.Helpers
             }
 
             await receiver.CloseAsync();
+        }
+
+        public async Task ResendDlqMessage(string connectionString, string topicPath, string subscriptionPath, Message message)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);        
+            
+            //get message
+            var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
+            var azureMessage = await receiver.PeekBySequenceNumberAsync(message.SequenceNumber);
+            var clonedMessage = azureMessage.Clone();
+            await receiver.CloseAsync();
+
+            //send message
+            await SendTopicMessage(connectionString, topicPath, clonedMessage);
+
+            //delete message
+            await DeleteMessage(connectionString, topicPath, subscriptionPath, message, true);
         }
     }
 }
