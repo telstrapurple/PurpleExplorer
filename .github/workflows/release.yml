@@ -12,9 +12,10 @@ on:
 
 jobs:
   publish:
-    needs: build
     if: github.ref == 'refs/heads/master'
     runs-on: macos-latest
+    env:
+      applicationVersion: ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup .NET Core
@@ -23,6 +24,8 @@ jobs:
           dotnet-version: 3.1.402
       - name: Version
         run: echo ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
+      - name: Version2
+        run: echo $applicationVersion
       # Publish osx-x64
       - name: Publish osx-x64
         run: dotnet publish -r osx-x64 -c Release /p:PublishTrimmed=true
