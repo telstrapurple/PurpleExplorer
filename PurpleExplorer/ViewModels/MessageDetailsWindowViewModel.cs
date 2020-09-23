@@ -24,12 +24,12 @@ namespace PurpleExplorer.ViewModels
 
         public async Task ResendMessage()
         {
-            //TODO: log - refactor?
+            _loggingService.Log($"Resending DLQ message: {Message.MessageId}");
 
             await _serviceBusHelper.ResendDlqMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
                 Message);
 
-            //TODO: log - refactor?
+            _loggingService.Log($"Resent DLQ message: {Message.MessageId}");
         }
     }
 }

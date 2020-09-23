@@ -136,7 +136,7 @@
 
         <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">
             <TextBox BorderThickness="0,3,0,0" HorizontalAlignment="Stretch" IsReadOnly="True" Name="LogBox"
-                     Watermark="logs ..." Text="{Binding LogText}" />
+                     Watermark="logs ..." Text="{Binding LoggingService.Logs}" />
         </DockPanel>
     </Grid>
 </Window>

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text;
+using ReactiveUI;
 
 namespace PurpleExplorer.Services
 {
-    public class LoggingService : ILoggingService 
+    public class LoggingService : ReactiveObject, ILoggingService
     {
-        private StringBuilder _log;
+        private readonly StringBuilder _log;
 
         public LoggingService()
         {
@@ -17,6 +18,7 @@ namespace PurpleExplorer.Services
         public void Log(string message)
         {
             _log.Insert(0, "[" + DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt") + "] " + message + "\n");
+            this.RaisePropertyChanged(nameof(Logs));
         }
     }
 }
