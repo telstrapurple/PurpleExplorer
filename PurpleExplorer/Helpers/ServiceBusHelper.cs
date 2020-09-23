@@ -40,6 +40,16 @@ namespace PurpleExplorer.Helpers
             return topics;
         }
 
+        public async Task<SubscriptionRuntimeInfo> GetSubscriptionRuntimeInfo(string connectionString,
+            string topicPath, string subscriptionName)
+        {
+            ManagementClient client = new ManagementClient(connectionString);
+            var runtimeInfo = await client.GetSubscriptionRuntimeInfoAsync(topicPath, subscriptionName);
+            await client.CloseAsync();
+
+            return runtimeInfo;
+        }
+
         public async Task<IList<ServiceBusSubscription>> GetSubscriptions(string connectionString, string topicPath)
         {
             IList<ServiceBusSubscription> subscriptions = new List<ServiceBusSubscription>();
@@ -49,14 +59,7 @@ namespace PurpleExplorer.Helpers
 
             foreach (var sub in topicSubscription)
             {
-                subscriptions.Add(
-                    new ServiceBusSubscription
-                    {
-                        Name = sub.SubscriptionName,
-                        MessageCount = sub.MessageCountDetails.ActiveMessageCount,
-                        DLQCount = sub.MessageCountDetails.DeadLetterMessageCount,
-                    }
-                );
+                subscriptions.Add(new ServiceBusSubscription(sub));
             }
 
             return subscriptions;

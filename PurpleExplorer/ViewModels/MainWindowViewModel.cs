@@ -147,6 +147,17 @@ namespace PurpleExplorer.ViewModels
             CurrentSubscription.Messages.AddRange(messages);
         }
 
+        public async Task RefreshMessageCount()
+        {
+            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+            var topicPath = CurrentTopic.Name;
+            var subscriptionName = CurrentSubscription.Name;
+            var runtimeInfo = await _serviceBusHelper.GetSubscriptionRuntimeInfo(connectionString, topicPath, subscriptionName);
+            
+            CurrentSubscription.UpdateMessageCountDetails(runtimeInfo.MessageCountDetails);
+            SetTabHeaders();   
+        }
+
         public void SetTabHeaders()
         {
             if (CurrentSubscription == null)
@@ -156,8 +167,8 @@ namespace PurpleExplorer.ViewModels
             }
             else
             {
-                MessagesTabHeader = $"Messages ({CurrentSubscription.Messages.Count})";
-                DlqTabHeader = $"Dead-letter ({CurrentSubscription.DlqMessages.Count})";
+                MessagesTabHeader = $"Messages ({CurrentSubscription.MessageCount})";
+                DlqTabHeader = $"Dead-letter ({CurrentSubscription.DlqCount})";
             }
         }
 
@@ -248,11 +259,11 @@ namespace PurpleExplorer.ViewModels
 
             await Task.WhenAll(
                 SetSubscriptionMessages(),
-                SetDlqMessages());
+                SetDlqMessages(),
+                RefreshMessageCount()
+                );
 
             Log("Fetched messages");
-
-            SetTabHeaders();
         }
 
         public async void SetSelectedSubscription(ServiceBusSubscription subscription)

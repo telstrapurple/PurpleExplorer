@@ -104,7 +104,7 @@
                                     <MultiBinding StringFormat="{}{0}({1},{2})">
                                         <Binding Path="Name" />
                                         <Binding Path="MessageCount" />
-                                        <Binding Path="DLQCount" />
+                                        <Binding Path="DlqCount" />
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
