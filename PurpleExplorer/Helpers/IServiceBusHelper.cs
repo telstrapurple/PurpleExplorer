@@ -14,6 +14,6 @@ namespace PurpleExplorer.Helpers
         public Task<IList<Models.Message>> GetMessagesBySubscription(string connectionString, string topicName, string subscriptionName);
         public Task SendTopicMessage(string connectionString, string topicPath, string message);
         public Task DeleteMessage(string connectionString, string topicPath, string subscriptionPath, Message message, bool isDlq);
-
+        public Task<long> PurgeMessages(string connectionString, string topicPath, string subscriptionPath, bool isDlq);
     }
 }

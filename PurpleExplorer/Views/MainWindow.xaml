@@ -60,6 +60,20 @@
                     <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
                 </StackPanel>
             </Button>
+            <Button Name="btnPurgeActiveMessages" Classes="topButton" IsEnabled="{Binding !!CurrentSubscription}"
+                    Command="{Binding PurgeMessages}" CommandParameter="false">
+                <StackPanel Orientation="Horizontal">
+                    <DrawingPresenter Drawing="{DynamicResource Modern.Clean}" />
+                    <TextBlock VerticalAlignment="Center">Purge messages</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Name="btnPurgeDlqMessages" Classes="topButton" IsEnabled="{Binding !!CurrentSubscription}"
+                    Command="{Binding PurgeMessages}" CommandParameter="true">
+                <StackPanel Orientation="Horizontal">
+                    <DrawingPresenter Drawing="{DynamicResource Modern.Clean}" />
+                    <TextBlock VerticalAlignment="Center">Purge dead-letter</TextBlock>
+                </StackPanel>
+            </Button>
             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="White" Margin="0,0,4,0">
                 PurpleExplorer
                 v0.1
