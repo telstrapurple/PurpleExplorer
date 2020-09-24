@@ -26,12 +26,12 @@ namespace PurpleExplorer.ViewModels
         private ServiceBusTopic _currentTopic;
         private Message _currentMessage;
         private string _connectionString;
+        private IObservable<bool> _sendMessageEnabled;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
-        
-        [DataMember]
-        public ObservableCollection<string> SavedConnectionStrings { get; set; }
-        
+
+        [DataMember] public ObservableCollection<string> SavedConnectionStrings { get; set; }
+
         [DataMember]
         public string ConnectionString
         {
@@ -76,7 +76,13 @@ namespace PurpleExplorer.ViewModels
 
         public Version AppVersion => Assembly.GetExecutingAssembly().GetName().Version;
         public string AppVersionText { get; set; }
-        
+
+        public IObservable<bool> SendMessageEnabled
+        {
+            get => _sendMessageEnabled;
+            set => this.RaiseAndSetIfChanged(ref _sendMessageEnabled, value);
+        }
+
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
             _loggingService = loggingService ?? Locator.Current.GetService<ILoggingService>();
@@ -84,9 +90,14 @@ namespace PurpleExplorer.ViewModels
 
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             SavedConnectionStrings = new ObservableCollection<string>();
-            
+
+            _sendMessageEnabled = this.WhenAnyValue<MainWindowViewModel, bool, ServiceBusTopic>(
+                x => x.CurrentTopic,
+                x => x != null && x.Subscriptions?.Count > 0
+            );
+
             SetTabHeaders();
-            
+
             AppVersionText = AppVersion.ToString();
             // Checking for new version asynchronous. no need to await on it
 #pragma warning disable 4014
@@ -102,8 +113,9 @@ namespace PurpleExplorer.ViewModels
             {
                 AppVersionText = $"new v{latestReleaseVersion} is available";
                 this.RaisePropertyChanged(nameof(AppVersionText));
-                
-                var message = $"New version v{latestReleaseVersion} is available. \n Download today at {latestRelease.html_url}";
+
+                var message =
+                    $"New version v{latestReleaseVersion} is available. \n Download today at {latestRelease.html_url}";
                 LoggingService.Log(message);
                 await MessageBoxHelper.ShowMessage("New version available", message);
             }
@@ -112,10 +124,11 @@ namespace PurpleExplorer.ViewModels
                 LoggingService.Log($"v{AppVersion} is the latest released version");
             }
         }
-        
+
         public async void ConnectionBtnPopupCommand()
         {
-            var viewModel = new ConnectionStringWindowViewModel { ConnectionString = this.ConnectionString, SavedConnectionStrings = this.SavedConnectionStrings };
+            var viewModel = new ConnectionStringWindowViewModel
+                {ConnectionString = this.ConnectionString, SavedConnectionStrings = this.SavedConnectionStrings};
 
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
@@ -181,10 +194,11 @@ namespace PurpleExplorer.ViewModels
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
             var topicPath = CurrentTopic.Name;
             var subscriptionName = CurrentSubscription.Name;
-            var runtimeInfo = await _serviceBusHelper.GetSubscriptionRuntimeInfo(connectionString, topicPath, subscriptionName);
-            
+            var runtimeInfo =
+                await _serviceBusHelper.GetSubscriptionRuntimeInfo(connectionString, topicPath, subscriptionName);
+
             CurrentSubscription.UpdateMessageCountDetails(runtimeInfo.MessageCountDetails);
-            SetTabHeaders();   
+            SetTabHeaders();
         }
 
         public void SetTabHeaders()
@@ -203,31 +217,25 @@ namespace PurpleExplorer.ViewModels
 
         public async void AddMessage()
         {
-            if (CurrentSubscription != null || (CurrentTopic != null && CurrentTopic.Subscriptions.Count > 0))
+            var viewModal = new AddMessageWindowViewModal();
+
+            var topicName = CurrentSubscription == null ? CurrentTopic.Name : CurrentSubscription.Topic.Name;
+            var returnedViewModal =
+                await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
+
+            if (returnedViewModal.Cancel)
             {
-                var viewModal = new AddMessageWindowViewModal();
-
-                var topicName = CurrentSubscription == null ? CurrentTopic.Name : CurrentSubscription.Topic.Name;
-                var returnedViewModal =
-                    await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
-
-                if (returnedViewModal.Cancel)
-                {
-                    return;
-                }
-
-                var messageText = returnedViewModal.Message.Trim();
-                var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-                if (!string.IsNullOrEmpty(messageText))
-                {
-                    LoggingService.Log("Sending message...");
-                    await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
-                    LoggingService.Log("Message sent");
-                }
+                return;
             }
 
-            if (CurrentTopic != null && CurrentTopic.Subscriptions.Count == 0)
-                await MessageBoxHelper.ShowError("Can't send a message to a Topic without any subscriptions.");
+            var messageText = returnedViewModal.Message.Trim();
+            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+            if (!string.IsNullOrEmpty(messageText))
+            {
+                LoggingService.Log("Sending message...");
+                await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
+                LoggingService.Log("Message sent");
+            }
         }
 
         public async void DeleteMessage()
@@ -258,7 +266,7 @@ namespace PurpleExplorer.ViewModels
                 isDlq
                     ? $"{_currentTopic.Name}/{_currentSubscription.Name}/$DeadLetterQueue"
                     : $"{_currentTopic.Name}/{_currentSubscription.Name}";
-            
+
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
                 $"Purging messages from {subscriptionPathText}",
                 $"Are you sure you would like to purge ALL the messages?");
@@ -272,10 +280,11 @@ namespace PurpleExplorer.ViewModels
 
             LoggingService.Log($"Purging ALL messages in {subscriptionPathText}... (might take some time)");
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-            var purgedCount = await _serviceBusHelper.PurgeMessages(connectionString, _currentTopic.Name, _currentSubscription.Name, isDlq);
+            var purgedCount = await _serviceBusHelper.PurgeMessages(connectionString, _currentTopic.Name,
+                _currentSubscription.Name, isDlq);
             LoggingService.Log($"Purged {purgedCount} messages in {subscriptionPathText}");
         }
-        
+
         public async Task RefreshMessages()
         {
             LoggingService.Log("Fetching messages...");
@@ -284,7 +293,7 @@ namespace PurpleExplorer.ViewModels
                 SetSubscriptionMessages(),
                 SetDlqMessages(),
                 RefreshMessageCount()
-                );
+            );
 
             LoggingService.Log("Fetched messages");
         }
