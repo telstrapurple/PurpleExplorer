@@ -30,6 +30,7 @@ namespace PurpleExplorer.Helpers
                 ButtonDefinitions = buttons,
                 ContentTitle = title,
                 ContentMessage = message,
+                ShowInCenter = true,
                 Icon = icon,
                 CanResize = false,
                 WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen

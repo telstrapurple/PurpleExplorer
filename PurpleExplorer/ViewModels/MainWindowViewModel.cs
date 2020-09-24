@@ -74,8 +74,9 @@ namespace PurpleExplorer.ViewModels
             get => _loggingService;
         }
 
-        public string ApplicationVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
+        public Version AppVersion => Assembly.GetExecutingAssembly().GetName().Version;
+        public string AppVersionText { get; set; }
+        
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
             _loggingService = loggingService ?? Locator.Current.GetService<ILoggingService>();
@@ -85,11 +86,36 @@ namespace PurpleExplorer.ViewModels
             SavedConnectionStrings = new ObservableCollection<string>();
             
             SetTabHeaders();
+            
+            AppVersionText = AppVersion.ToString();
+            // Checking for new version asynchronous. no need to await on it
+#pragma warning disable 4014
+            CheckForNewVersion();
+#pragma warning restore 4014
         }
 
+        private async Task CheckForNewVersion()
+        {
+            var latestRelease = await AppVersionHelper.GetLatestRelease();
+            var latestReleaseVersion = new Version(latestRelease.name);
+            if (latestReleaseVersion > AppVersion)
+            {
+                AppVersionText = $"new v{latestReleaseVersion} is available";
+                this.RaisePropertyChanged(nameof(AppVersionText));
+                
+                var message = $"New version v{latestReleaseVersion} is available. \n Download today at {latestRelease.html_url}";
+                LoggingService.Log(message);
+                await MessageBoxHelper.ShowMessage("New version available", message);
+            }
+            else
+            {
+                LoggingService.Log($"v{AppVersion} is the latest released version");
+            }
+        }
+        
         public async void ConnectionBtnPopupCommand()
         {
-            var viewModel = new ConnectionStringWindowViewModel() { ConnectionString = this.ConnectionString, SavedConnectionStrings = this.SavedConnectionStrings };
+            var viewModel = new ConnectionStringWindowViewModel { ConnectionString = this.ConnectionString, SavedConnectionStrings = this.SavedConnectionStrings };
 
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
