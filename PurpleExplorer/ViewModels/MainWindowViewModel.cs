@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
@@ -72,6 +73,8 @@ namespace PurpleExplorer.ViewModels
         {
             get => _loggingService;
         }
+
+        public string ApplicationVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
