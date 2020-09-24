@@ -46,7 +46,7 @@
                     <TextBlock VerticalAlignment="Center">Refresh</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Name="AddButton" Classes="topButton" IsEnabled="{Binding !!CurrentSubscription}"
+            <Button Name="AddButton" Classes="topButton" IsEnabled="{Binding SendMessageEnabled^}"
                     Command="{Binding AddMessage}">
                 <StackPanel Orientation="Horizontal">
                     <DrawingPresenter Drawing="{DynamicResource Material.Send}" />
