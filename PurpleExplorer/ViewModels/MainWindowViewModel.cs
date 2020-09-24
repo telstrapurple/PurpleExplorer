@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
@@ -29,8 +30,7 @@ namespace PurpleExplorer.ViewModels
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
 
-        [DataMember]
-        public ObservableCollection<string> SavedConnectionStrings { get; set; }
+        [DataMember] public ObservableCollection<string> SavedConnectionStrings { get; set; }
 
         [DataMember]
         public string ConnectionString
@@ -74,6 +74,9 @@ namespace PurpleExplorer.ViewModels
             get => _loggingService;
         }
 
+        public Version AppVersion => Assembly.GetExecutingAssembly().GetName().Version;
+        public string AppVersionText { get; set; }
+
         public IObservable<bool> SendMessageEnabled
         {
             get => _sendMessageEnabled;
@@ -94,11 +97,37 @@ namespace PurpleExplorer.ViewModels
             );
 
             SetTabHeaders();
+
+            AppVersionText = AppVersion.ToString();
+            // Checking for new version asynchronous. no need to await on it
+#pragma warning disable 4014
+            CheckForNewVersion();
+#pragma warning restore 4014
+        }
+
+        private async Task CheckForNewVersion()
+        {
+            var latestRelease = await AppVersionHelper.GetLatestRelease();
+            var latestReleaseVersion = new Version(latestRelease.name);
+            if (latestReleaseVersion > AppVersion)
+            {
+                AppVersionText = $"new v{latestReleaseVersion} is available";
+                this.RaisePropertyChanged(nameof(AppVersionText));
+
+                var message =
+                    $"New version v{latestReleaseVersion} is available. \n Download today at {latestRelease.html_url}";
+                LoggingService.Log(message);
+                await MessageBoxHelper.ShowMessage("New version available", message);
+            }
+            else
+            {
+                LoggingService.Log($"v{AppVersion} is the latest released version");
+            }
         }
 
         public async void ConnectionBtnPopupCommand()
         {
-            var viewModel = new ConnectionStringWindowViewModel()
+            var viewModel = new ConnectionStringWindowViewModel
                 {ConnectionString = this.ConnectionString, SavedConnectionStrings = this.SavedConnectionStrings};
 
             var returnedViewModel =
