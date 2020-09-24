@@ -74,9 +74,12 @@
                     <TextBlock VerticalAlignment="Center">Purge dead-letter</TextBlock>
                 </StackPanel>
             </Button>
-            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="White" Margin="0,0,4,0">
-                PurpleExplorer
-                v0.1
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="White" Margin="0,0,10,0" TextAlignment="Right">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="PurpleExplorer&#x0a;{0}">
+                        <Binding Path="AppVersionText" />
+                    </MultiBinding>
+                </TextBlock.Text>
             </TextBlock>
         </DockPanel>
 

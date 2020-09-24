@@ -12,7 +12,7 @@ It's a simple tool to help you to:
 * purge all messages
 
 ## How to Download
-Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Actions](https://github.com/telstrapurple/PurpleExplorer/actions?query=workflow%3A%22.NET+Core%22+branch%3Amaster) page
+Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page
 
 ## How to run
 ### Windows
@@ -22,9 +22,10 @@ You can allow windows defender to start this application:
 > click on _More Info_ -> Run anyway
 
 ### macOS
-> chmod +x PurpleExplorer
-
 > _Right-click_ -> Open
 
 You can allow macOS to start this application by enabling Developer tools for Terminal:
 > _System Preferences -> Security & Privacy -> Privacy_, select "Developer Tools" on the left, check terminal on the right.
+
+You can make `PurpleExplorer` file executable by:
+> chmod +x PurpleExplorer
