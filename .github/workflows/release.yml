@@ -15,10 +15,10 @@ jobs:
     #if: github.ref == 'refs/heads/master'
     runs-on: macos-latest
     env:
-      applicationVersion: ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
+      releaseVersion: ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
     steps:
       - name: Version
-        run: echo Start releasing version $applicationVersion
+        run: echo Releasing version $releaseVersion
       - uses: actions/checkout@v2
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
@@ -26,7 +26,7 @@ jobs:
           dotnet-version: 3.1.402
       # Publish osx-x64
       - name: Publish osx-x64
-        run: dotnet publish -r osx-x64 -c Release /p:PublishTrimmed=true /p:${{env.applicationVersion}}
+        run: dotnet publish -r osx-x64 -c Release /p:PublishTrimmed=true /p:Version=${{env.releaseVersion}}
       - name: Archive osx-x64
         uses: actions/upload-artifact@v1
         with:
@@ -34,7 +34,7 @@ jobs:
           path: PurpleExplorer/bin/Release/netcoreapp3.1/osx-x64/publish
       # Publish win-x64
       - name: Publish win-x64
-        run: dotnet publish -r win-x64 -c Release /p:PublishTrimmed=true /p:${{env.applicationVersion}}
+        run: dotnet publish -r win-x64 -c Release /p:PublishTrimmed=true /p:Version=${{env.releaseVersion}}
       - name: Archive win-x64
         uses: actions/upload-artifact@v1
         with:
@@ -42,9 +42,29 @@ jobs:
           path: PurpleExplorer/bin/Release/netcoreapp3.1/win-x64/publish
       # Publish linux-x64
       - name: Publish linux-x64
-        run: dotnet publish -r linux-x64 -c Release /p:PublishTrimmed=true /p:${{env.applicationVersion}}
+        run: dotnet publish -r linux-x64 -c Release /p:PublishTrimmed=true /p:Version=${{env.releaseVersion}}
       - name: Archive linux-x64
         uses: actions/upload-artifact@v1
         with:
           name: PurpleExplorer_linux-x64
           path: PurpleExplorer/bin/Release/netcoreapp3.1/linux-x64/publish
+      # Create release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.releaseVersion }}
+          release_name: ${{ env.releaseVersion }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./PurpleExplorer_osx-x64.zip
+          asset_name: PurpleExplorer_osx-x64.zip
+          asset_content_type: application/zip
