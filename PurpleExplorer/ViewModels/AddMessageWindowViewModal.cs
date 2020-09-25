@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using PurpleExplorer.Models;
 using ReactiveUI;
+using Splat;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -8,6 +9,7 @@ namespace PurpleExplorer.ViewModels
     {
         private string _message;
         private string _title;
+        private readonly IAppState _appState;
 
         public string Message
         {
@@ -22,5 +24,11 @@ namespace PurpleExplorer.ViewModels
         }
 
         public ObservableCollection<SavedMessage> SavedMessages { get; set; }
+
+        public AddMessageWindowViewModal(IAppState appState = null)
+        {
+            _appState = appState ?? Locator.Current.GetService<IAppState>();
+            SavedMessages = _appState.SavedMessages;
+        }
     }
 }
