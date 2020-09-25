@@ -2,10 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="780" d:DesignHeight="430"
+        mc:Ignorable="d" d:DesignWidth="780" d:DesignHeight="630"
         x:Class="PurpleExplorer.Views.MessageDetailsWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
-        Title="Message Details" Width="680" Height="430">
+        Title="Message Details" Width="680" Height="630">
 
     <Design.DataContext>
         <vm:MessageDetailsWindowViewModel />
@@ -13,7 +13,7 @@
     <Window.Styles>
         <Style Selector="TextBlock#ContentTextBlock">
             <Setter Property="Margin" Value="5, 5, 0, 0"/>
-            <Setter Property="Width" Value="500" />
+            <Setter Property="Width" Value="400" />
             <Setter Property="Height" Value="200" />
             <Setter Property="VerticalAlignment" Value="Top" />
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -30,24 +30,24 @@
         </Style>
         <Style Selector="TextBlock.right">
             <Setter Property="Margin" Value="5, 5, 0, 0"/>
-            <Setter Property="Width" Value="500" />
+            <Setter Property="Width" Value="400" />
             <Setter Property="Height" Value="20" />
             <Setter Property="Background" Value="White" />
             <Setter Property="VerticalAlignment" Value="Top" />
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
     </Window.Styles>
-    <Grid Height="600" VerticalAlignment="Top" Background="#c5e5f1">
+    <Grid Height="600" VerticalAlignment="Top">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25" />
-            <RowDefinition Height="25" />
-            <RowDefinition Height="25" />
-            <RowDefinition Height="200" />
-            <RowDefinition Height="25" />
-            <RowDefinition Height="25" />
-            <RowDefinition Height="25" />
-            <RowDefinition Height="25" />
-            <RowDefinition Height="25" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="240" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="45" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150" />
@@ -62,22 +62,37 @@
             </Button>
         </DockPanel>
         <TextBlock Text="MessageId" Classes="left" Grid.Row="1" Grid.Column="0"  />
-        <TextBlock Text="{Binding Message.MessageId}" Classes="right" Grid.Row="1" Grid.Column="1"  />
+        <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="30">
+            <TextBlock Text="{Binding Message.MessageId}" Classes="right" Grid.Row="1" Grid.Column="1"  />
+        </Border>
         <TextBlock Text="Content Type" Classes="left" Grid.Row="2" Grid.Column="0" />
-        <TextBlock Text="{Binding Message.ContentType}" Classes="right" Grid.Row="2" Grid.Column="1" />
+        <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="30">
+            <TextBlock Text="{Binding Message.ContentType}" Classes="right" Grid.Row="2" Grid.Column="1" />
+        </Border>
         <TextBlock Text="Content" Grid.Row="3" Classes="left" Grid.Column="0" />
-        <TextBlock Name="ContentTextBlock" Text="{Binding Message.Content}" Grid.Row="3"
-                   Grid.Column="1" />
+        <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="220">
+            <TextBlock Name="ContentTextBlock" Text="{Binding Message.Content}" Grid.Row="3" Grid.Column="1" />
+        </Border>
         <TextBlock Grid.Row="4" Grid.Column="0" Classes="left" Text="Sequence Number" />
-        <TextBlock Grid.Row="4" Grid.Column="1" Classes="right" Text="{Binding Message.SequenceNumber}" />
+        <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="30">
+            <TextBlock Grid.Row="4" Grid.Column="1" Classes="right" Text="{Binding Message.SequenceNumber}" />
+        </Border>
         <TextBlock Grid.Row="5" Grid.Column="0" Classes="left"  Text="Size" />
-        <TextBlock Grid.Row="5" Grid.Column="1" Classes="right" Text="{Binding Message.Size}" />
+        <Border Grid.Row="5" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="30">
+            <TextBlock Grid.Row="5" Grid.Column="1" Classes="right" Text="{Binding Message.Size}" />
+        </Border>
         <TextBlock Grid.Row="6" Grid.Column="0" Classes="left" Text="Delivery Count" />
-        <TextBlock Grid.Row="6" Grid.Column="1" Classes="right" Text="{Binding Message.DeliveryCount}" />
+        <Border Grid.Row="6" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="30">
+            <TextBlock Grid.Row="6" Grid.Column="1" Classes="right" Text="{Binding Message.DeliveryCount}" />
+        </Border>
         <TextBlock Grid.Row="7" Grid.Column="0" Classes="left"  Text="Correlation Id" />
-        <TextBlock Grid.Row="7" Grid.Column="1" Classes="right" Text="{Binding Message.CorrelationId}" />
+        <Border Grid.Row="7" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="30">
+            <TextBlock Grid.Row="7" Grid.Column="1" Classes="right" Text="{Binding Message.CorrelationId}" />
+        </Border>
         <TextBlock Grid.Row="8" Grid.Column="0" Classes="left"  Text="Time To Live" />
-        <TextBlock Grid.Row="8" Grid.Column="1" Classes="right" Text="{Binding Message.TimeToLive}" />
+        <Border Grid.Row="8" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Height="30">
+            <TextBlock Grid.Row="8" Grid.Column="1" Classes="right" Text="{Binding Message.TimeToLive}" />
+        </Border>
     </Grid>
 
 </Window>
