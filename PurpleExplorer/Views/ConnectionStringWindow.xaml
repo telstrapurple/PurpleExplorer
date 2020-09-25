@@ -2,10 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+        mc:Ignorable="d" d:DesignWidth="610" d:DesignHeight="480"
         x:Class="PurpleExplorer.Views.ConnectionStringWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
-        Title="Connect to Service Bus" Width="900" Height="500">
+        Title="Connect to Service Bus" Width="610" Height="480">
 
     <Design.DataContext>
         <vm:ConnectionStringWindowViewModel />
@@ -13,34 +13,32 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="70" />
-            <RowDefinition Height="70" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="70" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="320" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" MinWidth="500" Height="50" TextWrapping="Wrap" HorizontalAlignment="Stretch"
+        <TextBox Grid.Row="0" Height="30" Width="600" TextWrapping="Wrap" HorizontalAlignment="Left" Margin="5, 5, 0, 0"
                  VerticalAlignment="Top" Text="{Binding Path=ConnectionString, Mode=TwoWay}" />
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5, 0, 0, 0">
             <Button Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                    IsEnabled="{Binding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                    Click="btnSendClick">
+                IsEnabled="{Binding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Click="btnSendClick">
                 Connect to Service Bus
             </Button>
             <Button Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                    IsEnabled="{Binding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                    Click="btnSaveConnectionString">
+            IsEnabled="{Binding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Click="btnSaveConnectionString">
                 Save Connection String
             </Button>
         </StackPanel>
-
-        <ListBox Grid.Row="2" Name="lsbSavedConnectionString" Margin="0,0,5,0"
-                 Items="{Binding Path=SavedConnectionStrings, Mode=TwoWay} " Height="300" VerticalAlignment="Bottom"
-                 SelectionChanged="lsbConnectionStringSelectionChanged" />
-        <Button Grid.Row="3" Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="btnDeleteConnectionString">
+        
+        <ListBox Grid.Row="2" Name="lsbSavedConnectionString" Margin="5,0,5,0" Items="{Binding Path=SavedConnectionStrings, Mode=TwoWay} " 
+                 Width="600" Height="300" VerticalAlignment="Top" SelectionChanged="lsbConnectionStringSelectionChanged" HorizontalAlignment="Left" />
+        <Button Grid.Row="3" Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+             Click="btnDeleteConnectionString">
             Remove
         </Button>
     </Grid>
