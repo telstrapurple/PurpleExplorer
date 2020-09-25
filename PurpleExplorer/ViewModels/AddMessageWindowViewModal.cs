@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using ReactiveUI;
 
 namespace PurpleExplorer.ViewModels
@@ -12,8 +13,6 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _message, value);
         }
 
-        public AddMessageWindowViewModal() : base()
-        {
-        }
+        public ObservableCollection<string> SavedMessages { get; set; }
     }
 }
