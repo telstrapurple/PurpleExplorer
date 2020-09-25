@@ -95,14 +95,14 @@
                     </TreeDataTemplate>
                     <TreeDataTemplate DataType="models:ServiceBusTopic" ItemsSource="{Binding Subscriptions}">
                         <StackPanel Orientation="Horizontal">
-                            <DrawingPresenter Drawing="{DynamicResource VSImageLib.PublicQueue_16x}" />
-                            <TextBlock Foreground="Purple" Text="{Binding Name}" />
+                            <DrawingPresenter Drawing="{DynamicResource FluentIconsFilled.mail_all_filled}" />
+                            <TextBlock Foreground="Purple" Margin="0,7" Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>
                     <DataTemplate DataType="models:ServiceBusSubscription">
                         <StackPanel Orientation="Horizontal">
-                            <DrawingPresenter Drawing="{DynamicResource VSImageLib.Processor_16x}" />
-                            <TextBlock>
+                            <DrawingPresenter Drawing="{DynamicResource Unicons.Processor}" />
+                            <TextBlock Margin="0,4">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0}({1},{2})">
                                         <Binding Path="Name" />
