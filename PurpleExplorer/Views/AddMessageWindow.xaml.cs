@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using PurpleExplorer.Helpers;
+using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
 
 namespace PurpleExplorer.Views
@@ -33,22 +34,28 @@ namespace PurpleExplorer.Views
         public void btnSaveMessage(object sender, RoutedEventArgs e)
         {
             var dataContext = DataContext as AddMessageWindowViewModal;
-            var currentMessage = dataContext.Message;
-            dataContext.SavedMessages.Add(currentMessage);
+            var newMessage = new SavedMessage
+            {
+                Message = dataContext.Message,
+                Title = dataContext.Title
+            };
+            dataContext.SavedMessages.Add(newMessage);
         }
 
         public void btnDeleteMessage(object sender, RoutedEventArgs e)
         {
             var dataContext = DataContext as AddMessageWindowViewModal;
-            var listbox = this.FindControl<ListBox>("lsbSavedMessages");
-            dataContext.SavedMessages.Remove(listbox.SelectedItem as string);
+            var dataGrid = this.FindControl<DataGrid>("dgSavedMessages");
+            dataContext.SavedMessages.Remove(dataGrid.SelectedItem as SavedMessage);
         }
 
         public void messageSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var dataContext = DataContext as AddMessageWindowViewModal;
-            var listbox = sender as ListBox;
-            dataContext.Message = listbox.SelectedItem as string;
+            var dataGrid = sender as DataGrid;
+            var selectedMessage = dataGrid.SelectedItem as SavedMessage;
+            dataContext.Message = selectedMessage.Message;
+            dataContext.Title = selectedMessage.Title;
         }
     }
 }

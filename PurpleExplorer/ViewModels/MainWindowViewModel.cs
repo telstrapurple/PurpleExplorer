@@ -83,7 +83,7 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _sendMessageEnabled, value);
         }
         
-        [DataMember] private ObservableCollection<string> SavedMessages { get; set; }
+        [DataMember] private ObservableCollection<SavedMessage> SavedMessages { get; set; }
 
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
@@ -92,7 +92,7 @@ namespace PurpleExplorer.ViewModels
 
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
             SavedConnectionStrings = new ObservableCollection<string>();
-            SavedMessages = new ObservableCollection<string>();
+            SavedMessages = new ObservableCollection<SavedMessage>();
 
             _sendMessageEnabled = this.WhenAnyValue<MainWindowViewModel, bool, ServiceBusTopic>(
                 x => x.CurrentTopic,

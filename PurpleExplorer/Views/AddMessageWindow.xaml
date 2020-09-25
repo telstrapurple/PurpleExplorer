@@ -3,44 +3,52 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:PurpleExplorer.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="610" d:DesignHeight="480"
+        mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="480"
         x:Class="PurpleExplorer.Views.AddMessageWindow"
-        Title="Send message" Width="610" Height="480">
+        Title="Send message" Width="620" Height="480">
 
     <Design.DataContext>
         <viewModels:AddMessageWindowViewModal />
     </Design.DataContext>
 
-    <Grid>
+    <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="80" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="2*" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBox Height="60" Width="600" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5, 5, 0, 0"
+        <TextBox MinHeight="180" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                  TextWrapping="Wrap" Text="{Binding Path=Message, Mode=TwoWay}" />
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5, 0, 0, 0">
-            <Button Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center"
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <Button MinWidth="200" Height="30" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     IsEnabled="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                    Click="btnAddClick" Margin="0,0,5,0">
+                    Click="btnAddClick">
                 Send
             </Button>
-            <Button Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+            <Button MinWidth="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
                     IsEnabled="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     Click="btnSaveMessage">
                 Save Message
             </Button>
+            <TextBox Height="30" MinWidth="200" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     IsEnabled="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                     TextWrapping="Wrap" Text="{Binding Path=Title, Mode=TwoWay}" Watermark="Save message with title:" />
         </StackPanel>
+        
+        <DataGrid Grid.Row="2" Name="dgSavedMessages" Items="{Binding Path=SavedMessages, Mode=TwoWay}"
+                  SelectionChanged="messageSelectionChanged"
+                  IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" />
+            </DataGrid.Columns>
+        </DataGrid>
 
-        <ListBox Grid.Row="2" Name="lsbSavedMessages" Margin="5,0,5,5"
-                 Items="{Binding Path=SavedMessages, Mode=TwoWay} " Height="300" Width="600" VerticalAlignment="Bottom"
-                 SelectionChanged="messageSelectionChanged" />
-
-        <Button Grid.Row="3" Width="200" Height="30" Margin="5,5,5,5" HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+        <Button Grid.Row="3" Width="200" Height="30" Margin="0,5,0,0" HorizontalAlignment="Left"
+                VerticalAlignment="Center"
                 Click="btnDeleteMessage">
             Remove
         </Button>
