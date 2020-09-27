@@ -1,0 +1,12 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style Selector="Button.topButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Margin" Value="1,0" />
+        <Setter Property="BorderThickness" Value="0,0,2,0" />
+    </Style>
+    <Style Selector="Button.topButton DrawingPresenter">
+        <Setter Property="Margin" Value="0,0,5,0" />
+    </Style>
+</Styles>

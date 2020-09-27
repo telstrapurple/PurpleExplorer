@@ -97,21 +97,16 @@ namespace PurpleExplorer.Helpers
             return await client.GetNamespaceInfoAsync();
         }
 
-        public async Task SendTopicMessage(string connectionString, string topicPath, string content)
+        public async Task SendMessage(string connectionString, string topicPath, string content)
         {
-            var message = new AzureMessage() {Body = Encoding.UTF8.GetBytes(content)};
-            await SendTopicClientMessage(connectionString, topicPath, message);
+            var message = new AzureMessage {Body = Encoding.UTF8.GetBytes(content)};
+            await SendMessage(connectionString, topicPath, message);
         }
 
-        public async Task SendTopicMessage(string connectionString, string topicPath, AzureMessage message)
-        {
-            await SendTopicClientMessage(connectionString, topicPath, message);
-        }
-
-        async Task SendTopicClientMessage(string connectionString, string topicPath, AzureMessage messageToSend)
+        public async Task SendMessage(string connectionString, string topicPath, AzureMessage message)
         {
             var topicClient = new TopicClient(connectionString, topicPath);
-            await topicClient.SendAsync(messageToSend);
+            await topicClient.SendAsync(message);
             await topicClient.CloseAsync();
         }
 
@@ -166,9 +161,8 @@ namespace PurpleExplorer.Helpers
             return purgedCount;
         }
 
-        async Task<AzureMessage> GetMessageBySequenceNumber(string connectionString, string topicPath,
-            string subscriptionPath,
-            long sequenceNumber)
+        async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
+            string subscriptionPath, long sequenceNumber)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
             var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
@@ -176,18 +170,18 @@ namespace PurpleExplorer.Helpers
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var azureMessage = await receiver.PeekBySequenceNumberAsync(sequenceNumber);
             await receiver.CloseAsync();
-
+            
             return azureMessage;
         }
 
-        public async Task ResendDlqMessage(string connectionString, string topicPath, string subscriptionPath,
+        public async Task ResubmitDlqMessage(string connectionString, string topicPath, string subscriptionPath,
             Message message)
         {
-            var azureMessage = await GetMessageBySequenceNumber(connectionString, topicPath, subscriptionPath,
+            var azureMessage = await PeekDlqMessageBySequenceNumber(connectionString, topicPath, subscriptionPath,
                 message.SequenceNumber);
             var clonedMessage = CloneMessage(azureMessage);
 
-            await SendTopicMessage(connectionString, topicPath, clonedMessage);
+            await SendMessage(connectionString, topicPath, clonedMessage);
 
             await DeleteMessage(connectionString, topicPath, subscriptionPath, message, true);
         }

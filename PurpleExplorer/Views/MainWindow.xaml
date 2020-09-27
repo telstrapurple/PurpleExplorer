@@ -13,18 +13,6 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Window.Styles>
-        <Style Selector="Button.topButton">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="Margin" Value="1,0" />
-            <Setter Property="BorderThickness" Value="0,0,2,0" />
-        </Style>
-        <Style Selector="DrawingPresenter">
-            <Setter Property="Margin" Value="0,0,5,0" />
-        </Style>
-    </Window.Styles>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -90,19 +78,19 @@
                     <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                         <StackPanel Orientation="Horizontal">
                             <DrawingPresenter Drawing="{DynamicResource Unicons.ServerConnection}" />
-                            <TextBlock Foreground="Purple" Margin="4" VerticalAlignment="Center" Text="{Binding Name}" />
+                            <TextBlock Foreground="Purple" Margin="5, 4" VerticalAlignment="Center" Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>
                     <TreeDataTemplate DataType="models:ServiceBusTopic" ItemsSource="{Binding Subscriptions}">
                         <StackPanel Orientation="Horizontal">
                             <DrawingPresenter Drawing="{DynamicResource FluentIconsFilled.mail_all_filled}" />
-                            <TextBlock Foreground="Purple" Margin="0,7" Text="{Binding Name}" />
+                            <TextBlock Foreground="Purple" Margin="3,8" Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>
                     <DataTemplate DataType="models:ServiceBusSubscription">
                         <StackPanel Orientation="Horizontal">
                             <DrawingPresenter Drawing="{DynamicResource Unicons.Processor}" />
-                            <TextBlock Margin="0,4">
+                            <TextBlock Margin="3,4">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0}({1},{2})">
                                         <Binding Path="Name" />

@@ -8,9 +8,9 @@ It's a simple tool to help you:
 * View active and dead-letter messages
 * View message body and details
 * Send a new message
-* Save messages to send them easier
-* Re-submit a message from DLQ
+* Save messages to send them quickly
 * Purge active or dead-letter messages
+* Re-submit a message from dead-letter
 
 ## How to Download
 Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page
