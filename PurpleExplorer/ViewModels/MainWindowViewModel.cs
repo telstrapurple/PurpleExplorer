@@ -240,9 +240,13 @@ namespace PurpleExplorer.ViewModels
 
         public async void DeleteMessage()
         {
+            LoggingService.Log("DANGER NOTE: Deleting requires receiving the messages before and this increases the DeliveryCount of the messages");
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
                 $"Deleting message from {_currentTopic.Name}/{_currentSubscription.Name}",
-                $"Are you sure you would like to delete the message with ID: {_currentMessage.MessageId}");
+                $"DANGER!!! READ CAREFULLY \n" +
+                $"Deleting requires receiving the messages before and this increases the DeliveryCount of the messages. \n" +
+                $"There can be consequences to other messages in this subscription, Are you sure? \n \n" +
+                $"Are you sure you would like to delete the message with ID: {_currentMessage.MessageId} AND increase the delivery count of ALL the messages before it?");
 
             // Because buttonResult can be None or No
             if (buttonResult != ButtonResult.Yes)
@@ -251,6 +255,7 @@ namespace PurpleExplorer.ViewModels
                 return;
             }
 
+            LoggingService.Log($"User accepted to receive messages in order to delete message {_currentMessage.MessageId}. This is going to increases the DeliveryCount of the messages before it.");
             LoggingService.Log($"Deleting message {_currentMessage.MessageId}... (might take some seconds)");
             var connectionString = CurrentTopic.ServiceBus.ConnectionString;
             await _serviceBusHelper.DeleteMessage(connectionString, _currentTopic.Name, _currentSubscription.Name,

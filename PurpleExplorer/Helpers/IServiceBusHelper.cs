@@ -21,5 +21,7 @@ namespace PurpleExplorer.Helpers
         public Task<long> PurgeMessages(string connectionString, string topicPath, string subscriptionPath, bool isDlq);
         public Task ResubmitDlqMessage(string connectionString, string topicPath, string subscriptionPath,
             Message message);
+        public Task DeadletterMessage(string connectionString, string topicPath, string subscriptionPath,
+            Message message);
     }
 }

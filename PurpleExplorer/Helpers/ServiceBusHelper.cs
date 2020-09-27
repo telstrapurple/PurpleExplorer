@@ -186,6 +186,32 @@ namespace PurpleExplorer.Helpers
             await DeleteMessage(connectionString, topicPath, subscriptionPath, message, true);
         }
 
+        public async Task DeadletterMessage(string connectionString, string topicPath, string subscriptionPath,
+            Message message)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+
+            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
+
+            while (true)
+            {
+                var messages = await receiver.ReceiveAsync(_maxMessageCount);
+                if (messages == null || messages.Count == 0)
+                {
+                    break;
+                }
+
+                var foundMessage = messages.FirstOrDefault(m => m.MessageId.Equals(message.MessageId));
+                if (foundMessage != null)
+                {
+                    await receiver.DeadLetterAsync(foundMessage.SystemProperties.LockToken);
+                    break;
+                }
+            }
+
+            await receiver.CloseAsync();
+        }
+        
         AzureMessage CloneMessage(AzureMessage original)
         {
             return new AzureMessage

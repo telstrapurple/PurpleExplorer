@@ -9,8 +9,12 @@ It's a simple tool to help you:
 * View message body and details
 * Send a new message
 * Save messages to send them quickly
+* Delete a message^
 * Purge active or dead-letter messages
 * Re-submit a message from dead-letter
+* Dead-letter a message^
+
+\^ NOTE: These actions require receiving all the messages and this increases DeliveryCount. Be aware that there can be consequences to other messages
 
 ## How to Download
 Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page

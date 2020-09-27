@@ -40,6 +40,14 @@
 
     <StackPanel Orientation="Vertical">
         <DockPanel Background="#380f14" Height="30" LastChildFill="False">
+            <Button Command="{Binding DeadletterMessage}"
+                    IsVisible="{Binding !Message.IsDlq}"
+                    Classes="topButton">
+                <StackPanel Orientation="Horizontal">
+                    <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
+                    <TextBlock VerticalAlignment="Center">Send to dead-letter</TextBlock>
+                </StackPanel>
+            </Button>
             <Button Name="ResendButton" Command="{Binding ResubmitMessage}"
                     IsVisible="{Binding !!Message.IsDlq}"
                     Classes="topButton">
