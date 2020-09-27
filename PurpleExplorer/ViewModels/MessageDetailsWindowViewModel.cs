@@ -22,11 +22,11 @@ namespace PurpleExplorer.ViewModels
             _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
         }
 
-        public async Task ResendMessage()
+        public async Task ResubmitMessage()
         {
             _loggingService.Log($"Resending DLQ message: {Message.MessageId}");
 
-            await _serviceBusHelper.ResendDlqMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
+            await _serviceBusHelper.ResubmitDlqMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
                 Message);
 
             _loggingService.Log($"Resent DLQ message: {Message.MessageId}");
