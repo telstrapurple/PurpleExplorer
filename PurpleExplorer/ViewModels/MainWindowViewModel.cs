@@ -226,7 +226,7 @@ namespace PurpleExplorer.ViewModels
             if (!string.IsNullOrEmpty(messageText))
             {
                 LoggingService.Log("Sending message...");
-                await _serviceBusHelper.SendTopicMessage(connectionString, topicName, messageText);
+                await _serviceBusHelper.SendMessage(connectionString, topicName, messageText);
                 LoggingService.Log("Message sent");
             }
         }

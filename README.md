@@ -2,14 +2,15 @@
 
 Purple Explorer is a cross-platform desktop application built with .NET Core. 
 
-It's a simple tool to help you to: 
-* connect to an Azure service bus instance
-* list topics and subscriptions
-* see active and dead-letter queue messages
-* send a new message
-* delete a message
-* re-submit a message from DLQ
-* purge all messages
+It's a simple tool to help you: 
+* Connect to Azure Service Bus
+* View topics and subscriptions
+* View active and dead-letter messages
+* View message body and details
+* Send a new message
+* Save messages to send them quickly
+* Purge active or dead-letter messages
+* Re-submit a message from dead-letter
 
 ## How to Download
 Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page
@@ -29,3 +30,6 @@ You can allow macOS to start this application by enabling Developer tools for Te
 
 You can make `PurpleExplorer` file executable by:
 > chmod +x PurpleExplorer
+
+### Linux (CentOS, Debian, Fedora, Ubuntu and derivatives)
+> _Right-click_ -> Run
