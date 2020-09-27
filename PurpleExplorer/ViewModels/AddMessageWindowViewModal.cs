@@ -30,5 +30,15 @@ namespace PurpleExplorer.ViewModels
             _appState = appState ?? Locator.Current.GetService<IAppState>();
             SavedMessages = _appState.SavedMessages;
         }
+
+        public void SaveMessage()
+        {
+            var newMessage = new SavedMessage
+            {
+                Message = Message,
+                Title = Title
+            };
+            SavedMessages.Add(newMessage);
+        }
     }
 }

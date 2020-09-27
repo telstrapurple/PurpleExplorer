@@ -31,17 +31,6 @@ namespace PurpleExplorer.Views
             }
         }
 
-        public void btnSaveMessage(object sender, RoutedEventArgs e)
-        {
-            var dataContext = DataContext as AddMessageWindowViewModal;
-            var newMessage = new SavedMessage
-            {
-                Message = dataContext.Message,
-                Title = dataContext.Title
-            };
-            dataContext.SavedMessages.Add(newMessage);
-        }
-
         public void btnDeleteMessage(object sender, RoutedEventArgs e)
         {
             var dataContext = DataContext as AddMessageWindowViewModal;

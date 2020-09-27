@@ -30,9 +30,14 @@
             </Button>
             <Button MinWidth="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    IsEnabled="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                    Click="btnSaveMessage">
+                    Command="{Binding SaveMessage}">
                 Save Message
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Converter="{x:Static StringConverters.IsNotNullOrEmpty}" Path="Message" />
+                        <Binding Converter="{x:Static StringConverters.IsNotNullOrEmpty}" Path="Title" />
+                    </MultiBinding>
+                </Button.IsEnabled>
             </Button>
             <TextBox Height="30" MinWidth="200" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      IsEnabled="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
