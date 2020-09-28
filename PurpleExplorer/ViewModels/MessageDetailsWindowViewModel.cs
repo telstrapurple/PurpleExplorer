@@ -35,11 +35,11 @@ namespace PurpleExplorer.ViewModels
         
         public async Task DeadletterMessage()
         {
-            _loggingService.Log("DANGER NOTE: Sending to dead-letter requires receiving the messages before and this increases the DeliveryCount of the messages");
+            _loggingService.Log("DANGER NOTE: Sending to dead-letter requires receiving all the messages up to the selected message to perform this action and this increases the DeliveryCount of the messages");
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
                 $"Sending message to dead-letter",
                 $"DANGER!!! READ CAREFULLY \n" +
-                $"Sending to dead-letter requires receiving the messages before and this increases the DeliveryCount of the messages. \n" +
+                $"Sending to dead-letter requires receiving all the messages up to the selected message to perform this action and this increases the DeliveryCount of the messages. \n" +
                 $"There can be consequences to other messages in this subscription, Are you sure? \n \n" +
                 $"Are you sure you would like to send the message {Message.MessageId} AND increase the delivery count of ALL the messages before it?");
 
