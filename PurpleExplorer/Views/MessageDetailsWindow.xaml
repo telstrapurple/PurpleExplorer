@@ -5,7 +5,8 @@
         mc:Ignorable="d" d:DesignWidth="780" d:DesignHeight="630"
         x:Class="PurpleExplorer.Views.MessageDetailsWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
-        Title="Message Details" Width="680" Height="630">
+        Title="Message Details" Icon="/Assets/avalonia-logo.ico"
+        Width="680" Height="630">
 
     <Design.DataContext>
         <vm:MessageDetailsWindowViewModel />
