@@ -1,16 +1,28 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PurpleExplorer"
-             x:Class="PurpleExplorer.App">
+             xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
+             x:Class="PurpleExplorer.App"
+             Name="Purple Explorer">
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
 
     <Application.Styles>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
-        <StyleInclude Source="/Styles/Icons.xaml"/>
-        <StyleInclude Source="/Styles/CustomStyles.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
+        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml" />
+        <StyleInclude Source="/Styles/Icons.xaml" />
+        <StyleInclude Source="/Styles/CustomStyles.xaml" />
     </Application.Styles>
+
+    <Design.DataContext>
+        <vm:AppWindowViewModel />
+    </Design.DataContext>
+
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="About Purple Explorer" Command="{Binding Path=AboutPageCommand}" />
+        </NativeMenu>
+    </NativeMenu.Menu>
 </Application>
