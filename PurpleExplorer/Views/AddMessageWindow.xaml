@@ -13,16 +13,16 @@
 
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="40" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
         <TextBox MinHeight="180" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                  TextWrapping="Wrap" Text="{Binding Path=Message, Mode=TwoWay}" />
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
+        <StackPanel Grid.Row="1" Margin="0,5,0,5" Orientation="Horizontal" HorizontalAlignment="Stretch">
             <Button MinWidth="200" Height="30" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     IsEnabled="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     Click="btnAddClick">

@@ -43,8 +43,8 @@ namespace PurpleExplorer.Views
             var dataContext = DataContext as AddMessageWindowViewModal;
             var dataGrid = sender as DataGrid;
             var selectedMessage = dataGrid.SelectedItem as SavedMessage;
-            dataContext.Message = selectedMessage.Message;
-            dataContext.Title = selectedMessage.Title;
+            dataContext.Message = selectedMessage?.Message;
+            dataContext.Title = selectedMessage?.Title;
         }
     }
 }
