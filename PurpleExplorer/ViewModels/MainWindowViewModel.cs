@@ -15,7 +15,6 @@ using System.Runtime.Serialization;
 
 namespace PurpleExplorer.ViewModels
 {
-    [DataContract]
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IServiceBusHelper _serviceBusHelper;
@@ -29,10 +28,7 @@ namespace PurpleExplorer.ViewModels
         private IObservable<bool> _sendMessageEnabled;
 
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
-
-        [DataMember] public ObservableCollection<string> SavedConnectionStrings { get; set; }
-
-        [DataMember]
+        
         public string ConnectionString
         {
             get => _connectionString;
@@ -82,14 +78,13 @@ namespace PurpleExplorer.ViewModels
             get => _sendMessageEnabled;
             set => this.RaiseAndSetIfChanged(ref _sendMessageEnabled, value);
         }
-
+        
         public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
         {
             _loggingService = loggingService ?? Locator.Current.GetService<ILoggingService>();
             _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
 
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
-            SavedConnectionStrings = new ObservableCollection<string>();
 
             _sendMessageEnabled = this.WhenAnyValue<MainWindowViewModel, bool, ServiceBusTopic>(
                 x => x.CurrentTopic,
@@ -127,8 +122,7 @@ namespace PurpleExplorer.ViewModels
 
         public async void ConnectionBtnPopupCommand()
         {
-            var viewModel = new ConnectionStringWindowViewModel
-                {ConnectionString = this.ConnectionString, SavedConnectionStrings = this.SavedConnectionStrings};
+            var viewModel = new ConnectionStringWindowViewModel();
 
             var returnedViewModel =
                 await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
@@ -140,7 +134,6 @@ namespace PurpleExplorer.ViewModels
             }
 
             ConnectionString = returnedViewModel.ConnectionString?.Trim();
-            SavedConnectionStrings = returnedViewModel.SavedConnectionStrings;
 
             if (string.IsNullOrEmpty(ConnectionString))
             {

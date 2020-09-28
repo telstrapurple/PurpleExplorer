@@ -1,10 +1,8 @@
-using System.Runtime.CompilerServices;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Microsoft.Azure.Amqp.Framing;
 using PurpleExplorer.Helpers;
+using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
 
 namespace PurpleExplorer.Views
@@ -31,6 +29,22 @@ namespace PurpleExplorer.Views
                 dataContext.Cancel = false;
                 Close();
             }
+        }
+
+        public void btnDeleteMessage(object sender, RoutedEventArgs e)
+        {
+            var dataContext = DataContext as AddMessageWindowViewModal;
+            var dataGrid = this.FindControl<DataGrid>("dgSavedMessages");
+            dataContext.SavedMessages.Remove(dataGrid.SelectedItem as SavedMessage);
+        }
+
+        public void messageSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var dataContext = DataContext as AddMessageWindowViewModal;
+            var dataGrid = sender as DataGrid;
+            var selectedMessage = dataGrid.SelectedItem as SavedMessage;
+            dataContext.Message = selectedMessage?.Message;
+            dataContext.Title = selectedMessage?.Title;
         }
     }
 }

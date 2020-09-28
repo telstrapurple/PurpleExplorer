@@ -1,8 +1,8 @@
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using PurpleExplorer.Helpers;
+using PurpleExplorer.Models;
 using PurpleExplorer.Services;
 using PurpleExplorer.ViewModels;
 using PurpleExplorer.Views;
@@ -24,12 +24,13 @@ namespace PurpleExplorer
             Locator.CurrentMutable.RegisterLazySingleton(() => new LoggingService(), typeof(ILoggingService));
 
             var suspension = new AutoSuspendHelper(ApplicationLifetime);
-            RxApp.SuspensionHost.CreateNewAppState = () => new MainWindowViewModel();
+            RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
             RxApp.SuspensionHost.SetupDefaultSuspendResume(new NewtonsoftJsonSuspensionDriver("appstate.json"));
             suspension.OnFrameworkInitializationCompleted();
-            var state = RxApp.SuspensionHost.GetAppState<MainWindowViewModel>();
+            var state = RxApp.SuspensionHost.GetAppState<AppState>();
+            Locator.CurrentMutable.RegisterLazySingleton(() => state, typeof(IAppState));
 
-            new MainWindow { DataContext = state }.Show();
+            new MainWindow { DataContext = new MainWindowViewModel() }.Show();
 
             base.OnFrameworkInitializationCompleted();
         }
