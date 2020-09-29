@@ -41,13 +41,6 @@
                     <TextBlock VerticalAlignment="Center">New message</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Name="MinusButton" Classes="topButton" IsEnabled="{Binding !!CurrentMessage}"
-                    Command="{Binding DeleteMessage}">
-                <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
-                    <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
-                </StackPanel>
-            </Button>
             <Button Name="btnPurgeActiveMessages" Classes="topButton" IsEnabled="{Binding !!CurrentSubscription}"
                     Command="{Binding PurgeMessages}" CommandParameter="false">
                 <StackPanel Orientation="Horizontal">
