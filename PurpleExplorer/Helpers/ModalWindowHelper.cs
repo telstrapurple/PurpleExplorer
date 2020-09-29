@@ -15,6 +15,7 @@ namespace PurpleExplorer.Helpers
 
             T window = new T();
             window.DataContext = viewModel;
+            window.Icon = new WindowIcon("/Assets/avalonia-logo.ico");
 
             await window.ShowDialog(mainWindow);
             return window.DataContext as U;
