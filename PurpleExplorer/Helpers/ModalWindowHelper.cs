@@ -1,8 +1,12 @@
-﻿using Avalonia;
+﻿using System;
+using System.Reflection;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using PurpleExplorer.ViewModels;
 using System.Threading.Tasks;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 
 namespace PurpleExplorer.Helpers
 {
@@ -15,7 +19,12 @@ namespace PurpleExplorer.Helpers
 
             T window = new T();
             window.DataContext = viewModel;
-            window.Icon = new WindowIcon("/Assets/avalonia-logo.ico");
+            
+            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            string assemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
+            var rawUri = "/Assets/avalonia-logo.ico";
+            var bitmap = new Bitmap(assets.Open(new Uri($"avares://{assemblyName}{rawUri}")));
+            window.Icon = new WindowIcon(bitmap);
 
             await window.ShowDialog(mainWindow);
             return window.DataContext as U;
