@@ -5,7 +5,8 @@
         xmlns:viewModels="clr-namespace:PurpleExplorer.ViewModels"
         mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="480"
         x:Class="PurpleExplorer.Views.AddMessageWindow"
-        Title="Send message" Width="620" Height="480">
+        Title="Send message" Icon="/Assets/avalonia-logo.ico"
+        Width="620" Height="480">
 
     <Design.DataContext>
         <viewModels:AddMessageWindowViewModal />
