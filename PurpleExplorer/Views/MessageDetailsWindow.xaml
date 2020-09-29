@@ -40,6 +40,14 @@
 
     <StackPanel Orientation="Vertical">
         <DockPanel Background="#380f14" Height="30" LastChildFill="False">
+            <Button Name="MinusButton" Classes="topButton" IsEnabled="{Binding !!CurrentMessage}"
+                    Command="{Binding DeleteMessage}"
+                    CommandParameter="{Binding $parent[Window]}">
+                <StackPanel Orientation="Horizontal">
+                    <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
+                    <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
+                </StackPanel>
+            </Button>
             <Button Command="{Binding DeadletterMessage}"
                     IsVisible="{Binding !Message.IsDlq}"
                     Classes="topButton">
