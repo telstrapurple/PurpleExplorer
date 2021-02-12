@@ -50,14 +50,16 @@ namespace PurpleExplorer.Views
         {
             var mainWindowViewModel = DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
-
+            
             mainWindowViewModel.ClearSelection();
-            if (treeView.SelectedItem is ServiceBusSubscription selectedSubscription)
+            
+            var selectedItem = treeView.SelectedItems.Count > 0 ? treeView.SelectedItems[0] : null;
+            if (selectedItem is ServiceBusSubscription selectedSubscription)
             {
                 mainWindowViewModel.SetSelectedSubscription(selectedSubscription);
             }
 
-            if (treeView.SelectedItem is ServiceBusTopic selectedTopic)
+            if (selectedItem is ServiceBusTopic selectedTopic)
             {
                 mainWindowViewModel.SetSelectedTopic(selectedTopic);
             }

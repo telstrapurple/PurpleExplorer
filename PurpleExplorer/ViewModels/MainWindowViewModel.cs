@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using MessageBox.Avalonia.Enums;
 using PurpleExplorer.Services;
 using Splat;
-using System.Runtime.Serialization;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -274,9 +273,9 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentSubscription = subscription;
             CurrentTopic = subscription.Topic;
-
-            await RefreshMessages();
             LoggingService.Log("Subscription selected: " + subscription.Name);
+            
+            await RefreshMessages();
         }
 
         public void SetSelectedTopic(ServiceBusTopic selectedTopic)
