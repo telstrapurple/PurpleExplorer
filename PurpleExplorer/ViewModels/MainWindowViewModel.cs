@@ -16,16 +16,24 @@ namespace PurpleExplorer.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private readonly IServiceBusHelper _serviceBusHelper;
+        private readonly ITopicHelper _topicHelper;
+        private readonly IQueueHelper _queueHelper;
         private readonly ILoggingService _loggingService;
         private string _messageTabHeader;
         private string _dlqTabHeader;
+        private string _topicTabHeader;
+        private string _queueTabHeader;
+        
         private ServiceBusSubscription _currentSubscription;
         private ServiceBusTopic _currentTopic;
+        private ServiceBusQueue _currentQueue;
         private Message _currentMessage;
         private string _connectionString;
-        private IObservable<bool> _sendMessageEnabled;
-
+        private IObservable<bool> _queueLevelActionEnabled;
+        private MessageCollection _currentMessageCollection;
+        
+        public ObservableCollection<Message> Messages { get; }
+        public ObservableCollection<Message> DlqMessages { get; }
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         
         public string ConnectionString
@@ -46,6 +54,18 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _dlqTabHeader, value);
         }
 
+        public string TopicTabHeader
+        {
+            get => _topicTabHeader;
+            set => this.RaiseAndSetIfChanged(ref _topicTabHeader, value);
+        }
+        
+        public string QueueTabHeader
+        {
+            get => _queueTabHeader;
+            set => this.RaiseAndSetIfChanged(ref _queueTabHeader, value);
+        }
+        
         public ServiceBusSubscription CurrentSubscription
         {
             get => _currentSubscription;
@@ -64,33 +84,50 @@ namespace PurpleExplorer.ViewModels
             set => this.RaiseAndSetIfChanged(ref _currentMessage, value);
         }
 
-        public ILoggingService LoggingService
+        public ServiceBusQueue CurrentQueue
         {
-            get => _loggingService;
+            get => _currentQueue;
+            set => this.RaiseAndSetIfChanged(ref _currentQueue, value);
+        }
+        
+        public MessageCollection CurrentMessageCollection
+        {
+            get
+            {
+                if (CurrentSubscription != null)
+                    return CurrentSubscription;
+                if (CurrentQueue != null)
+                    return CurrentQueue;
+                return null;
+            }
         }
 
+        public ILoggingService LoggingService => _loggingService;
         public Version AppVersion => Assembly.GetExecutingAssembly().GetName().Version;
         public string AppVersionText { get; set; }
 
-        public IObservable<bool> SendMessageEnabled
+        public IObservable<bool> QueueLevelActionEnabled
         {
-            get => _sendMessageEnabled;
-            set => this.RaiseAndSetIfChanged(ref _sendMessageEnabled, value);
+            get => _queueLevelActionEnabled;
+            set => this.RaiseAndSetIfChanged(ref _queueLevelActionEnabled, value);
         }
-        
-        public MainWindowViewModel(IServiceBusHelper serviceBusHelper = null, ILoggingService loggingService = null)
+        public MainWindowViewModel()
         {
-            _loggingService = loggingService ?? Locator.Current.GetService<ILoggingService>();
-            _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
+            _loggingService = Locator.Current.GetService<ILoggingService>();
+            _topicHelper = Locator.Current.GetService<ITopicHelper>();
+            _queueHelper = Locator.Current.GetService<IQueueHelper>();
 
+            Messages = new ObservableCollection<Message>();
+            DlqMessages = new ObservableCollection<Message>();
             ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
 
-            _sendMessageEnabled = this.WhenAnyValue<MainWindowViewModel, bool, ServiceBusTopic>(
-                x => x.CurrentTopic,
-                x => x != null && x.Subscriptions?.Count > 0
+            _queueLevelActionEnabled = this.WhenAnyValue(
+                x => x.CurrentSubscription,
+                x=> x.CurrentQueue,
+                (subscription, queue) => subscription != null || queue != null 
             );
 
-            SetTabHeaders();
+            RefreshTabHeaders();
 
             AppVersionText = AppVersion.ToString();
             // Checking for new version asynchronous. no need to await on it
@@ -143,8 +180,9 @@ namespace PurpleExplorer.ViewModels
             {
                 LoggingService.Log("Connecting...");
 
-                var namespaceInfo = await _serviceBusHelper.GetNamespaceInfo(ConnectionString);
-                var topics = await _serviceBusHelper.GetTopics(ConnectionString);
+                var namespaceInfo = await _topicHelper.GetNamespaceInfo(ConnectionString);
+                var topics = await _topicHelper.GetTopics(ConnectionString);
+                var queues = await _queueHelper.GetQueues(ConnectionString);
 
                 var newResource = new ServiceBusResource
                 {
@@ -152,6 +190,7 @@ namespace PurpleExplorer.ViewModels
                     ConnectionString = this.ConnectionString
                 };
 
+                newResource.AddQueues(queues.ToArray());
                 newResource.AddTopics(topics.ToArray());
                 ConnectedServiceBuses.Add(newResource);
                 LoggingService.Log("Connected to Service Bus: " + namespaceInfo.Name);
@@ -160,50 +199,97 @@ namespace PurpleExplorer.ViewModels
             {
                 await MessageBoxHelper.ShowError("The connection string is invalid.");
             }
+            finally
+            {
+                RefreshTabHeaders();
+            }
         }
 
-        public async Task SetDlqMessages()
-        {
-            CurrentSubscription.DlqMessages.Clear();
-            var dlqMessages =
-                await _serviceBusHelper.GetDlqMessages(CurrentSubscription.Topic.ServiceBus.ConnectionString,
-                    CurrentSubscription.Topic.Name, CurrentSubscription.Name);
-            CurrentSubscription.DlqMessages.AddRange(dlqMessages);
-        }
-
-        public async Task SetSubscriptionMessages()
-        {
-            CurrentSubscription.Messages.Clear();
-            var messages =
-                await _serviceBusHelper.GetMessagesBySubscription(CurrentSubscription.Topic.ServiceBus.ConnectionString,
-                    CurrentSubscription.Topic.Name,
-                    CurrentSubscription.Name);
-            CurrentSubscription.Messages.AddRange(messages);
-        }
-
-        public async Task RefreshMessageCount()
-        {
-            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-            var topicPath = CurrentTopic.Name;
-            var subscriptionName = CurrentSubscription.Name;
-            var runtimeInfo =
-                await _serviceBusHelper.GetSubscriptionRuntimeInfo(connectionString, topicPath, subscriptionName);
-
-            CurrentSubscription.UpdateMessageCountDetails(runtimeInfo.MessageCountDetails);
-            SetTabHeaders();
-        }
-
-        public void SetTabHeaders()
+        public async Task FetchSubscriptionMessages()
         {
             if (CurrentSubscription == null)
+            {
+                return;
+            }
+            
+            Messages.Clear();
+            CurrentSubscription.ClearMessages();
+            var messages =
+                await _topicHelper.GetMessagesBySubscription(CurrentSubscription.Topic.ServiceBus.ConnectionString,
+                    CurrentSubscription.Topic.Name,
+                    CurrentSubscription.Name);
+            CurrentSubscription.AddMessages(messages);
+            Messages.AddRange(messages);
+        }
+
+        public async Task FetchSubscriptionDlqMessages()
+        {
+            if (CurrentSubscription == null)
+            {
+                return;
+            }
+            
+            DlqMessages.Clear();
+            CurrentSubscription.ClearDlqMessages();
+            var dlqMessages =
+                await _topicHelper.GetDlqMessages(CurrentSubscription.Topic.ServiceBus.ConnectionString,
+                    CurrentSubscription.Topic.Name, CurrentSubscription.Name);
+            CurrentSubscription.AddDlqMessages(dlqMessages);
+            DlqMessages.AddRange(dlqMessages);
+        }
+        
+        public async Task FetchQueueMessages()
+        {
+            if (CurrentQueue == null)
+            {
+                return;
+            }
+            
+            Messages.Clear();
+            CurrentQueue.ClearMessages();
+            var messages = await _queueHelper.GetMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
+            CurrentQueue.AddMessages(messages);
+            Messages.AddRange(messages);
+        }
+        
+        public async Task FetchQueueDlqMessages()
+        {
+            if (CurrentQueue == null)
+            {
+                return;
+            }
+            
+            DlqMessages.Clear();
+            CurrentQueue.ClearDlqMessages();
+            var messages = await _queueHelper.GetDlqMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
+            CurrentQueue.AddDlqMessages(messages);
+            DlqMessages.AddRange(messages);
+        }
+        
+        public void RefreshTabHeaders()
+        {
+            if (CurrentMessageCollection != null)
+            {
+                MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount})";
+                DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount})";
+            }
+            else
             {
                 MessagesTabHeader = "Messages";
                 DlqTabHeader = "Dead-letter";
             }
+
+            var topicCount = ConnectedServiceBuses.Sum(x => x.Topics.Count);
+            var queueCount = ConnectedServiceBuses.Sum(x => x.Queues.Count);
+            if (topicCount > 0 || queueCount > 0)
+            {
+                TopicTabHeader = $"Topics ({topicCount})";
+                QueueTabHeader = $"Queues ({queueCount})";
+            }
             else
             {
-                MessagesTabHeader = $"Messages ({CurrentSubscription.MessageCount})";
-                DlqTabHeader = $"Dead-letter ({CurrentSubscription.DlqCount})";
+                TopicTabHeader = "Topics";
+                QueueTabHeader = "Queues";
             }
         }
 
@@ -211,7 +297,6 @@ namespace PurpleExplorer.ViewModels
         {
             var viewModal = new AddMessageWindowViewModal();
 
-            var topicName = CurrentSubscription == null ? CurrentTopic.Name : CurrentSubscription.Topic.Name;
             var returnedViewModal =
                 await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
 
@@ -221,25 +306,46 @@ namespace PurpleExplorer.ViewModels
             }
 
             var messageText = returnedViewModal.Message.Trim();
-            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-            if (!string.IsNullOrEmpty(messageText))
+            if (string.IsNullOrEmpty(messageText))
             {
-                LoggingService.Log("Sending message...");
-                await _serviceBusHelper.SendMessage(connectionString, topicName, messageText);
-                LoggingService.Log("Message sent");
+                return;
             }
+            
+            LoggingService.Log("Sending message...");
+            if (CurrentTopic != null)
+            {
+                var connectionString = CurrentTopic.ServiceBus.ConnectionString;
+                await _topicHelper.SendMessage(connectionString, CurrentTopic.Name, messageText);
+            }
+
+            if (CurrentQueue != null)
+            {
+                var connectionString = CurrentQueue.ServiceBus.ConnectionString;
+                await _queueHelper.SendMessage(connectionString, CurrentQueue.Name, messageText);
+            }
+            LoggingService.Log("Message sent");
         }
 
         public async void PurgeMessages(string isDlqText)
         {
             var isDlq = Convert.ToBoolean(isDlqText);
-            var subscriptionPathText =
-                isDlq
+            string purgingPath = null;
+            if (_currentSubscription != null)
+            {
+                purgingPath = isDlq
                     ? $"{_currentTopic.Name}/{_currentSubscription.Name}/$DeadLetterQueue"
                     : $"{_currentTopic.Name}/{_currentSubscription.Name}";
+            }
+
+            if (_currentQueue != null)
+            {
+                purgingPath = isDlq
+                    ? $"{_currentQueue.Name}/$DeadLetterQueue"
+                    : $"{_currentQueue.Name}";
+            }
 
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
-                $"Purging messages from {subscriptionPathText}",
+                $"Purging messages from {purgingPath}",
                 $"Are you sure you would like to purge ALL the messages?");
 
             // Because buttonResult can be None or No
@@ -249,33 +355,49 @@ namespace PurpleExplorer.ViewModels
                 return;
             }
 
-            LoggingService.Log($"Purging ALL messages in {subscriptionPathText}... (might take some time)");
-            var connectionString = CurrentTopic.ServiceBus.ConnectionString;
-            var purgedCount = await _serviceBusHelper.PurgeMessages(connectionString, _currentTopic.Name,
-                _currentSubscription.Name, isDlq);
-            LoggingService.Log($"Purged {purgedCount} messages in {subscriptionPathText}");
+            LoggingService.Log($"Purging ALL messages in {purgingPath}... (might take some time)");
+            long purgedCount = -1;
+            if (CurrentSubscription != null)
+            {
+                var connectionString = CurrentSubscription.Topic.ServiceBus.ConnectionString;
+                purgedCount = await _topicHelper.PurgeMessages(connectionString, _currentTopic.Name,
+                    _currentSubscription.Name, isDlq);
+            }
+
+            if (CurrentQueue != null)
+            {
+                var connectionString = CurrentQueue.ServiceBus.ConnectionString;
+                purgedCount = await _queueHelper.PurgeMessages(connectionString, _currentQueue.Name, isDlq);
+            }
+
+            LoggingService.Log($"Purged {purgedCount} messages in {purgingPath}");
         }
 
-        public async Task RefreshMessages()
+        public async Task Refresh()
+        {
+            await FetchMessages();
+            RefreshTabHeaders();
+        }
+        
+        public async Task FetchMessages()
         {
             LoggingService.Log("Fetching messages...");
 
             await Task.WhenAll(
-                SetSubscriptionMessages(),
-                SetDlqMessages(),
-                RefreshMessageCount()
+                FetchSubscriptionMessages(),
+                FetchSubscriptionDlqMessages(),
+                FetchQueueMessages(),
+                FetchQueueDlqMessages()
             );
 
             LoggingService.Log("Fetched messages");
         }
 
-        public async void SetSelectedSubscription(ServiceBusSubscription subscription)
+        public void SetSelectedSubscription(ServiceBusSubscription subscription)
         {
             CurrentSubscription = subscription;
             CurrentTopic = subscription.Topic;
             LoggingService.Log("Subscription selected: " + subscription.Name);
-            
-            await RefreshMessages();
         }
 
         public void SetSelectedTopic(ServiceBusTopic selectedTopic)
@@ -290,12 +412,21 @@ namespace PurpleExplorer.ViewModels
             LoggingService.Log("Message selected: " + message.MessageId);
         }
 
-        public void ClearSelection()
+        public void SetSelectedQueue(ServiceBusQueue selectedQueue)
+        {
+            CurrentQueue = selectedQueue;
+            LoggingService.Log("Queue selected: " + selectedQueue.Name);
+        }
+        
+        public void ClearAllSelections()
         {
             CurrentSubscription = null;
             CurrentTopic = null;
+            CurrentQueue = null;
             CurrentMessage = null;
-            SetTabHeaders();
+            Messages.Clear();
+            DlqMessages.Clear();
+            RefreshTabHeaders();
         }
     }
 }
