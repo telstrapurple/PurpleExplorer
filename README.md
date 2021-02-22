@@ -5,8 +5,9 @@ Purple Explorer is a cross-platform desktop application built with .NET Core.
 It's a simple tool to help you: 
 * Connect to Azure Service Bus
 * View topics and subscriptions
+* View queues
 * View active and dead-letter messages
-* View message body and details
+* View message body and its details
 * Send a new message
 * Save messages to send them quickly
 * Delete a message^
