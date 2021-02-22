@@ -20,8 +20,9 @@ namespace PurpleExplorer
 
         public override void OnFrameworkInitializationCompleted()
         {
-            Locator.CurrentMutable.Register(() => new ServiceBusHelper(), typeof(IServiceBusHelper));
+            Locator.CurrentMutable.Register(() => new TopicHelper(), typeof(ITopicHelper));
             Locator.CurrentMutable.RegisterLazySingleton(() => new LoggingService(), typeof(ILoggingService));
+            Locator.CurrentMutable.Register(() => new QueueHelper(), typeof(IQueueHelper));
 
             var suspension = new AutoSuspendHelper(ApplicationLifetime);
             RxApp.SuspensionHost.CreateNewAppState = () => new AppState();

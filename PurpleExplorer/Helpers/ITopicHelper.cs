@@ -6,7 +6,7 @@ using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
 namespace PurpleExplorer.Helpers
 {
-    public interface IServiceBusHelper
+    public interface ITopicHelper
     {
         public Task<NamespaceInfo> GetNamespaceInfo(string connectionString);
         public Task<IList<ServiceBusTopic>> GetTopics(string connectionString);

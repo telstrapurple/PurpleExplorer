@@ -6,7 +6,8 @@ namespace PurpleExplorer.Models
     {
         public string Name { get; set; }
         public string ConnectionString { get; set; }
-        public ObservableCollection<ServiceBusTopic> Topics { get; set; }
+        public ObservableCollection<ServiceBusQueue> Queues { get; private set; }
+        public ObservableCollection<ServiceBusTopic> Topics { get; private set; }
         
         public void AddTopics(params ServiceBusTopic[] topics)
         {
@@ -16,6 +17,17 @@ namespace PurpleExplorer.Models
             {
                 topic.ServiceBus = this;
                 Topics.Add(topic);
+            }
+        }
+        
+        public void AddQueues(params ServiceBusQueue[] queues)
+        {
+            Queues ??= new ObservableCollection<ServiceBusQueue>();
+
+            foreach (var queue in queues)
+            {
+                queue.ServiceBus = this;
+                Queues.Add(queue);
             }
         }
     }

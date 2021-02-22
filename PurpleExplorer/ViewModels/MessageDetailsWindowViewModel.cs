@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Avalonia.Controls;
 using MessageBox.Avalonia.Enums;
-using Microsoft.Azure.Amqp.Framing;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.Services;
@@ -11,25 +10,44 @@ namespace PurpleExplorer.ViewModels
 {
     public class MessageDetailsWindowViewModel : ViewModelBase
     {
-        private readonly IServiceBusHelper _serviceBusHelper;
+        private readonly ITopicHelper _topicHelper;
+        private readonly IQueueHelper _queueHelper;
         private readonly ILoggingService _loggingService;
 
         public Message Message { get; set; }
         public ServiceBusSubscription Subscription { get; set; }
+        public ServiceBusQueue Queue { get; set; }
         public string ConnectionString { get; set; }
 
-        public MessageDetailsWindowViewModel(IServiceBusHelper serviceBusHelper = null,
-            ILoggingService loggingService = null)
+        public MessageDetailsWindowViewModel(ITopicHelper topicHelper = null,
+            ILoggingService loggingService = null,
+            IQueueHelper queueHelper = null)
         {
             _loggingService = loggingService ?? Locator.Current.GetService<ILoggingService>();
-            _serviceBusHelper = serviceBusHelper ?? Locator.Current.GetService<IServiceBusHelper>();
+            _topicHelper = topicHelper ?? Locator.Current.GetService<ITopicHelper>();
+            _queueHelper = queueHelper ?? Locator.Current.GetService<IQueueHelper>();
         }
 
         public async void DeleteMessage(Window window)
         {
             _loggingService.Log("DANGER NOTE: Deleting requires receiving all the messages up to the selected message to perform this action and this increases the DeliveryCount of the messages");
+            string deletingPath = null;
+            if (Subscription != null)
+            {
+                deletingPath = Message.IsDlq
+                    ? $"{Subscription.Topic.Name}/{Subscription.Name}/$DeadLetterQueue"
+                    : $"{Subscription.Topic.Name}/{Subscription.Name}";
+            }
+
+            if (Queue != null)
+            {
+                deletingPath = Message.IsDlq
+                    ? $"{Queue.Name}/$DeadLetterQueue"
+                    : $"{Queue.Name}";
+            }
+            
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
-                $"Deleting message from {Subscription.Topic.Name}/{Subscription.Name}",
+                $"Deleting message from {deletingPath}",
                 $"DANGER!!! READ CAREFULLY \n" +
                 $"Deleting requires receiving all the messages up to the selected message to perform this action and this increases the DeliveryCount of the messages. \n" +
                 $"There can be consequences to other messages in this subscription, Are you sure? \n \n" +
@@ -43,9 +61,20 @@ namespace PurpleExplorer.ViewModels
 
             _loggingService.Log($"User accepted to receive messages in order to delete message {Message.MessageId}. This is going to increases the DeliveryCount of the messages before it.");
             _loggingService.Log($"Deleting message {Message.MessageId}... (might take some seconds)");
-            var connectionString = Subscription.Topic.ServiceBus.ConnectionString;
-            await _serviceBusHelper.DeleteMessage(connectionString, Subscription.Topic.Name, Subscription.Name,
-                Message, Message.IsDlq);
+
+            if (Subscription != null)
+            {
+                var connectionString = Subscription.Topic.ServiceBus.ConnectionString;
+                await _topicHelper.DeleteMessage(connectionString, Subscription.Topic.Name, Subscription.Name,
+                    Message, Message.IsDlq);
+            }
+
+            if (Queue != null)
+            {
+                var connectionString = Queue.ServiceBus.ConnectionString;
+                await _queueHelper.DeleteMessage(connectionString, Queue.Name, Message, Message.IsDlq);
+            }
+
             _loggingService.Log($"Message deleted, MessageId: {Message.MessageId}");
             window.Close();
         }
@@ -54,8 +83,16 @@ namespace PurpleExplorer.ViewModels
         {
             _loggingService.Log($"Resending DLQ message: {Message.MessageId}");
 
-            await _serviceBusHelper.ResubmitDlqMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
-                Message);
+            if (Subscription != null)
+            {
+                await _topicHelper.ResubmitDlqMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
+                    Message);
+            }
+
+            if (Queue != null)
+            {
+                await _queueHelper.ResubmitDlqMessage(ConnectionString, Queue.Name, Message);
+            }
 
             _loggingService.Log($"Resent DLQ message: {Message.MessageId}");
         }
@@ -79,8 +116,16 @@ namespace PurpleExplorer.ViewModels
             _loggingService.Log($"User accepted to receive messages in order to send message {Message.MessageId} to dead-letter. This is going to increases the DeliveryCount of the messages before it.");
             _loggingService.Log($"Sending message: {Message.MessageId} to dead-letter");
 
-            await _serviceBusHelper.DeadletterMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
-                Message);
+            if (Subscription != null)
+            {
+                await _topicHelper.DeadletterMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
+                    Message);
+            }
+
+            if (Queue != null)
+            {
+                await _queueHelper.DeadletterMessage(ConnectionString, Queue.Name, Message);
+            }
 
             _loggingService.Log($"Sent message: {Message.MessageId} to dead-letter");
         }

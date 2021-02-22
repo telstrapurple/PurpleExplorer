@@ -12,7 +12,7 @@ using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
 namespace PurpleExplorer.Helpers
 {
-    public class ServiceBusHelper : IServiceBusHelper
+    public class TopicHelper : ITopicHelper
     {
         private int _maxMessageCount = 100;
 
@@ -161,7 +161,7 @@ namespace PurpleExplorer.Helpers
             return purgedCount;
         }
 
-        async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
+        private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
             string subscriptionPath, long sequenceNumber)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
@@ -179,7 +179,7 @@ namespace PurpleExplorer.Helpers
         {
             var azureMessage = await PeekDlqMessageBySequenceNumber(connectionString, topicPath, subscriptionPath,
                 message.SequenceNumber);
-            var clonedMessage = CloneMessage(azureMessage);
+            var clonedMessage = azureMessage.CloneMessage();
 
             await SendMessage(connectionString, topicPath, clonedMessage);
 
@@ -210,18 +210,6 @@ namespace PurpleExplorer.Helpers
             }
 
             await receiver.CloseAsync();
-        }
-        
-        AzureMessage CloneMessage(AzureMessage original)
-        {
-            return new AzureMessage
-            {
-                Body = original.Body,
-                Label = original.Label,
-                To = original.To,
-                SessionId = original.SessionId,
-                ContentType = original.ContentType
-            };
         }
     }
 }

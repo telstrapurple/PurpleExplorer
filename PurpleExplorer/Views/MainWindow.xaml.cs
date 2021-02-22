@@ -23,13 +23,13 @@ namespace PurpleExplorer.Views
         {
             var grid = sender as DataGrid;
             var mainWindowViewModel = DataContext as MainWindowViewModel;
-            var connectionString = mainWindowViewModel.ConnectionString;
-            var subscription = mainWindowViewModel.CurrentSubscription;
+
             var viewModal = new MessageDetailsWindowViewModel
             {
                 Message = grid.SelectedItem as Message, 
-                ConnectionString = connectionString, 
-                Subscription = subscription
+                ConnectionString = mainWindowViewModel.ConnectionString, 
+                Subscription = mainWindowViewModel.CurrentSubscription,
+                Queue = mainWindowViewModel.CurrentQueue
             };
 
             await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal);
@@ -46,22 +46,47 @@ namespace PurpleExplorer.Views
             }
         }
 
-        private void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var mainWindowViewModel = DataContext as MainWindowViewModel;
             var treeView = sender as TreeView;
-            
-            mainWindowViewModel.ClearSelection();
+
+            ClearOtherSelections(treeView);
+            mainWindowViewModel.ClearAllSelections();
             
             var selectedItem = treeView.SelectedItems.Count > 0 ? treeView.SelectedItems[0] : null;
             if (selectedItem is ServiceBusSubscription selectedSubscription)
             {
                 mainWindowViewModel.SetSelectedSubscription(selectedSubscription);
+                await mainWindowViewModel.FetchMessages();
+                mainWindowViewModel.RefreshTabHeaders();
             }
 
             if (selectedItem is ServiceBusTopic selectedTopic)
             {
                 mainWindowViewModel.SetSelectedTopic(selectedTopic);
+            }
+            
+            if (selectedItem is ServiceBusQueue selectedQueue)
+            {
+                mainWindowViewModel.SetSelectedQueue(selectedQueue);
+                await mainWindowViewModel.FetchMessages();
+                mainWindowViewModel.RefreshTabHeaders();
+            }
+        }
+
+        private void ClearOtherSelections(TreeView currentTreeView)
+        {
+            var tvQueues = this.FindControl<TreeView>("tvQueues");
+            var tvTopics = this.FindControl<TreeView>("tvTopics");
+            if (currentTreeView == tvQueues)
+            {
+                tvTopics.UnselectAll();
+            }
+
+            if (currentTreeView == tvTopics)
+            {
+                tvQueues.UnselectAll();
             }
         }
     }
