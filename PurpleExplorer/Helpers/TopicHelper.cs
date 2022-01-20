@@ -161,6 +161,44 @@ namespace PurpleExplorer.Helpers
             return purgedCount;
         }
 
+        public async Task<long> TransferDlqMessages(string connectionString, string topicPath, string subscriptionPath)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            path = EntityNameHelper.FormatDeadLetterPath(path);
+            
+            long transferredCount = 0;
+            MessageReceiver receiver = null;
+            TopicClient sender = null;
+            try
+            {
+                receiver = new MessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
+                sender = new TopicClient(connectionString, topicPath);
+                var operationTimeout = TimeSpan.FromSeconds(5);
+                while (true)
+                {
+                    var messages = await receiver.ReceiveAsync(_maxMessageCount, operationTimeout);
+                    if (messages == null || messages.Count == 0)
+                    {
+                        break;
+                    }
+
+                    await sender.SendAsync(messages);
+
+                    transferredCount += messages.Count;
+                }
+            }
+            finally
+            {
+                if (receiver != null) 
+                    await receiver.CloseAsync();
+
+                if (sender != null)
+                    await sender.CloseAsync();
+            }
+
+            return transferredCount;
+        }
+
         private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
             string subscriptionPath, long sequenceNumber)
         {

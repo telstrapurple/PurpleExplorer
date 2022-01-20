@@ -138,7 +138,7 @@ namespace PurpleExplorer.Helpers
 
             await DeleteMessage(connectionString, queue, message, true);
         }
-        
+
         public async Task<long> PurgeMessages(string connectionString, string queue, bool isDlq)
         {
             var path = isDlq ? EntityNameHelper.FormatDeadLetterPath(queue) : queue;
@@ -160,6 +160,43 @@ namespace PurpleExplorer.Helpers
             await receiver.CloseAsync();
             return purgedCount;
         }
+        
+        public async Task<long> TransferDlqMessages(string connectionString, string queuePath)
+        {
+            var path = EntityNameHelper.FormatDeadLetterPath(queuePath);
+
+            long transferredCount = 0;
+            MessageReceiver receiver = null;
+            QueueClient sender = null;
+            try
+            {
+                receiver = new MessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
+                sender = new QueueClient(connectionString, queuePath);
+                var operationTimeout = TimeSpan.FromSeconds(5);
+                while (true)
+                {
+                    var messages = await receiver.ReceiveAsync(_maxMessageCount, operationTimeout);
+                    if (messages == null || messages.Count == 0)
+                    {
+                        break;
+                    }
+
+                    await sender.SendAsync(messages);
+
+                    transferredCount += messages.Count;
+                }
+            }
+            finally
+            {
+                if (receiver != null) 
+                    await receiver.CloseAsync();
+
+                if (sender != null)
+                    await sender.CloseAsync();
+            }
+
+            return transferredCount;
+        }
     }
 
     public interface IQueueHelper
@@ -174,5 +211,6 @@ namespace PurpleExplorer.Helpers
             Message message, bool isDlq);
         Task ResubmitDlqMessage(string connectionString, string queue, Message message);
         Task<long> PurgeMessages(string connectionString, string queue, bool isDlq);
+        Task<long> TransferDlqMessages(string connectionString, string queue);
     }
 }
