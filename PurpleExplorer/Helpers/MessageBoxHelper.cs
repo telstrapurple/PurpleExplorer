@@ -32,7 +32,7 @@ namespace PurpleExplorer.Helpers
                 ContentMessage = message,
                 ShowInCenter = true,
                 Icon = icon,
-                CanResize = false,
+                CanResize = true,
                 WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner
             });
 
