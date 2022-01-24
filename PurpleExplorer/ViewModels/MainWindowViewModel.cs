@@ -400,7 +400,7 @@ namespace PurpleExplorer.ViewModels
 
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
                 $"Purging messages from {purgingPath}",
-                $"Are you sure you would like to purge ALL the messages?");
+                $"Are you sure you would like to purge ALL the messages from {purgingPath}?");
 
             // Because buttonResult can be None or No
             if (buttonResult != ButtonResult.Yes)

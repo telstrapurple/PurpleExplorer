@@ -33,7 +33,7 @@ namespace PurpleExplorer.Helpers
                 ShowInCenter = true,
                 Icon = icon,
                 CanResize = false,
-                WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen
+                WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner
             });
 
             return await msBoxStandardWindow.ShowDialog((Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)

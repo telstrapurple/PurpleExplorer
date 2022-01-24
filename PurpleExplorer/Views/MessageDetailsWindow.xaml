@@ -79,6 +79,7 @@
                 <RowDefinition Height="45" />
                 <RowDefinition Height="45" />
                 <RowDefinition Height="45" />
+                <RowDefinition Height="45" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150" />
@@ -108,6 +109,9 @@
             
             <TextBlock Grid.Row="7" Grid.Column="0" Classes="left" Text="Time To Live" />
             <TextBlock Grid.Row="7" Grid.Column="1" Classes="right" Text="{Binding Message.TimeToLive}" />
+            
+            <TextBlock Grid.Row="8" Grid.Column="0" Classes="left" Text="Enqueued Time (UTC)" />
+            <TextBlock Grid.Row="8" Grid.Column="1" Classes="right" Text="{Binding Message.EnqueueTimeUtc}" />
         </Grid>
     </StackPanel>
 

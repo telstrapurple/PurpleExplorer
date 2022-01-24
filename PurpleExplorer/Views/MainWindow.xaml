@@ -171,6 +171,7 @@
                             <DataGridTextColumn Header="Size" Binding="{Binding Size}" />
                             <DataGridTextColumn Header="Delivery Count" Binding="{Binding DeliveryCount}" />
                             <DataGridTextColumn Header="Dead-letter reason" Binding="{Binding DeadLetterReason}" />
+                            <DataGridTextColumn Header="Enqueue time (UTC)" Binding="{Binding EnqueueTimeUtc}" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>
