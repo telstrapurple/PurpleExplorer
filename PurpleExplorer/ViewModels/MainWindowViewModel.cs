@@ -342,19 +342,22 @@ namespace PurpleExplorer.ViewModels
         public async void TransferDeadletterMessages()
         {
             string dlqPath = null;
+            string transferTo = null; 
             if (_currentSubscription != null)
             {
-                dlqPath = $"{_currentTopic.Name}/{_currentSubscription.Name}/$DeadLetterQueue";
+                transferTo = $"{_currentTopic.Name}/{_currentSubscription.Name}";
+                dlqPath = $"{transferTo}/$DeadLetterQueue";
             }
 
             if (_currentQueue != null)
             {
-                dlqPath = $"{_currentQueue.Name}/$DeadLetterQueue";
+                transferTo = $"{_currentQueue.Name}";
+                dlqPath = $"{transferTo}/$DeadLetterQueue";
             }
             
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
                 "Transferring messages from DLQ",
-                $"Are you sure you would like to transfer ALL the messages on {dlqPath}?");
+                $"Are you sure you would like to transfer ALL the messages on {dlqPath} back to {transferTo}?");
             
             // Because buttonResult can be None or No
             if (buttonResult != ButtonResult.Yes)
@@ -363,7 +366,7 @@ namespace PurpleExplorer.ViewModels
                 return;
             }
 
-            LoggingService.Log($"Transferred ALL messages in {dlqPath}... (might take some time)");
+            LoggingService.Log($"Transferring ALL messages in {dlqPath}... (might take some time)");
             long transferCount = -1;
             if (CurrentSubscription != null)
             {
