@@ -6,7 +6,8 @@
         x:Class="PurpleExplorer.Views.ConnectionStringWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
         Title="Connect to Service Bus" Icon="/Assets/avalonia-logo.ico"
-        Width="610" Height="480">
+        Width="610" Height="480"
+        WindowStartupLocation="CenterOwner">
 
     <Design.DataContext>
         <vm:ConnectionStringWindowViewModel />

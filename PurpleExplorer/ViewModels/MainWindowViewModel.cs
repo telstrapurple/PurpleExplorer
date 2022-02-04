@@ -9,8 +9,10 @@ using PurpleExplorer.Views;
 using ReactiveUI;
 using System.Threading.Tasks;
 using MessageBox.Avalonia.Enums;
+using Microsoft.Azure.ServiceBus;
 using PurpleExplorer.Services;
 using Splat;
+using Message = PurpleExplorer.Models.Message;
 
 namespace PurpleExplorer.ViewModels
 {
@@ -198,6 +200,17 @@ namespace PurpleExplorer.ViewModels
             catch (ArgumentException)
             {
                 await MessageBoxHelper.ShowError("The connection string is invalid.");
+                LoggingService.Log("Connection failed: The connection string is invalid");
+            }
+            catch (UnauthorizedException)
+            {
+                await MessageBoxHelper.ShowError("Unable to connect to Service Bus; unauthorized.");
+                LoggingService.Log("Connection failed: Unauthorized");
+            }
+            catch (ServiceBusException ex)
+            {
+                await MessageBoxHelper.ShowError($"Unable to connect to Service Bus; {ex.Message}");
+                LoggingService.Log($"Connection failed: {ex.Message}");
             }
             finally
             {
@@ -326,6 +339,50 @@ namespace PurpleExplorer.ViewModels
             LoggingService.Log("Message sent");
         }
 
+        public async void TransferDeadletterMessages()
+        {
+            string dlqPath = null;
+            string transferTo = null; 
+            if (_currentSubscription != null)
+            {
+                transferTo = $"{_currentTopic.Name}/{_currentSubscription.Name}";
+                dlqPath = $"{transferTo}/$DeadLetterQueue";
+            }
+
+            if (_currentQueue != null)
+            {
+                transferTo = $"{_currentQueue.Name}";
+                dlqPath = $"{transferTo}/$DeadLetterQueue";
+            }
+            
+            var buttonResult = await MessageBoxHelper.ShowConfirmation(
+                "Transferring messages from DLQ",
+                $"Are you sure you would like to transfer ALL the messages on {dlqPath} back to {transferTo}?");
+            
+            // Because buttonResult can be None or No
+            if (buttonResult != ButtonResult.Yes)
+            {
+                CurrentMessage = null;
+                return;
+            }
+
+            LoggingService.Log($"Transferring ALL messages in {dlqPath}... (might take some time)");
+            long transferCount = -1;
+            if (CurrentSubscription != null)
+            {
+                var connectionString = CurrentSubscription.Topic.ServiceBus.ConnectionString;
+                transferCount = await _topicHelper.TransferDlqMessages(connectionString, _currentTopic.Name,
+                    _currentSubscription.Name);
+            }
+
+            if (CurrentQueue != null)
+            {
+                var connectionString = CurrentQueue.ServiceBus.ConnectionString;
+                transferCount = await _queueHelper.TransferDlqMessages(connectionString, _currentQueue.Name);
+            }
+            LoggingService.Log($"Transferred {transferCount} messages in {dlqPath}");
+        }
+
         public async void PurgeMessages(string isDlqText)
         {
             var isDlq = Convert.ToBoolean(isDlqText);
@@ -346,7 +403,7 @@ namespace PurpleExplorer.ViewModels
 
             var buttonResult = await MessageBoxHelper.ShowConfirmation(
                 $"Purging messages from {purgingPath}",
-                $"Are you sure you would like to purge ALL the messages?");
+                $"Are you sure you would like to purge ALL the messages from {purgingPath}?");
 
             // Because buttonResult can be None or No
             if (buttonResult != ButtonResult.Yes)

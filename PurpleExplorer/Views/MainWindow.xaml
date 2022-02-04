@@ -55,6 +55,13 @@
                     <TextBlock VerticalAlignment="Center">Purge dead-letter</TextBlock>
                 </StackPanel>
             </Button>
+            <Button Name="btnTransferDlqMessages" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
+                    Command="{Binding TransferDeadletterMessages}">
+                <StackPanel Orientation="Horizontal">
+                    <DrawingPresenter Drawing="{DynamicResource Modern.Clean}" />
+                    <TextBlock VerticalAlignment="Center">Transfer DLQ</TextBlock>
+                </StackPanel>
+            </Button>
             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="White" Margin="0,0,10,0"
                        TextAlignment="Right">
                 <TextBlock.Text>
@@ -164,6 +171,7 @@
                             <DataGridTextColumn Header="Size" Binding="{Binding Size}" />
                             <DataGridTextColumn Header="Delivery Count" Binding="{Binding DeliveryCount}" />
                             <DataGridTextColumn Header="Dead-letter reason" Binding="{Binding DeadLetterReason}" />
+                            <DataGridTextColumn Header="Enqueue time (UTC)" Binding="{Binding EnqueueTimeUtc}" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>
