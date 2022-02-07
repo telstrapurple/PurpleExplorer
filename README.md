@@ -18,7 +18,7 @@ It's a simple tool to help you:
 \^ NOTE: These actions require receiving all the messages up to the selected message and this increases DeliveryCount. Be aware that there can be consequences to other messages in the subscription.
 
 ## How to Download
-Win-x64, macOS-x64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page
+Win-x64, macOS-x64, macOS-arm64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page
 
 ## How to run
 ### Windows
