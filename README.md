@@ -1,6 +1,6 @@
 # Purple Explorer - cross-platform Azure Service Bus explorer (Windows, macOS, Linux)
 
-Purple Explorer is a cross-platform desktop application built with .NET Core. 
+Purple Explorer is a cross-platform desktop application built with .NET 6.
 
 It's a simple tool to help you: 
 * Connect to Azure Service Bus
@@ -18,7 +18,9 @@ It's a simple tool to help you:
 \^ NOTE: These actions require receiving all the messages up to the selected message and this increases DeliveryCount. Be aware that there can be consequences to other messages in the subscription.
 
 ## How to Download
-Win-x64, macOS-x64, macOS-arm64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page
+Win-x64, macOS-x64, macOS-arm64 and linux-x64 pre-built binaries can be found on [Releases](https://github.com/telstrapurple/PurpleExplorer/releases) page.
+
+Note that you need to have [.Net 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) installed first.
 
 ## How to run
 ### Windows
