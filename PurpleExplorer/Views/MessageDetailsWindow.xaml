@@ -13,13 +13,12 @@
         <vm:MessageDetailsWindowViewModel />
     </Design.DataContext>
     <Window.Styles>
-        <Style Selector="TextBlock#ContentTextBlock">
+        <Style Selector="TextBox#ContentTextBlock">
             <Setter Property="Margin" Value="5, 5, 0, 0" />
-            <Setter Property="Width" Value="400" />
-            <Setter Property="Height" Value="200" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Background" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
         </Style>
 
         <Style Selector="TextBlock.left">
@@ -40,79 +39,80 @@
         </Style>
     </Window.Styles>
 
-    <StackPanel Orientation="Vertical">
-        <DockPanel Background="#380f14" Height="30" LastChildFill="False">
-            <Button Name="MinusButton" Classes="topButton" IsEnabled="{Binding !!CurrentMessage}"
-                    Command="{Binding DeleteMessage}"
-                    CommandParameter="{Binding $parent[Window]}">
-                <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
-                    <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
-                </StackPanel>
-            </Button>
-            <Button Command="{Binding DeadletterMessage}"
-                    IsVisible="{Binding !Message.IsDlq}"
-                    Classes="topButton">
-                <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
-                    <TextBlock VerticalAlignment="Center">Send to dead-letter</TextBlock>
-                </StackPanel>
-            </Button>
-            <Button Name="ResendButton" Command="{Binding ResubmitMessage}"
-                    IsVisible="{Binding !!Message.IsDlq}"
-                    Classes="topButton">
-                <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
-                    <TextBlock VerticalAlignment="Center">Resubmit back to topic</TextBlock>
-                </StackPanel>
-            </Button>
-        </DockPanel>
+    <ScrollViewer>
+        <StackPanel Orientation="Vertical">
+            <DockPanel Background="#380f14" Height="30" LastChildFill="False">
+                <Button Name="MinusButton" Classes="topButton" IsEnabled="{Binding !!CurrentMessage}"
+                        Command="{Binding DeleteMessage}"
+                        CommandParameter="{Binding $parent[Window]}">
+                    <StackPanel Orientation="Horizontal">
+                        <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
+                        <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding DeadletterMessage}"
+                        IsVisible="{Binding !Message.IsDlq}"
+                        Classes="topButton">
+                    <StackPanel Orientation="Horizontal">
+                        <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
+                        <TextBlock VerticalAlignment="Center">Send to dead-letter</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="ResendButton" Command="{Binding ResubmitMessage}"
+                        IsVisible="{Binding !!Message.IsDlq}"
+                        Classes="topButton">
+                    <StackPanel Orientation="Horizontal">
+                        <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
+                        <TextBlock VerticalAlignment="Center">Resubmit back to topic</TextBlock>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
 
-        <Grid Height="600" VerticalAlignment="Top" ShowGridLines="True">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="45" />
-                <RowDefinition Height="45" />
-                <RowDefinition Height="45" />
-                <RowDefinition Height="240" />
-                <RowDefinition Height="45" />
-                <RowDefinition Height="45" />
-                <RowDefinition Height="45" />
-                <RowDefinition Height="45" />
-                <RowDefinition Height="45" />
-                <RowDefinition Height="45" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="500" />
-            </Grid.ColumnDefinitions>
+            <Grid MinHeight="600" VerticalAlignment="Top" ShowGridLines="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="500" />
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Text="MessageId" Classes="left" Grid.Row="0" Grid.Column="0" />
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Message.MessageId}" Classes="right" />
-            
-            <TextBlock Text="Content Type" Classes="left" Grid.Row="1" Grid.Column="0" />
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Message.ContentType}" Classes="right" />
-            
-            <TextBlock Text="Content" Grid.Row="2" Classes="left" Grid.Column="0" />
-            <TextBlock Grid.Row="2" Grid.Column="1" Name="ContentTextBlock" Text="{Binding Message.Content}" />
-            
-            <TextBlock Grid.Row="3" Grid.Column="0" Classes="left" Text="Sequence Number" />
-            <TextBlock Grid.Row="3" Grid.Column="1" Classes="right" Text="{Binding Message.SequenceNumber}" />
-            
-            <TextBlock Grid.Row="4" Grid.Column="0" Classes="left" Text="Size" />
-            <TextBlock Grid.Row="4" Grid.Column="1" Classes="right" Text="{Binding Message.Size}" />
-            
-            <TextBlock Grid.Row="5" Grid.Column="0" Classes="left" Text="Delivery Count" />
-            <TextBlock Grid.Row="5" Grid.Column="1" Classes="right" Text="{Binding Message.DeliveryCount}" />
-            
-            <TextBlock Grid.Row="6" Grid.Column="0" Classes="left" Text="Correlation Id" />
-            <TextBlock Grid.Row="6" Grid.Column="1" Classes="right" Text="{Binding Message.CorrelationId}" />
-            
-            <TextBlock Grid.Row="7" Grid.Column="0" Classes="left" Text="Time To Live" />
-            <TextBlock Grid.Row="7" Grid.Column="1" Classes="right" Text="{Binding Message.TimeToLive}" />
-            
-            <TextBlock Grid.Row="8" Grid.Column="0" Classes="left" Text="Enqueued Time (UTC)" />
-            <TextBlock Grid.Row="8" Grid.Column="1" Classes="right" Text="{Binding Message.EnqueueTimeUtc}" />
-        </Grid>
-    </StackPanel>
+                <TextBlock Text="MessageId" Classes="left" Grid.Row="0" Grid.Column="0" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Message.MessageId}" Classes="right" />
 
+                <TextBlock Text="Content Type" Classes="left" Grid.Row="1" Grid.Column="0" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Message.ContentType}" Classes="right" />
+
+                <TextBlock Text="Content" Grid.Row="2" Classes="left" Grid.Column="0" />
+                <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Name="ContentTextBlock" Text="{Binding Message.Content}" />
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Classes="left" Text="Sequence Number" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Classes="right" Text="{Binding Message.SequenceNumber}" />
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Classes="left" Text="Size" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Classes="right" Text="{Binding Message.Size}" />
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Classes="left" Text="Delivery Count" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Classes="right" Text="{Binding Message.DeliveryCount}" />
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Classes="left" Text="Correlation Id" />
+                <TextBlock Grid.Row="6" Grid.Column="1" Classes="right" Text="{Binding Message.CorrelationId}" />
+
+                <TextBlock Grid.Row="7" Grid.Column="0" Classes="left" Text="Time To Live" />
+                <TextBlock Grid.Row="7" Grid.Column="1" Classes="right" Text="{Binding Message.TimeToLive}" />
+
+                <TextBlock Grid.Row="8" Grid.Column="0" Classes="left" Text="Enqueued Time (UTC)" />
+                <TextBlock Grid.Row="8" Grid.Column="1" Classes="right" Text="{Binding Message.EnqueueTimeUtc}" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </Window>
