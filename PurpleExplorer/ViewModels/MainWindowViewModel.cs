@@ -183,18 +183,19 @@ namespace PurpleExplorer.ViewModels
                 LoggingService.Log("Connecting...");
 
                 var namespaceInfo = await _topicHelper.GetNamespaceInfo(ConnectionString);
-                var topics = await _topicHelper.GetTopics(ConnectionString);
+                var topics = await _topicHelper.GetTopicsAndSubscriptions(ConnectionString);
                 var queues = await _queueHelper.GetQueues(ConnectionString);
 
-                var newResource = new ServiceBusResource
+                var serviceBusResource = new ServiceBusResource
                 {
                     Name = namespaceInfo.Name,
-                    ConnectionString = this.ConnectionString
+                    CreatedTime = namespaceInfo.CreatedTime,
+                    ConnectionString = ConnectionString
                 };
 
-                newResource.AddQueues(queues.ToArray());
-                newResource.AddTopics(topics.ToArray());
-                ConnectedServiceBuses.Add(newResource);
+                serviceBusResource.AddQueues(queues.ToArray());
+                serviceBusResource.AddTopics(topics.ToArray());
+                ConnectedServiceBuses.Add(serviceBusResource);
                 LoggingService.Log("Connected to Service Bus: " + namespaceInfo.Name);
             }
             catch (ArgumentException)
@@ -306,6 +307,20 @@ namespace PurpleExplorer.ViewModels
             }
         }
 
+        public async Task RefreshConnectedServiceBuses()
+        {
+            foreach (var serviceBusResource in ConnectedServiceBuses)
+            {
+                var topicsAndSubscriptions = await _topicHelper.GetTopicsAndSubscriptions(serviceBusResource.ConnectionString);
+                var serviceBusQueues = await _queueHelper.GetQueues(serviceBusResource.ConnectionString);
+
+                serviceBusResource.Topics.Clear();
+                serviceBusResource.Queues.Clear();
+                serviceBusResource.AddTopics(topicsAndSubscriptions.ToArray());
+                serviceBusResource.AddQueues(serviceBusQueues.ToArray());
+            }
+        }
+        
         public async void AddMessage()
         {
             var viewModal = new AddMessageWindowViewModal();
@@ -419,21 +434,34 @@ namespace PurpleExplorer.ViewModels
                 var connectionString = CurrentSubscription.Topic.ServiceBus.ConnectionString;
                 purgedCount = await _topicHelper.PurgeMessages(connectionString, _currentTopic.Name,
                     _currentSubscription.Name, isDlq);
+
+                if (!isDlq)
+                    CurrentSubscription.ClearMessages();
+                else
+                    CurrentSubscription.ClearDlqMessages();
             }
 
             if (CurrentQueue != null)
             {
                 var connectionString = CurrentQueue.ServiceBus.ConnectionString;
                 purgedCount = await _queueHelper.PurgeMessages(connectionString, _currentQueue.Name, isDlq);
+                
+                if (!isDlq)
+                    CurrentQueue.ClearMessages();
+                else
+                    CurrentQueue.ClearDlqMessages();
             }
-
             LoggingService.Log($"Purged {purgedCount} messages in {purgingPath}");
+
+            // Refreshing messages
+            await FetchMessages();
         }
 
         public async Task Refresh()
         {
-            await FetchMessages();
+            await RefreshConnectedServiceBuses();
             RefreshTabHeaders();
+            await FetchMessages();
         }
         
         public async Task FetchMessages()

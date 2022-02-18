@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using DynamicData;
 using ReactiveUI;
 
@@ -10,6 +11,7 @@ namespace PurpleExplorer.Models
     /// </summary>
     public abstract class MessageCollection : ReactiveObject
     {
+        // These are needed to be set before fetching messages, in the second constructor
         private long _messageCount;
         private long _dlqCount;
        
@@ -19,13 +21,13 @@ namespace PurpleExplorer.Models
         public long MessageCount
         {
             get => _messageCount;
-            set => this.RaiseAndSetIfChanged(ref _messageCount, value);
+            private set => this.RaiseAndSetIfChanged(ref _messageCount, value);
         }
         
         public long DlqCount
         {
             get => _dlqCount;
-            set => this.RaiseAndSetIfChanged(ref _dlqCount, value);
+            private set => this.RaiseAndSetIfChanged(ref _dlqCount, value);
         }
 
         protected MessageCollection()
@@ -43,25 +45,37 @@ namespace PurpleExplorer.Models
         public void AddMessages(IEnumerable<Message> messages)
         {
             Messages.AddRange(messages);
-            _messageCount = Messages.Count;
+            MessageCount = Messages.Count;
         }
 
+        public void RemoveMessage(string messageId)
+        {
+            Messages.Remove(Messages.Single(msg => msg.MessageId.Equals(messageId)));
+            MessageCount = Messages.Count;
+        }
+        
         public void ClearMessages()
         {
             Messages.Clear();
-            _messageCount = 0;
+            MessageCount = Messages.Count;
         }
         
         public void AddDlqMessages(IEnumerable<Message> dlqMessages)
         {
             DlqMessages.AddRange(dlqMessages);
-            _dlqCount = DlqMessages.Count;
+            DlqCount = DlqMessages.Count;
+        }
+        
+        public void RemoveDlqMessage(string messageId)
+        {
+            DlqMessages.Remove(DlqMessages.Single(msg => msg.MessageId.Equals(messageId)));
+            DlqCount = DlqMessages.Count;
         }
         
         public void ClearDlqMessages()
         {
             DlqMessages.Clear();
-            _dlqCount = 0;
+            DlqCount = DlqMessages.Count;
         }
     }
 }
