@@ -16,23 +16,18 @@ namespace PurpleExplorer.Helpers
     {
         private int _maxMessageCount = 100;
 
-        public async Task<IList<ServiceBusTopic>> GetTopics(string connectionString)
+        public async Task<IList<ServiceBusTopic>> GetTopicsAndSubscriptions(string connectionString)
         {
             IList<ServiceBusTopic> topics = new List<ServiceBusTopic>();
             var client = new ManagementClient(connectionString);
             var busTopics = await client.GetTopicsAsync();
             await client.CloseAsync();
 
-            await Task.WhenAll(busTopics.Select(async t =>
+            await Task.WhenAll(busTopics.Select(async topic =>
             {
-                var topicName = t.Path;
-                var subscriptions = await GetSubscriptions(connectionString, topicName);
+                var newTopic = new ServiceBusTopic(topic);
 
-                var newTopic = new ServiceBusTopic
-                {
-                    Name = topicName
-                };
-
+                var subscriptions = await GetSubscriptions(connectionString, newTopic.Name);
                 newTopic.AddSubscriptions(subscriptions.ToArray());
                 topics.Add(newTopic);
             }));
@@ -40,14 +35,30 @@ namespace PurpleExplorer.Helpers
             return topics;
         }
 
-        public async Task<SubscriptionRuntimeInfo> GetSubscriptionRuntimeInfo(string connectionString,
-            string topicPath, string subscriptionName)
+        public async Task<ServiceBusTopic> GetTopic(string connectionString, string topicPath, bool retrieveSubscriptions)
         {
-            ManagementClient client = new ManagementClient(connectionString);
+            var client = new ManagementClient(connectionString);
+            var busTopics = await client.GetTopicAsync(topicPath);
+            await client.CloseAsync();
+
+            var newTopic = new ServiceBusTopic(busTopics);
+
+            if (retrieveSubscriptions)
+            {
+                var subscriptions = await GetSubscriptions(connectionString, newTopic.Name);
+                newTopic.AddSubscriptions(subscriptions.ToArray());
+            }
+
+            return newTopic;
+        }
+        
+        public async Task<ServiceBusSubscription> GetSubscription(string connectionString, string topicPath, string subscriptionName)
+        {
+            var client = new ManagementClient(connectionString);
             var runtimeInfo = await client.GetSubscriptionRuntimeInfoAsync(topicPath, subscriptionName);
             await client.CloseAsync();
 
-            return runtimeInfo;
+            return new ServiceBusSubscription(runtimeInfo);
         }
 
         public async Task<IList<ServiceBusSubscription>> GetSubscriptions(string connectionString, string topicPath)

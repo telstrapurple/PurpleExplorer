@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 
 namespace PurpleExplorer.Models
@@ -5,6 +6,7 @@ namespace PurpleExplorer.Models
     public class ServiceBusResource 
     {
         public string Name { get; set; }
+        public DateTime CreatedTime { get; set; }
         public string ConnectionString { get; set; }
         public ObservableCollection<ServiceBusQueue> Queues { get; private set; }
         public ObservableCollection<ServiceBusTopic> Topics { get; private set; }
@@ -29,6 +31,12 @@ namespace PurpleExplorer.Models
                 queue.ServiceBus = this;
                 Queues.Add(queue);
             }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            var comparingResource = obj as ServiceBusResource;
+            return Name.Equals(comparingResource.Name) && CreatedTime.Equals(comparingResource.CreatedTime);
         }
     }
 }

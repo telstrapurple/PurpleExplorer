@@ -67,12 +67,22 @@ namespace PurpleExplorer.ViewModels
                 var connectionString = Subscription.Topic.ServiceBus.ConnectionString;
                 await _topicHelper.DeleteMessage(connectionString, Subscription.Topic.Name, Subscription.Name,
                     Message, Message.IsDlq);
+                
+                if(!Message.IsDlq) 
+                    Subscription.RemoveMessage(Message.MessageId);
+                else
+                    Subscription.RemoveDlqMessage(Message.MessageId);
             }
 
             if (Queue != null)
             {
                 var connectionString = Queue.ServiceBus.ConnectionString;
                 await _queueHelper.DeleteMessage(connectionString, Queue.Name, Message, Message.IsDlq);
+                
+                if(!Message.IsDlq) 
+                    Queue.RemoveMessage(Message.MessageId);
+                else
+                    Queue.RemoveDlqMessage(Message.MessageId);
             }
 
             _loggingService.Log($"Message deleted, MessageId: {Message.MessageId}");
