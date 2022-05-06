@@ -22,6 +22,7 @@
         </Grid.RowDefinitions>
 
         <TextBox MinHeight="180" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 FontFamily="Microsoft YaHei,Simsun,苹方-简,宋体-简"
                  TextWrapping="Wrap" Text="{Binding Path=Message, Mode=TwoWay}" />
 
         <StackPanel Grid.Row="1" Margin="0,5,0,5" Orientation="Horizontal" HorizontalAlignment="Stretch">
