@@ -185,7 +185,6 @@
                         </DataGrid>
                     </TabItem>
                 </TabControl>
-            </Grid>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">
