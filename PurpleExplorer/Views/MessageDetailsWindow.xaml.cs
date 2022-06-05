@@ -8,7 +8,10 @@ namespace PurpleExplorer.Views
     {
         public MessageDetailsWindow()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+#if DEBUG
+            this.AttachDevTools();
+#endif
         }
 
         private void InitializeComponent()

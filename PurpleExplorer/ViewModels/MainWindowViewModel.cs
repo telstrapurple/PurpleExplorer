@@ -33,6 +33,7 @@ namespace PurpleExplorer.ViewModels
         private string _connectionString;
         private IObservable<bool> _queueLevelActionEnabled;
         private MessageCollection _currentMessageCollection;
+        private IAppState _appState;
         
         public ObservableCollection<Message> Messages { get; }
         public ObservableCollection<Message> DlqMessages { get; }
@@ -118,6 +119,7 @@ namespace PurpleExplorer.ViewModels
             _loggingService = Locator.Current.GetService<ILoggingService>();
             _topicHelper = Locator.Current.GetService<ITopicHelper>();
             _queueHelper = Locator.Current.GetService<IQueueHelper>();
+            _appState = Locator.Current.GetService<IAppState>();
 
             Messages = new ObservableCollection<Message>();
             DlqMessages = new ObservableCollection<Message>();
@@ -501,6 +503,11 @@ namespace PurpleExplorer.ViewModels
         {
             CurrentQueue = selectedQueue;
             LoggingService.Log("Queue selected: " + selectedQueue.Name);
+        }
+
+        public async Task ShowSettings()
+        {
+            await ModalWindowHelper.ShowModalWindow<AppSettingsWindow>(_appState as AppState);
         }
         
         public void ClearAllSelections()

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:PurpleExplorer.Models"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
@@ -23,140 +24,140 @@
             <Button HorizontalAlignment="Left" Command="{Binding ConnectionBtnPopupCommand}"
                     Classes="topButton">
                 <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource FluentIconsFilled.plug_disconnected_filled}" />
+                    <i:Icon Value="fa-plug" />
                     <TextBlock VerticalAlignment="Center">Connect</TextBlock>
                 </StackPanel>
             </Button>
             <Button Name="RefreshButton" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
                     Command="{Binding Refresh}">
                 <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Material.Refresh}" />
+                    <i:Icon Value="fa-arrows-rotate" />
                     <TextBlock VerticalAlignment="Center">Refresh</TextBlock>
                 </StackPanel>
             </Button>
             <Button Name="AddButton" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
                     Command="{Binding AddMessage}">
                 <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Material.Send}" />
+                    <i:Icon Value="fa-envelope" />
                     <TextBlock VerticalAlignment="Center">New message</TextBlock>
                 </StackPanel>
             </Button>
             <Button Name="btnPurgeActiveMessages" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
                     Command="{Binding PurgeMessages}" CommandParameter="false">
                 <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Modern.Clean}" />
+                    <i:Icon Value="fa-trash" />
                     <TextBlock VerticalAlignment="Center">Purge messages</TextBlock>
                 </StackPanel>
             </Button>
             <Button Name="btnPurgeDlqMessages" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
                     Command="{Binding PurgeMessages}" CommandParameter="true">
                 <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Modern.Clean}" />
+                    <i:Icon Value="fa-trash" />
                     <TextBlock VerticalAlignment="Center">Purge dead-letter</TextBlock>
                 </StackPanel>
             </Button>
             <Button Name="btnTransferDlqMessages" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
                     Command="{Binding TransferDeadletterMessages}">
                 <StackPanel Orientation="Horizontal">
-                    <DrawingPresenter Drawing="{DynamicResource Modern.Clean}" />
+                    <i:Icon Value="fa-shuffle" />
                     <TextBlock VerticalAlignment="Center">Transfer DLQ</TextBlock>
                 </StackPanel>
             </Button>
-            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="White" Margin="0,0,10,0"
-                       TextAlignment="Right">
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="PurpleExplorer&#x0a;{0}">
-                        <Binding Path="AppVersionText" />
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock Foreground="White" Margin="0,2,10,0" TextAlignment="Right">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="PurpleExplorer&#x0a;{0}">
+                            <Binding Path="AppVersionText" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>   
+                <Button HorizontalAlignment="Right" Command="{Binding ShowSettings}"
+                        Classes="topButton">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center">Settings</TextBlock>
+                        <i:Icon Value="fa-gear" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="1" Dock="Left">
-            <Grid> 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="300" MinWidth="300" />
-                    <ColumnDefinition Width="3" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TabControl Grid.Column="0">
-                    <TabItem Header="{Binding TopicTabHeader}">
-                        <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Name="tvTopics">
-                            <TreeView.DataTemplates>
-                                <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <DrawingPresenter Drawing="{DynamicResource Unicons.ServerConnection}" />
-                                        <TextBlock Foreground="Purple" Margin="5, 4" VerticalAlignment="Center"
+            <TabControl Width="300">
+                <TabItem Header="{Binding TopicTabHeader}">
+                    <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Name="tvTopics">
+                        <TreeView.DataTemplates>
+                            <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
+                                <StackPanel Orientation="Horizontal">
+                                    <i:Icon Value="fa-server" />
+                                    <TextBlock Foreground="Purple" Margin="5, 4" VerticalAlignment="Center"
                                                Text="{Binding Name}" />
-                                    </StackPanel>
-                                </TreeDataTemplate>
-                                <TreeDataTemplate DataType="models:ServiceBusTopic" ItemsSource="{Binding Subscriptions}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <DrawingPresenter Drawing="{DynamicResource FluentIconsFilled.mail_all_filled}" />
-                                        <TextBlock Foreground="Purple" Margin="3,8" Text="{Binding Name}" />
-                                    </StackPanel>
-                                </TreeDataTemplate>
-                                <DataTemplate DataType="models:ServiceBusSubscription">
-                                    <StackPanel Orientation="Horizontal">
-                                        <DrawingPresenter Drawing="{DynamicResource Unicons.Processor}" />
-                                        <TextBlock Margin="3,4">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0}({1},{2})">
-                                                    <Binding Path="Name" />
-                                                    <Binding Path="MessageCount" />
-                                                    <Binding Path="DlqCount" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </TreeView.DataTemplates>
-                            <TreeView.Styles>
-                                <Style Selector="TreeViewItem">
-                                    <Setter Property="IsExpanded" Value="True" />
-                                </Style>
-                            </TreeView.Styles>
-                        </TreeView>
-                    </TabItem>
-                    <TabItem Header="{Binding QueueTabHeader}">
-                        <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Name="tvQueues">
-                            <TreeView.DataTemplates>
-                                <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Queues}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <DrawingPresenter Drawing="{DynamicResource Unicons.ServerConnection}" />
-                                        <TextBlock Foreground="Purple" Margin="5, 4" VerticalAlignment="Center"
+                                </StackPanel>
+                            </TreeDataTemplate>
+                            <TreeDataTemplate DataType="models:ServiceBusTopic" ItemsSource="{Binding Subscriptions}">
+                                <StackPanel Orientation="Horizontal">
+                                    <i:Icon Value="fa-bars" />
+                                    <TextBlock Foreground="Purple" Margin="3,8" Text="{Binding Name}" />
+                                </StackPanel>
+                            </TreeDataTemplate>
+                            <DataTemplate DataType="models:ServiceBusSubscription">
+                                <StackPanel Orientation="Horizontal">
+                                    <i:Icon Value="fa-microchip" />
+                                    <TextBlock Margin="3,4">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}({1},{2})">
+                                                <Binding Path="Name" />
+                                                <Binding Path="MessageCount" />
+                                                <Binding Path="DlqCount" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </TreeView.DataTemplates>
+                        <TreeView.Styles>
+                            <Style Selector="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="True" />
+                            </Style>
+                        </TreeView.Styles>
+                    </TreeView>
+                </TabItem>
+                <TabItem Header="{Binding QueueTabHeader}">
+                    <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Name="tvQueues">
+                        <TreeView.DataTemplates>
+                            <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Queues}">
+                                <StackPanel Orientation="Horizontal">
+                                    <i:Icon Value="fa-server" />
+                                    <TextBlock Foreground="Purple" Margin="5, 4" VerticalAlignment="Center"
                                                Text="{Binding Name}" />
-                                    </StackPanel>
-                                </TreeDataTemplate>
-                                <DataTemplate DataType="models:ServiceBusQueue">
-                                    <StackPanel Orientation="Horizontal">
-                                        <DrawingPresenter Drawing="{DynamicResource FluentIconsFilled.mail_all_filled}" />
-                                        <TextBlock Margin="3,7">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0}({1},{2})">
-                                                    <Binding Path="Name" />
-                                                    <Binding Path="MessageCount" />
-                                                    <Binding Path="DlqCount" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </TreeView.DataTemplates>
-                            <TreeView.Styles>
-                                <Style Selector="TreeViewItem">
-                                    <Setter Property="IsExpanded" Value="True" />
-                                </Style>
-                            </TreeView.Styles>
-                        </TreeView>
-                    </TabItem>
-                </TabControl>
-                    
-                <GridSplitter Grid.Column="1"  ResizeDirection="Columns"/>
-                    
-                <TabControl Grid.Column="2">
-                    <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
-                        <DataGrid Items="{Binding Messages}" Tapped="MessagesGrid_Tapped"
+                                </StackPanel>
+                            </TreeDataTemplate>
+                            <DataTemplate DataType="models:ServiceBusQueue">
+                                <StackPanel Orientation="Horizontal">
+                                    <i:Icon Value="fa-bars" />
+                                    <TextBlock Margin="3,7">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}({1},{2})">
+                                                <Binding Path="Name" />
+                                                <Binding Path="MessageCount" />
+                                                <Binding Path="DlqCount" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </TreeView.DataTemplates>
+                        <TreeView.Styles>
+                            <Style Selector="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="True" />
+                            </Style>
+                        </TreeView.Styles>
+                    </TreeView>
+                </TabItem>
+            </TabControl>
+
+            <TabControl>
+                <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
+                    <DataGrid Items="{Binding Messages}" Tapped="MessagesGrid_Tapped"
                               DoubleTapped="MessagesGrid_DoubleTapped"
                               IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                             <DataGrid.Columns>
@@ -184,7 +185,6 @@
                         </DataGrid>
                     </TabItem>
                 </TabControl>
-            </Grid>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">

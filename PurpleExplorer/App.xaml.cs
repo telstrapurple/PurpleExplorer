@@ -1,3 +1,4 @@
+using System.IO;
 using Avalonia;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
@@ -20,19 +21,24 @@ namespace PurpleExplorer
 
         public override void OnFrameworkInitializationCompleted()
         {
-            Locator.CurrentMutable.Register(() => new TopicHelper(), typeof(ITopicHelper));
-            Locator.CurrentMutable.RegisterLazySingleton(() => new LoggingService(), typeof(ILoggingService));
-            Locator.CurrentMutable.Register(() => new QueueHelper(), typeof(IQueueHelper));
-
+            var appStatePath = "appstate.json";
+            if (!File.Exists(appStatePath))
+            {
+                File.Create(appStatePath).Close();
+            }
+            
             var suspension = new AutoSuspendHelper(ApplicationLifetime);
             RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
-            RxApp.SuspensionHost.SetupDefaultSuspendResume(new NewtonsoftJsonSuspensionDriver("appstate.json"));
+            RxApp.SuspensionHost.SetupDefaultSuspendResume(new NewtonsoftJsonSuspensionDriver(appStatePath));
             suspension.OnFrameworkInitializationCompleted();
             var state = RxApp.SuspensionHost.GetAppState<AppState>();
+
             Locator.CurrentMutable.RegisterLazySingleton(() => state, typeof(IAppState));
+            Locator.CurrentMutable.RegisterLazySingleton(() => new LoggingService(), typeof(ILoggingService));
+            Locator.CurrentMutable.Register(() => new TopicHelper(state.AppSettings), typeof(ITopicHelper));
+            Locator.CurrentMutable.Register(() => new QueueHelper(state.AppSettings), typeof(IQueueHelper));
 
             new MainWindow { DataContext = new MainWindowViewModel() }.Show();
-
             base.OnFrameworkInitializationCompleted();
         }
     }
