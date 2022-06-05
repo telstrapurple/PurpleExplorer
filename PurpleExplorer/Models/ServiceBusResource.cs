@@ -36,7 +36,7 @@ namespace PurpleExplorer.Models
         public override bool Equals(object? obj)
         {
             var comparingResource = obj as ServiceBusResource;
-            return Name.Equals(comparingResource.Name) && CreatedTime.Equals(comparingResource.CreatedTime);
+            return comparingResource != null && Name.Equals(comparingResource.Name) && CreatedTime.Equals(comparingResource.CreatedTime);
         }
     }
 }

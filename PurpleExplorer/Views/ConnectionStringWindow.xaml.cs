@@ -5,6 +5,7 @@ using DynamicData;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.ViewModels;
 using System.Linq;
+using Avalonia;
 
 namespace PurpleExplorer.Views
 {
@@ -13,6 +14,9 @@ namespace PurpleExplorer.Views
         public ConnectionStringWindow()
         {
             InitializeComponent();
+#if DEBUG
+            this.AttachDevTools();
+#endif
         }
 
         private void InitializeComponent()

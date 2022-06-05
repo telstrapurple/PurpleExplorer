@@ -1,0 +1,18 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia">
+    <Style Selector="Button.topButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Margin" Value="1,0" />
+        <Setter Property="BorderThickness" Value="0,0,2,0" />
+    </Style>
+    <Style Selector="Button.topButton i|Icon">
+        <Setter Property="Margin" Value="0,0,1,0" />
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+    </Style>
+    <Style Selector="Button.topButton TextBlock">
+        <Setter Property="Margin" Value="0,1,0,0" />
+    </Style>
+</Styles>
