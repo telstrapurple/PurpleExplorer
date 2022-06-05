@@ -14,13 +14,18 @@ namespace PurpleExplorer.Helpers
 {
     public class QueueHelper : IQueueHelper
     {
-        private int _maxMessageCount = 100;
+        private readonly AppSettings _appSettings;
+
+        public QueueHelper(AppSettings appSettings)
+        {
+            _appSettings = appSettings;
+        }
 
         public async Task<IList<ServiceBusQueue>> GetQueues(string connectionString)
         {
             IList<ServiceBusQueue> queues = new List<ServiceBusQueue>();
             var client = new ManagementClient(connectionString);
-            var queuesInfo = await client.GetQueuesRuntimeInfoAsync();
+            var queuesInfo = await client.GetQueuesRuntimeInfoAsync(_appSettings.QueueListFetchCount);
             await client.CloseAsync();   
             
             await Task.WhenAll(queuesInfo.Select(async queue =>
@@ -54,7 +59,7 @@ namespace PurpleExplorer.Helpers
         public async Task<IList<Message>> GetMessages(string connectionString, string queueName)
         {
             var receiver = new MessageReceiver(connectionString, queueName, ReceiveMode.PeekLock);
-            var messages = await receiver.PeekAsync(_maxMessageCount);
+            var messages = await receiver.PeekAsync(_appSettings.QueueMessageFetchCount);
             return messages.Select(msg => new Message(msg, false)).ToList();
         }
 
@@ -63,7 +68,7 @@ namespace PurpleExplorer.Helpers
             var deadletterPath = EntityNameHelper.FormatDeadLetterPath(queueName);
 
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
-            var receivedMessages = await receiver.PeekAsync(_maxMessageCount);
+            var receivedMessages = await receiver.PeekAsync(_appSettings.QueueMessageFetchCount);
             await receiver.CloseAsync();
 
             return receivedMessages.Select(message => new Message(message, true)).ToList();
@@ -75,7 +80,7 @@ namespace PurpleExplorer.Helpers
 
             while (true)
             {
-                var messages = await receiver.ReceiveAsync(_maxMessageCount);
+                var messages = await receiver.ReceiveAsync(_appSettings.QueueMessageFetchCount);
                 if (messages == null || messages.Count == 0)
                 {
                     break;
@@ -101,7 +106,7 @@ namespace PurpleExplorer.Helpers
 
             while (true)
             {
-                var messages = await receiver.ReceiveAsync(_maxMessageCount);
+                var messages = await receiver.ReceiveAsync(_appSettings.QueueMessageFetchCount);
                 if (messages == null || messages.Count == 0)
                 {
                     break;
@@ -148,7 +153,7 @@ namespace PurpleExplorer.Helpers
             var operationTimeout = TimeSpan.FromSeconds(5);
             while (true)
             {
-                var messages = await receiver.ReceiveAsync(_maxMessageCount, operationTimeout);
+                var messages = await receiver.ReceiveAsync(_appSettings.QueueMessageFetchCount, operationTimeout);
                 if (messages == null || messages.Count == 0)
                 {
                     break;
@@ -175,7 +180,7 @@ namespace PurpleExplorer.Helpers
                 var operationTimeout = TimeSpan.FromSeconds(5);
                 while (true)
                 {
-                    var messages = await receiver.ReceiveAsync(_maxMessageCount, operationTimeout);
+                    var messages = await receiver.ReceiveAsync(_appSettings.QueueMessageFetchCount, operationTimeout);
                     if (messages == null || messages.Count == 0)
                     {
                         break;
