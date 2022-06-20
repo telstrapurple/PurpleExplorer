@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       majorVersion:
-        require: true
+        required: true
         default: "0"
       minorVersion:
         required: true
