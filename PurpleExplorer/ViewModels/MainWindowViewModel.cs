@@ -133,7 +133,9 @@ namespace PurpleExplorer.ViewModels
 
             RefreshTabHeaders();
 
-            AppVersionText = AppVersion.ToString();
+            AppVersionText = AppVersion.ToString(3);
+            LoggingService.Log($"PurpleExplorer v{AppVersionText}");
+
             // Checking for new version asynchronous. no need to await on it
 #pragma warning disable 4014
             CheckForNewVersion();

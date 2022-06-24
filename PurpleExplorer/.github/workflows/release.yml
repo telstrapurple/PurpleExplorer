@@ -12,7 +12,7 @@ on:
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     runs-on: macos-latest
     env:
       releaseVersion: ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
@@ -26,22 +26,22 @@ jobs:
           dotnet-version: 6.0.x
       # Publish osx-x64
       - name: Publish osx-x64
-        run: dotnet publish -r osx-x64 -c Release /p:PublishTrimmed=true /p:Version=${{env.releaseVersion}}
+        run: dotnet publish -r osx-x64 -p:Configuration=Release -p:DebugType=None -p:DebugSymbols=false -p:Version=${{env.releaseVersion}}
       - name: Zip osx-x64
         run: (cd PurpleExplorer/bin/Release/net6.0/osx-x64/publish ; zip -r PurpleExplorer_osx-x64.zip *)
       # Publish osx-arm64
       - name: Publish osx-arm64
-        run: dotnet publish -r osx-arm64 -c Release /p:PublishTrimmed=true /p:Version=${{env.releaseVersion}}
+        run: dotnet publish -r osx-arm64 -p:Configuration=Release -p:DebugType=None -p:DebugSymbols=false -p:Version=${{env.releaseVersion}}
       - name: Zip osx-arm64
         run: (cd PurpleExplorer/bin/Release/net6.0/osx-arm64/publish ; zip -r PurpleExplorer_osx-arm64.zip *)
       # Publish win-x64
       - name: Publish win-x64
-        run: dotnet publish -r win-x64 -c Release /p:PublishTrimmed=true /p:Version=${{env.releaseVersion}}
+        run: dotnet publish -r win-x64 -p:Configuration=Release -p:DebugType=None -p:DebugSymbols=false -p:Version=${{env.releaseVersion}}
       - name: Zip win-x64
         run: (cd PurpleExplorer/bin/Release/net6.0/win-x64/publish ; zip -r PurpleExplorer_win-x64 *)
       # Publish linux-x64
       - name: Publish linux-x64
-        run: dotnet publish -r linux-x64 -c Release /p:PublishTrimmed=true /p:Version=${{env.releaseVersion}}
+        run: dotnet publish -r linux-x64 -p:Configuration=Release -p:DebugType=None -p:DebugSymbols=false -p:Version=${{env.releaseVersion}}
       - name: Zip linux-x64
         run: (cd PurpleExplorer/bin/Release/net6.0/linux-x64/publish ; zip -r PurpleExplorer_linux-x64 *)
       # Create release
