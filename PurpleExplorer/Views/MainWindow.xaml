@@ -64,7 +64,7 @@
                 </StackPanel>
             </Button>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <TextBlock Foreground="White" Margin="0,2,10,0" TextAlignment="Right">
+                <TextBlock Foreground="White" Margin="0,3,10,0" TextAlignment="Right">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="PurpleExplorer&#x0a;{0}">
                             <Binding Path="AppVersionText" />
@@ -164,6 +164,7 @@
                                 <DataGridTextColumn Header="Sequence Number" Binding="{Binding SequenceNumber}" />
                                 <DataGridTextColumn Header="Message Id" Binding="{Binding MessageId}" />
                                 <DataGridTextColumn Header="Content" Binding="{Binding Content}" />
+                                <DataGridTextColumn Header="Label" Binding="{Binding Label}" />
                                 <DataGridTextColumn Header="Size" Binding="{Binding Size}" />
                                 <DataGridTextColumn Header="Delivery Count" Binding="{Binding DeliveryCount}" />
                                 <DataGridTextColumn Header="Enqueue time (UTC)" Binding="{Binding EnqueueTimeUtc}" />
@@ -177,6 +178,7 @@
                                 <DataGridTextColumn Header="Sequence Number" Binding="{Binding SequenceNumber}" />
                                 <DataGridTextColumn Header="Message Id" Binding="{Binding MessageId}" />
                                 <DataGridTextColumn Header="Content" Binding="{Binding Content}" />
+                                <DataGridTextColumn Header="Label" Binding="{Binding Label}" />
                                 <DataGridTextColumn Header="Size" Binding="{Binding Size}" />
                                 <DataGridTextColumn Header="Delivery Count" Binding="{Binding DeliveryCount}" />
                                 <DataGridTextColumn Header="Dead-letter reason" Binding="{Binding DeadLetterReason}" />
