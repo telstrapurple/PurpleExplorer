@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using Microsoft.Azure.ServiceBus;
 using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
 namespace PurpleExplorer.Models
@@ -22,7 +21,7 @@ namespace PurpleExplorer.Models
         
         public Message(AzureMessage azureMessage, bool isDlq)
         {
-            this.Content = Encoding.UTF8.GetString(azureMessage.Body);
+            this.Content = azureMessage.Body is not null ? Encoding.UTF8.GetString(azureMessage.Body) : string.Empty;
             this.MessageId = azureMessage.MessageId;
             this.CorrelationId = azureMessage.CorrelationId;
             this.DeliveryCount = azureMessage.SystemProperties.DeliveryCount;
