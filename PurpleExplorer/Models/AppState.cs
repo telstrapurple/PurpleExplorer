@@ -8,7 +8,7 @@ namespace PurpleExplorer.Models
     public class AppState: ViewModelBase, IAppState
     {
         [DataMember] 
-        public ObservableCollection<string> SavedConnectionStrings { get; set; }
+        public ObservableCollection<ServiceBusConnectionString> SavedConnectionStrings { get; set; }
         
         [DataMember] 
         public ObservableCollection<SavedMessage> SavedMessages { get; set; }
@@ -18,7 +18,7 @@ namespace PurpleExplorer.Models
         
         public AppState()
         {
-            SavedConnectionStrings = new ObservableCollection<string>();
+            SavedConnectionStrings = new ObservableCollection<ServiceBusConnectionString>();
             SavedMessages = new ObservableCollection<SavedMessage>();
             AppSettings = new AppSettings();
         }

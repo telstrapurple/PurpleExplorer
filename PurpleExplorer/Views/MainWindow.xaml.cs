@@ -31,7 +31,7 @@ namespace PurpleExplorer.Views
             var viewModal = new MessageDetailsWindowViewModel
             {
                 Message = grid.SelectedItem as Message, 
-                ConnectionString = mainWindowViewModel.ConnectionString, 
+                ConnectionString = mainWindowViewModel.ConnectionString,
                 Subscription = mainWindowViewModel.CurrentSubscription,
                 Queue = mainWindowViewModel.CurrentQueue
             };

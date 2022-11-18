@@ -12,7 +12,7 @@ using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
 namespace PurpleExplorer.Helpers
 {
-    public class QueueHelper : IQueueHelper
+    public class QueueHelper : BaseHelper, IQueueHelper
     {
         private readonly AppSettings _appSettings;
 
@@ -21,10 +21,10 @@ namespace PurpleExplorer.Helpers
             _appSettings = appSettings;
         }
 
-        public async Task<IList<ServiceBusQueue>> GetQueues(string connectionString)
+        public async Task<IList<ServiceBusQueue>> GetQueues(ServiceBusConnectionString connectionString)
         {
             IList<ServiceBusQueue> queues = new List<ServiceBusQueue>();
-            var client = new ManagementClient(connectionString);
+            var client = GetManagementClient(connectionString);
             var queuesInfo = await client.GetQueuesRuntimeInfoAsync(_appSettings.QueueListFetchCount);
             await client.CloseAsync();   
             
@@ -43,40 +43,40 @@ namespace PurpleExplorer.Helpers
             return queues;
         }
         
-        public async Task SendMessage(string connectionString, string queueName, string content)
+        public async Task SendMessage(ServiceBusConnectionString connectionString, string queueName, string content)
         {
             var message = new AzureMessage {Body = Encoding.UTF8.GetBytes(content)};
             await SendMessage(connectionString, queueName, message);
         }
 
-        public async Task SendMessage(string connectionString, string queueName, AzureMessage message)
+        public async Task SendMessage(ServiceBusConnectionString connectionString, string queueName, AzureMessage message)
         {
-            var client = new QueueClient(connectionString, queueName);
+            var client = GetQueueClient(connectionString, queueName);
             await client.SendAsync(message);
             await client.CloseAsync();
         }
 
-        public async Task<IList<Message>> GetMessages(string connectionString, string queueName)
+        public async Task<IList<Message>> GetMessages(ServiceBusConnectionString connectionString, string queueName)
         {
-            var receiver = new MessageReceiver(connectionString, queueName, ReceiveMode.PeekLock);
+            var receiver = GetMessageReceiver(connectionString, queueName, ReceiveMode.PeekLock);
             var messages = await receiver.PeekAsync(_appSettings.QueueMessageFetchCount);
             return messages.Select(msg => new Message(msg, false)).ToList();
         }
 
-        public async Task<IList<Message>> GetDlqMessages(string connectionString, string queueName)
+        public async Task<IList<Message>> GetDlqMessages(ServiceBusConnectionString connectionString, string queueName)
         {
             var deadletterPath = EntityNameHelper.FormatDeadLetterPath(queueName);
 
-            var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
+            var receiver = GetMessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var receivedMessages = await receiver.PeekAsync(_appSettings.QueueMessageFetchCount);
             await receiver.CloseAsync();
 
             return receivedMessages.Select(message => new Message(message, true)).ToList();
         }
         
-        public async Task DeadletterMessage(string connectionString, string queue, Message message)
+        public async Task DeadletterMessage(ServiceBusConnectionString connectionString, string queue, Message message)
         {
-            var receiver = new MessageReceiver(connectionString, queue, ReceiveMode.PeekLock);
+            var receiver = GetMessageReceiver(connectionString, queue, ReceiveMode.PeekLock);
 
             while (true)
             {
@@ -97,12 +97,12 @@ namespace PurpleExplorer.Helpers
             await receiver.CloseAsync();
         }
         
-        public async Task DeleteMessage(string connectionString, string queue,
+        public async Task DeleteMessage(ServiceBusConnectionString connectionString, string queue,
             Message message, bool isDlq)
         {
             var path = isDlq ? EntityNameHelper.FormatDeadLetterPath(queue) : queue;
 
-            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
+            var receiver = GetMessageReceiver(connectionString, path, ReceiveMode.PeekLock);
 
             while (true)
             {
@@ -123,18 +123,18 @@ namespace PurpleExplorer.Helpers
             await receiver.CloseAsync();
         }
         
-        private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string queue, long sequenceNumber)
+        private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(ServiceBusConnectionString connectionString, string queue, long sequenceNumber)
         {
             var deadletterPath = EntityNameHelper.FormatDeadLetterPath(queue);
 
-            var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
+            var receiver = GetMessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var azureMessage = await receiver.PeekBySequenceNumberAsync(sequenceNumber);
             await receiver.CloseAsync();
             
             return azureMessage;
         }
         
-        public async Task ResubmitDlqMessage(string connectionString, string queue, Message message)
+        public async Task ResubmitDlqMessage(ServiceBusConnectionString connectionString, string queue, Message message)
         {
             var azureMessage = await PeekDlqMessageBySequenceNumber(connectionString, queue, message.SequenceNumber);
             var clonedMessage = azureMessage.CloneMessage();
@@ -144,12 +144,13 @@ namespace PurpleExplorer.Helpers
             await DeleteMessage(connectionString, queue, message, true);
         }
 
-        public async Task<long> PurgeMessages(string connectionString, string queue, bool isDlq)
+        public async Task<long> PurgeMessages(ServiceBusConnectionString connectionString, string queue, bool isDlq)
         {
             var path = isDlq ? EntityNameHelper.FormatDeadLetterPath(queue) : queue;
 
             long purgedCount = 0;
-            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
+
+            var receiver = GetMessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
             var operationTimeout = TimeSpan.FromSeconds(5);
             while (true)
             {
@@ -166,7 +167,7 @@ namespace PurpleExplorer.Helpers
             return purgedCount;
         }
         
-        public async Task<long> TransferDlqMessages(string connectionString, string queuePath)
+        public async Task<long> TransferDlqMessages(ServiceBusConnectionString connectionString, string queuePath)
         {
             var path = EntityNameHelper.FormatDeadLetterPath(queuePath);
 
@@ -175,8 +176,8 @@ namespace PurpleExplorer.Helpers
             QueueClient sender = null;
             try
             {
-                receiver = new MessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
-                sender = new QueueClient(connectionString, queuePath);
+                receiver = GetMessageReceiver(connectionString, path, ReceiveMode.ReceiveAndDelete);
+                sender = GetQueueClient(connectionString, queuePath);
                 var operationTimeout = TimeSpan.FromSeconds(5);
                 while (true)
                 {
@@ -202,20 +203,5 @@ namespace PurpleExplorer.Helpers
 
             return transferredCount;
         }
-    }
-
-    public interface IQueueHelper
-    {
-        Task<IList<ServiceBusQueue>> GetQueues(string connectionString);
-        public Task SendMessage(string connectionString, string topicPath, string content);
-        public Task SendMessage(string connectionString, string topicPath, AzureMessage message);
-        Task<IList<Message>> GetMessages(string connectionString, string queueName);
-        Task<IList<Message>> GetDlqMessages(string connectionString, string queueName);
-        Task DeadletterMessage(string connectionString, string queue, Message message);
-        Task DeleteMessage(string connectionString, string queue,
-            Message message, bool isDlq);
-        Task ResubmitDlqMessage(string connectionString, string queue, Message message);
-        Task<long> PurgeMessages(string connectionString, string queue, bool isDlq);
-        Task<long> TransferDlqMessages(string connectionString, string queue);
     }
 }
