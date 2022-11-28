@@ -30,7 +30,6 @@ namespace PurpleExplorer.ViewModels
         private ServiceBusTopic _currentTopic;
         private ServiceBusQueue _currentQueue;
         private Message _currentMessage;
-        private string _connectionString;
         private IObservable<bool> _queueLevelActionEnabled;
         private MessageCollection _currentMessageCollection;
         private IAppState _appState;
@@ -39,11 +38,7 @@ namespace PurpleExplorer.ViewModels
         public ObservableCollection<Message> DlqMessages { get; }
         public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
         
-        public string ConnectionString
-        {
-            get => _connectionString;
-            set => this.RaiseAndSetIfChanged(ref _connectionString, value);
-        }
+        public ServiceBusConnectionString ConnectionString { get; set; }
 
         public string MessagesTabHeader
         {
@@ -175,9 +170,13 @@ namespace PurpleExplorer.ViewModels
                 return;
             }
 
-            ConnectionString = returnedViewModel.ConnectionString?.Trim();
+            ConnectionString = new ServiceBusConnectionString
+            {
+                ConnectionString = returnedViewModel.ConnectionString,
+                UseManagedIdentity= returnedViewModel.UseManagedIdentity
+            };
 
-            if (string.IsNullOrEmpty(ConnectionString))
+            if (string.IsNullOrEmpty(ConnectionString.ConnectionString))
             {
                 return;
             }

@@ -17,7 +17,7 @@ namespace PurpleExplorer.ViewModels
         public Message Message { get; set; }
         public ServiceBusSubscription Subscription { get; set; }
         public ServiceBusQueue Queue { get; set; }
-        public string ConnectionString { get; set; }
+        public ServiceBusConnectionString ConnectionString { get; set; }
 
         public MessageDetailsWindowViewModel(ITopicHelper topicHelper = null,
             ILoggingService loggingService = null,
