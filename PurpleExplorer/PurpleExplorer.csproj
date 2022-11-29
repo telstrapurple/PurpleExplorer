@@ -18,16 +18,16 @@
         <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.15" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.15" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.15" />
+        <PackageReference Include="Avalonia" Version="0.10.18" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.18" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.15" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.15" />
-        <PackageReference Include="MessageBox.Avalonia" Version="2.0.1" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
+        <PackageReference Include="MessageBox.Avalonia" Version="2.1.0" />
         <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.2.0" />
-        <PackageReference Include="Projektanker.Icons.Avalonia" Version="5.0.2" />
-        <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="5.0.2" />
+        <PackageReference Include="Projektanker.Icons.Avalonia" Version="5.6.0" />
+        <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="5.6.0" />
     </ItemGroup>
     <ItemGroup>
       <None Update="appstate.json">
