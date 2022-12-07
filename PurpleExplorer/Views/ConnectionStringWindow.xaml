@@ -5,47 +5,50 @@
         mc:Ignorable="d" d:DesignWidth="610" d:DesignHeight="480"
         x:Class="PurpleExplorer.Views.ConnectionStringWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        x:DataType="vm:ConnectionStringWindowViewModel"
         Title="Connect to Service Bus" Icon="/Assets/avalonia-logo.ico"
-        Width="610" Height="480"
+        Width="610" Height="510"
         WindowStartupLocation="CenterOwner">
 
     <Design.DataContext>
         <vm:ConnectionStringWindowViewModel />
     </Design.DataContext>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="320" />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+        <Label Grid.Row="0" Margin="5, 5, 0, 0" VerticalAlignment="Bottom">Connection String:</Label>
+        <TextBox Grid.Row="1" Height="30" Width="600" TextWrapping="Wrap" HorizontalAlignment="Left"
+                 Margin="5, 0, 0, 0"
+                 VerticalAlignment="Top" Text="{CompiledBinding Path=ConnectionString, Mode=TwoWay}" />
 
-        <CheckBox Grid.Row="0" Margin="5, 0, 0, 0" IsChecked="{Binding UseManagedIdentity}">Managed Identity</CheckBox>
+        <CheckBox Grid.Row="2" Margin="5, 3, 0, 0" VerticalAlignment="Top" IsChecked="{CompiledBinding UseManagedIdentity}">Use Managed Identity</CheckBox>
 
-        <Label Grid.Row="1" Margin="5, 0, 0, 0">Connection String:</Label>
-
-        <TextBox Grid.Row="2" Height="30" Width="600" TextWrapping="Wrap" HorizontalAlignment="Left" Margin="5, 5, 0, 0"
-                 VerticalAlignment="Top" Text="{Binding Path=ConnectionString, Mode=TwoWay}" />
-
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5, 0, 0, 0">
+        <DockPanel Grid.Row="3" Dock="Left" Margin="5, 0, 5, 0">
             <Button Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                IsEnabled="{Binding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                Click="btnSendClick">
-                Connect to Service Bus
+                    IsEnabled="{CompiledBinding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    Click="btnSaveConnectionString">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <i:Icon Value="fa-plus" />
+                    <TextBlock VerticalAlignment="Center">Save Connection String</TextBlock>
+                </StackPanel>
             </Button>
-            <Button Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-            IsEnabled="{Binding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                Click="btnSaveConnectionString">
-                Save Connection String
-            </Button>
-        </StackPanel>
-        
-        <ListBox Grid.Row="4" Name="lsbSavedConnectionString" Margin="5,0,5,0" Items="{Binding Path=SavedConnectionStrings, Mode=TwoWay}" 
-                 Width="600" Height="300" VerticalAlignment="Top" SelectionChanged="lsbConnectionStringSelectionChanged" HorizontalAlignment="Left">
-        
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Width="200" Height="30" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        IsEnabled="{CompiledBinding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                        Click="btnSendClick">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <i:Icon Value="fa-plug" />
+                        <TextBlock VerticalAlignment="Center">Connect to Service Bus</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+
+        <ListBox Grid.Row="4" Name="lsbSavedConnectionString" Margin="5,0,5,0"
+                 Items="{Binding Path=SavedConnectionStrings, Mode=TwoWay}"
+                 Width="600" Height="300" VerticalAlignment="Top"
+                 SelectionChanged="lsbConnectionStringSelectionChanged" HorizontalAlignment="Left">
+
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -55,9 +58,14 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Button Grid.Row="5" Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-             Click="btnDeleteConnectionString">
-            Remove
+        <Button Grid.Row="5" Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left"
+                IsEnabled="{Binding #lsbSavedConnectionString.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                VerticalAlignment="Top"
+                Click="btnDeleteConnectionString">
+            <StackPanel Orientation="Horizontal" Spacing="5">
+                <i:Icon Value="fa-minus" />
+                <TextBlock VerticalAlignment="Center">Remove</TextBlock>
+            </StackPanel>
         </Button>
     </Grid>
 </Window>

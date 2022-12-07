@@ -1,8 +1,7 @@
-﻿namespace PurpleExplorer.Services
+﻿namespace PurpleExplorer.Services;
+
+public interface ILoggingService
 {
-    public interface ILoggingService
-    {
-        void Log(string message);
-        string Logs { get; }
-    }
+    void Log(string message);
+    string Logs { get; }
 }

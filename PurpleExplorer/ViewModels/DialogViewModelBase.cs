@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace PurpleExplorer.ViewModels;
 
-namespace PurpleExplorer.ViewModels
+public class DialogViewModelBase : ViewModelBase 
 {
-    public class DialogViewModelBase : ViewModelBase 
-    {
-        public bool Cancel { get; set; }
+    public bool Cancel { get; set; }
         
-        public DialogViewModelBase()
-        {
-            this.Cancel = true;
-        }
+    public DialogViewModelBase()
+    {
+        this.Cancel = true;
     }
 }

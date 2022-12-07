@@ -1,8 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using PurpleExplorer.Models;
-using Splat;
 
 namespace PurpleExplorer.Views;
 
