@@ -28,6 +28,11 @@ public class MainWindow : Window
         var grid = sender as DataGrid;
         var mainWindowViewModel = DataContext as MainWindowViewModel;
 
+        if (grid?.SelectedItem == null)
+        {
+            return;
+        }
+
         var viewModal = new MessageDetailsWindowViewModel
         {
             Message = grid.SelectedItem as Message, 

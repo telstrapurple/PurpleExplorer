@@ -24,19 +24,19 @@ public class ConnectionStringWindow : Window
     }
     public async void btnSendClick(object sender, RoutedEventArgs e)
     {
-        var dataContext = this.DataContext as ConnectionStringWindowViewModel;
+        var dataContext = DataContext as ConnectionStringWindowViewModel;
         if (string.IsNullOrEmpty(dataContext.ConnectionString))
             await MessageBoxHelper.ShowError("Please enter a service bus connection string.");
         else
         {
             dataContext.Cancel = false;
-            this.Close();
+            Close();
         }
     }
 
     public async void btnSaveConnectionString(object sender, RoutedEventArgs e)
     {
-        var dataContext = this.DataContext as ConnectionStringWindowViewModel;
+        var dataContext = DataContext as ConnectionStringWindowViewModel;
             
         if (dataContext.SavedConnectionStrings.FirstOrDefault(x => x.ConnectionString == dataContext.ConnectionString && x.UseManagedIdentity == dataContext.UseManagedIdentity) != null)
             await MessageBoxHelper.ShowMessage("Duplicate connection string", "This connection string is already saved.");
@@ -50,8 +50,8 @@ public class ConnectionStringWindow : Window
 
     private void lsbConnectionStringSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ListBox box = sender as ListBox;
-        var dataContext = this.DataContext as ConnectionStringWindowViewModel;
+        var box = sender as ListBox;
+        var dataContext = DataContext as ConnectionStringWindowViewModel;
         var serviceBusConnectionString = box.SelectedItem as Models.ServiceBusConnectionString;
         dataContext.ConnectionString = serviceBusConnectionString.ConnectionString;
         dataContext.UseManagedIdentity = serviceBusConnectionString.UseManagedIdentity;
@@ -59,7 +59,7 @@ public class ConnectionStringWindow : Window
 
     public void btnDeleteConnectionString(object sender, RoutedEventArgs e)
     {
-        var dataContext = this.DataContext as ConnectionStringWindowViewModel;
+        var dataContext = DataContext as ConnectionStringWindowViewModel;
         var listBox = this.FindControl<ListBox>("lsbSavedConnectionString");
         dataContext.SavedConnectionStrings.Remove(listBox.SelectedItem as Models.ServiceBusConnectionString);
     }
