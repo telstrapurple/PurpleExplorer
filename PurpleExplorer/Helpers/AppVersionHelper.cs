@@ -13,7 +13,7 @@ public static class AppVersionHelper
         httpClient.DefaultRequestHeaders.Add("User-Agent", "Application");
         var response =
             await httpClient.GetAsync(
-                "https://api.github.com/repos/telstrapurple/PurpleExplorer/releases/latest");
+                "https://api.github.com/repos/TrentonBlackburn/PurpleExplorer-TrentonEnhanced/releases/latest");
         var content = await response.Content.ReadAsStringAsync();
         var githubRelease = JsonConvert.DeserializeObject<GithubRelease>(content);
         return githubRelease;

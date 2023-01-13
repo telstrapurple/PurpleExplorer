@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DynamicData;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
+using Microsoft.Azure.ServiceBus.Management;
 using PurpleExplorer.Models;
 using Message = PurpleExplorer.Models.Message;
 using AzureMessage = Microsoft.Azure.ServiceBus.Message;
@@ -24,10 +26,20 @@ public class QueueHelper : BaseHelper, IQueueHelper
     {
         IList<ServiceBusQueue> queues = new List<ServiceBusQueue>();
         var client = GetManagementClient(connectionString);
-        var queuesInfo = await client.GetQueuesRuntimeInfoAsync(_appSettings.QueueListFetchCount);
+
+        var pageCount = 0;
+        IList<QueueRuntimeInfo?> totalQueueSet = new List<QueueRuntimeInfo?>();
+        IList<QueueRuntimeInfo?> queuePageSet;
+        do
+        {
+            queuePageSet =
+                await client.GetQueuesRuntimeInfoAsync(_appSettings.QueueListFetchCount, (pageCount++ * 100));
+            totalQueueSet.AddRange(queuePageSet);
+        } while (queuePageSet.Count == _appSettings.QueueListFetchCount);
+        
         await client.CloseAsync();   
             
-        await Task.WhenAll(queuesInfo.Select(async queue =>
+        await Task.WhenAll(totalQueueSet.Select(async queue =>
         {
             var queueName = queue.Path;
 

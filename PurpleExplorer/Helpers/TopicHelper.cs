@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DynamicData;
 using Message = PurpleExplorer.Models.Message;
 using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
@@ -23,21 +24,50 @@ public class TopicHelper : BaseHelper, ITopicHelper
 
     public async Task<IList<ServiceBusTopic>> GetTopicsAndSubscriptions(ServiceBusConnectionString connectionString)
     {
-        IList<ServiceBusTopic> topics = new List<ServiceBusTopic>();
-        var client = GetManagementClient(connectionString);
-        var busTopics = await client.GetTopicsAsync(_appSettings.TopicListFetchCount);
-        await client.CloseAsync();
-
-        await Task.WhenAll(busTopics.Select(async topic =>
+        try
         {
-            var newTopic = new ServiceBusTopic(topic);
+            IList<ServiceBusTopic> topics = new List<ServiceBusTopic>();
+            var client = GetManagementClient(connectionString);
+        
+            var pageCount = 0;
+            IList<TopicDescription?> totalTopicSet = new List<TopicDescription?>();
+            IList<TopicDescription?> topicPageSet;
+            do
+            {
+                topicPageSet = await client.GetTopicsAsync(_appSettings.TopicListFetchCount, (pageCount++ * 100));
+                totalTopicSet.AddRange(topicPageSet);
+            } while (topicPageSet.Count == _appSettings.TopicListFetchCount);
+        
+            await client.CloseAsync();
+            return totalTopicSet.Select(topic => new ServiceBusTopic(topic)).ToList();
 
-            var subscriptions = await GetSubscriptions(connectionString, newTopic.Name);
-            newTopic.AddSubscriptions(subscriptions.ToArray());
-            topics.Add(newTopic);
-        }));
+            // TODO: Maybe refactor this to load on click. Right now this would DDOS AzureServiceBus
+            /*
+            await Task.WhenAll(totalTopicSet.Select(async topic =>
+            {
+                var newTopic = new ServiceBusTopic(topic);
 
-        return topics;
+                try
+                {
+                    var subscriptions = await GetSubscriptions(connectionString, newTopic.Name);
+                    newTopic.AddSubscriptions(subscriptions.ToArray());
+                    topics.Add(newTopic);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Something went wrong. Error: {e.Message}");
+                }
+                
+                return topics;
+            }));
+            */
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Something went wrong. Error: {e.Message}");
+        }
+        
+        return new List<ServiceBusTopic>();
     }
 
     public async Task<ServiceBusTopic> GetTopic(ServiceBusConnectionString connectionString, string topicPath, bool retrieveSubscriptions)

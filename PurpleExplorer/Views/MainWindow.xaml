@@ -8,7 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="PurpleExplorer - cross-platform Azure Service Bus explorer">
+        Title="PurpleExplorer-TrentonEnhanced (Fork) - Cross-platform Azure Service Bus explorer">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
@@ -66,18 +66,18 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <TextBlock Foreground="White" Margin="0,3,10,0" TextAlignment="Right">
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="PurpleExplorer&#x0a;{0}">
+                        <MultiBinding StringFormat="PurpleExplorer-TrentonEnhanced (Fork)&#x0a;{0}">
                             <Binding Path="AppVersionText" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>   
-                <Button HorizontalAlignment="Right" Command="{Binding ShowSettings}"
-                        Classes="topButton">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock VerticalAlignment="Center">Settings</TextBlock>
-                        <i:Icon Value="fa-gear" />
-                    </StackPanel>
-                </Button>
+                <!-- <Button HorizontalAlignment="Right" Command="{Binding ShowSettings}" -->
+                <!--         Classes="topButton"> -->
+                <!--     <StackPanel Orientation="Horizontal"> -->
+                <!--         <TextBlock VerticalAlignment="Center">Settings</TextBlock> -->
+                <!--         <i:Icon Value="fa-gear" /> -->
+                <!--     </StackPanel> -->
+                <!-- </Button> -->
             </StackPanel>
         </DockPanel>
 
