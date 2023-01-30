@@ -14,8 +14,6 @@ namespace PurpleExplorer.Helpers;
 
 public class QueueHelper : BaseHelper, IQueueHelper
 {
-    private const int MaxQueueListFetchCountPerPage = 100;
-
     private readonly AppSettings _appSettings;
 
     public QueueHelper(AppSettings appSettings)
@@ -196,13 +194,13 @@ public class QueueHelper : BaseHelper, IQueueHelper
     private async Task<List<ServiceBusQueue>> GetQueues(ManagementClient client)
     {
         var queueInfos = new List<QueueRuntimeInfo>();
-        var numberOfPages = _appSettings.QueueListFetchCount / MaxQueueListFetchCountPerPage;
-        var remainder = _appSettings.QueueListFetchCount % (numberOfPages * MaxQueueListFetchCountPerPage);
+        var numberOfPages = _appSettings.QueueListFetchCount / MaxRequestItemsPerPage;
+        var remainder = _appSettings.QueueListFetchCount % (numberOfPages * MaxRequestItemsPerPage);
 
         for (int pageCount = 0; pageCount < numberOfPages; pageCount++)
         {
-            var numberToSkip = MaxQueueListFetchCountPerPage * pageCount;
-            var page = await client.GetQueuesRuntimeInfoAsync(MaxQueueListFetchCountPerPage, numberToSkip);
+            var numberToSkip = MaxRequestItemsPerPage * pageCount;
+            var page = await client.GetQueuesRuntimeInfoAsync(MaxRequestItemsPerPage, numberToSkip);
             if (page.Any())
             {
                 queueInfos.AddRange(page);
@@ -220,7 +218,7 @@ public class QueueHelper : BaseHelper, IQueueHelper
         if (remainder > 0)
         {
             var numberAlreadyFetched = numberOfPages > 0
-                ? MaxQueueListFetchCountPerPage * numberOfPages
+                ? MaxRequestItemsPerPage * numberOfPages
                 : 0;
             var remainingItems = await client.GetQueuesRuntimeInfoAsync(
                 remainder,

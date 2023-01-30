@@ -9,6 +9,8 @@ namespace PurpleExplorer.Helpers;
 
 public abstract class BaseHelper
 {
+    protected const int MaxRequestItemsPerPage = 100;
+
     protected ManagementClient GetManagementClient(ServiceBusConnectionString connectionString)
     {
         if (connectionString.UseManagedIdentity)

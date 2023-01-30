@@ -15,7 +15,6 @@ namespace PurpleExplorer.Helpers;
 
 public class TopicHelper : BaseHelper, ITopicHelper
 {
-    private const int MaxTopicListFetchCountPerPage = 100;
     private readonly AppSettings _appSettings;
 
     public TopicHelper(AppSettings appSettings)
@@ -42,13 +41,13 @@ public class TopicHelper : BaseHelper, ITopicHelper
     private async Task<List<ServiceBusTopic>> GetTopicsWithSubscriptions(ManagementClient client)
     {
         var topicDescriptions = new List<TopicDescription>();
-        var numberOfPages = _appSettings.TopicListFetchCount / MaxTopicListFetchCountPerPage;
-        var remainder = _appSettings.TopicListFetchCount % (numberOfPages * MaxTopicListFetchCountPerPage);
+        var numberOfPages = _appSettings.TopicListFetchCount / MaxRequestItemsPerPage;
+        var remainder = _appSettings.TopicListFetchCount % (numberOfPages * MaxRequestItemsPerPage);
 
         for (int pageCount = 0; pageCount < numberOfPages; pageCount++)
         {
-            var numberToSkip = MaxTopicListFetchCountPerPage * pageCount;
-            var page = await client.GetTopicsAsync(MaxTopicListFetchCountPerPage, numberToSkip);
+            var numberToSkip = MaxRequestItemsPerPage * pageCount;
+            var page = await client.GetTopicsAsync(MaxRequestItemsPerPage, numberToSkip);
             if (page.Any())
             {
                 topicDescriptions.AddRange(page);
@@ -63,7 +62,7 @@ public class TopicHelper : BaseHelper, ITopicHelper
         if (remainder > 0)
         {
             var numberAlreadyFetched = numberOfPages > 0
-                ? MaxTopicListFetchCountPerPage * numberOfPages
+                ? MaxRequestItemsPerPage * numberOfPages
                 : 0;
             var remainingItems = await client.GetTopicsAsync(
                 remainder,
