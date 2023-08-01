@@ -43,6 +43,7 @@ public class ConnectionStringWindow : Window
         else
             dataContext.SavedConnectionStrings.Add(new Models.ServiceBusConnectionString
             {
+                Name = dataContext.Name,
                 ConnectionString = dataContext.ConnectionString,
                 UseManagedIdentity = dataContext.UseManagedIdentity
             });
@@ -50,17 +51,18 @@ public class ConnectionStringWindow : Window
 
     private void lsbConnectionStringSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var box = sender as ListBox;
+        var dataGrid = sender as DataGrid;
         var dataContext = DataContext as ConnectionStringWindowViewModel;
-        var serviceBusConnectionString = box.SelectedItem as Models.ServiceBusConnectionString;
-        dataContext.ConnectionString = serviceBusConnectionString.ConnectionString;
-        dataContext.UseManagedIdentity = serviceBusConnectionString.UseManagedIdentity;
+        var item = dataGrid.SelectedItem as Models.ServiceBusConnectionString;
+        dataContext.Name = item.Name;
+        dataContext.ConnectionString = item.ConnectionString;
+        dataContext.UseManagedIdentity = item.UseManagedIdentity;
     }
 
     public void btnDeleteConnectionString(object sender, RoutedEventArgs e)
     {
         var dataContext = DataContext as ConnectionStringWindowViewModel;
-        var listBox = this.FindControl<ListBox>("lsbSavedConnectionString");
-        dataContext.SavedConnectionStrings.Remove(listBox.SelectedItem as Models.ServiceBusConnectionString);
+        var dataGrid = this.FindControl<DataGrid>("lsbSavedConnectionString");
+        dataContext.SavedConnectionStrings.Remove(dataGrid.SelectedItem as Models.ServiceBusConnectionString);
     }
 }

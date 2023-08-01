@@ -15,15 +15,20 @@
         <vm:ConnectionStringWindowViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
-        <Label Grid.Row="0" Margin="5, 5, 0, 0" VerticalAlignment="Bottom">Connection String:</Label>
-        <TextBox Grid.Row="1" Height="30" Width="600" TextWrapping="Wrap" HorizontalAlignment="Left"
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+        <Label Grid.Row="0" Margin="5, 5, 0, 0" VerticalAlignment="Bottom">Name:</Label>
+        <TextBox Grid.Row="1" Width="200" HorizontalAlignment="Left"
+                 Margin="5, 0, 0, 0"
+                 VerticalAlignment="Top" Text="{CompiledBinding Path=Name, Mode=TwoWay}" />
+
+        <Label Grid.Row="2" Margin="5, 5, 0, 0" VerticalAlignment="Bottom">Connection String:</Label>
+        <TextBox Grid.Row="3" Height="30" Width="600" TextWrapping="Wrap" HorizontalAlignment="Left"
                  Margin="5, 0, 0, 0"
                  VerticalAlignment="Top" Text="{CompiledBinding Path=ConnectionString, Mode=TwoWay}" />
 
-        <CheckBox Grid.Row="2" Margin="5, 3, 0, 0" VerticalAlignment="Top" IsChecked="{CompiledBinding UseManagedIdentity}">Use Managed Identity</CheckBox>
+        <CheckBox Grid.Row="4" Margin="5, 3, 0, 0" VerticalAlignment="Top" IsChecked="{CompiledBinding UseManagedIdentity}">Use Managed Identity</CheckBox>
 
-        <DockPanel Grid.Row="3" Dock="Left" Margin="5, 0, 5, 0">
+        <DockPanel Grid.Row="5" Dock="Left" Margin="5, 0, 5, 0">
             <Button Width="200" Height="30" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Top"
                     IsEnabled="{CompiledBinding ConnectionString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     Click="btnSaveConnectionString">
@@ -44,21 +49,17 @@
             </StackPanel>
         </DockPanel>
 
-        <ListBox Grid.Row="4" Name="lsbSavedConnectionString" Margin="5,0,5,0"
-                 Items="{Binding Path=SavedConnectionStrings, Mode=TwoWay}"
-                 Width="600" Height="300" VerticalAlignment="Top"
-                 SelectionChanged="lsbConnectionStringSelectionChanged" HorizontalAlignment="Left">
-
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding ConnectionString}" />
-                        <TextBlock Text="[Managed Identity]" IsVisible="{Binding UseManagedIdentity}" Margin="5,0,0,0" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <Button Grid.Row="5" Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left"
+        <DataGrid Grid.Row="6" Name="lsbSavedConnectionString" Margin="5, 0, 5, 0"
+                  Items="{Binding Path=SavedConnectionStrings, Mode=TwoWay}"
+                  Height="300"
+                  SelectionChanged="lsbConnectionStringSelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                <DataGridCheckBoxColumn Header="MI" Binding="{Binding UseManagedIdentity}"/>
+                <DataGridTextColumn Header="Connection String" Binding="{Binding ConnectionString}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Grid.Row="7" Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left"
                 IsEnabled="{Binding #lsbSavedConnectionString.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                 VerticalAlignment="Top"
                 Click="btnDeleteConnectionString">
