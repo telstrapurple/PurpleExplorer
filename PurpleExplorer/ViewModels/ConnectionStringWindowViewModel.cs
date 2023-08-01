@@ -7,10 +7,18 @@ namespace PurpleExplorer.ViewModels;
 
 public class ConnectionStringWindowViewModel : DialogViewModelBase
 {
+    private string _name;
     private string _connectionString;
     private bool _useManagedIdentity;
     private readonly IAppState _appState;
     public ObservableCollection<ServiceBusConnectionString> SavedConnectionStrings { get; set; }
+
+    public string Name
+    {
+        get => _name;
+        set => this.RaiseAndSetIfChanged(ref _name, value);
+    }
+
     public string ConnectionString
     {
         get => _connectionString;
