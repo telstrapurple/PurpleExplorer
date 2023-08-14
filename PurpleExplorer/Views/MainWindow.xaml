@@ -82,7 +82,8 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="1" Dock="Left">
-            <TabControl Width="300">
+            <Grid ColumnDefinitions="300, 5, *">
+            <TabControl Grid.Column="0">
                 <TabItem Header="{Binding TopicTabHeader}">
                     <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Name="tvTopics">
                         <TreeView.DataTemplates>
@@ -155,7 +156,9 @@
                 </TabItem>
             </TabControl>
 
-            <TabControl>
+            <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" VerticalAlignment="Stretch" Width="4" />
+
+            <TabControl Grid.Column="2">
                 <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
                     <DataGrid Items="{Binding Messages}" Tapped="MessagesGrid_Tapped"
                               DoubleTapped="MessagesGrid_DoubleTapped"
@@ -187,6 +190,7 @@
                         </DataGrid>
                     </TabItem>
                 </TabControl>
+            </Grid>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">
