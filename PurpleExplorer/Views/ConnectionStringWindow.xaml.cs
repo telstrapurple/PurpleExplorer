@@ -1,10 +1,10 @@
-﻿using Avalonia.Controls;
+﻿using System.Linq;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.ViewModels;
-using System.Linq;
-using Avalonia;
 
 namespace PurpleExplorer.Views;
 
@@ -37,7 +37,7 @@ public class ConnectionStringWindow : Window
     public async void btnSaveConnectionString(object sender, RoutedEventArgs e)
     {
         var dataContext = DataContext as ConnectionStringWindowViewModel;
-            
+
         if (dataContext.SavedConnectionStrings.FirstOrDefault(x => x.ConnectionString == dataContext.ConnectionString && x.UseManagedIdentity == dataContext.UseManagedIdentity) != null)
             await MessageBoxHelper.ShowMessage("Duplicate connection string", "This connection string is already saved.");
         else
@@ -50,11 +50,13 @@ public class ConnectionStringWindow : Window
 
     private void lsbConnectionStringSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var box = sender as ListBox;
-        var dataContext = DataContext as ConnectionStringWindowViewModel;
-        var serviceBusConnectionString = box.SelectedItem as Models.ServiceBusConnectionString;
-        dataContext.ConnectionString = serviceBusConnectionString.ConnectionString;
-        dataContext.UseManagedIdentity = serviceBusConnectionString.UseManagedIdentity;
+        // sender can be button when we arrive here from the remove button
+        if (sender is ListBox box && box.SelectedItem is Models.ServiceBusConnectionString serviceBusConnectionString)
+        {
+            var dataContext = DataContext as ConnectionStringWindowViewModel;
+            dataContext.ConnectionString = serviceBusConnectionString.ConnectionString;
+            dataContext.UseManagedIdentity = serviceBusConnectionString.UseManagedIdentity;
+        }
     }
 
     public void btnDeleteConnectionString(object sender, RoutedEventArgs e)
