@@ -50,7 +50,7 @@ public class ConnectionStringWindow : Window
 
     private void lsbConnectionStringSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // sender can be button when we arrive here from the remove button
+        // sender can be Button when we arrive here from the remove button
         if (sender is ListBox box && box.SelectedItem is Models.ServiceBusConnectionString serviceBusConnectionString)
         {
             var dataContext = DataContext as ConnectionStringWindowViewModel;
