@@ -5,7 +5,7 @@
         xmlns:models="clr-namespace:PurpleExplorer.Models"
         mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.AppSettingsWindow"
-        Width="520" Height="250"
+        Width="520" Height="180"
         Title="Settings"
         WindowStartupLocation="CenterOwner">
     
