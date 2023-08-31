@@ -63,4 +63,9 @@ public class ConnectionStringWindow : Window
         var listBox = this.FindControl<ListBox>("lsbSavedConnectionString");
         dataContext.SavedConnectionStrings.Remove(listBox.SelectedItem as Models.ServiceBusConnectionString);
     }
+    
+    public void OnCancel(object? sender, RoutedEventArgs args)
+    {
+        this.Close();
+    }
 }
