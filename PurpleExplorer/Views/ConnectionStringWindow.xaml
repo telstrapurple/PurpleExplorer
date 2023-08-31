@@ -61,11 +61,13 @@
         <Button Grid.Row="5" Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left"
                 IsEnabled="{Binding #lsbSavedConnectionString.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                 VerticalAlignment="Top"
+                HotKey="Escape"
                 Click="btnDeleteConnectionString">
             <StackPanel Orientation="Horizontal" Spacing="5">
                 <i:Icon Value="fa-minus" />
                 <TextBlock VerticalAlignment="Center">Remove</TextBlock>
             </StackPanel>
         </Button>
+        <Button Grid.Row="8" Grid.Column="2" Content="Cancel TODO:OF:Move me See https://stackoverflow.com/a/76925008/521554" Click="OnCancel" IsCancel="True"/>
     </Grid>
 </Window>
