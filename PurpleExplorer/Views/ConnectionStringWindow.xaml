@@ -59,16 +59,24 @@
                 <DataGridTextColumn Header="Connection String" Binding="{Binding ConnectionString}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Grid.Row="7" Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left"
-                IsEnabled="{Binding #lsbSavedConnectionString.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                VerticalAlignment="Top"
-                HotKey="Escape"
-                Click="btnDeleteConnectionString">
-            <StackPanel Orientation="Horizontal" Spacing="5">
-                <i:Icon Value="fa-minus" />
-                <TextBlock VerticalAlignment="Center">Remove</TextBlock>
+        
+        <DockPanel Grid.Row="7">
+            <Button Width="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Left"
+                        IsEnabled="{Binding #lsbSavedConnectionString.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        VerticalAlignment="Top"
+                        Click="btnDeleteConnectionString">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <i:Icon Value="fa-minus" />
+                    <TextBlock VerticalAlignment="Center">Remove</TextBlock>
+                </StackPanel>
+            </Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Click="OnCancel" IsCancel="True"
+                        Width="200"
+                        Content="Close" 
+                        HotKey="Escape">
+                </Button>
             </StackPanel>
-        </Button>
-        <Button Grid.Row="8" Grid.Column="2" Content="Cancel TODO:OF:Move me See https://stackoverflow.com/a/76925008/521554" Click="OnCancel" IsCancel="True"/>
+        </DockPanel>
     </Grid>
 </Window>
