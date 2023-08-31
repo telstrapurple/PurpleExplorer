@@ -66,7 +66,7 @@ public class ConnectionStringWindow : Window
         dataContext.SavedConnectionStrings.Remove(dataGrid.SelectedItem as Models.ServiceBusConnectionString);
     }
     
-    public void OnCancel(object? sender, RoutedEventArgs args)
+    public void OnClose(object? sender, RoutedEventArgs args)
     {
         this.Close();
     }
