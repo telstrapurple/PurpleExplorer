@@ -5,8 +5,8 @@
         xmlns:models="clr-namespace:PurpleExplorer.Models"
         mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="450"
         x:Class="PurpleExplorer.Views.AppSettingsWindow"
-        Width="520" Height="250"
-        Title="AppSettingsWindow"
+        Width="520" Height="180"
+        Title="Settings"
         WindowStartupLocation="CenterOwner">
     
         <Design.DataContext>
@@ -27,7 +27,7 @@
                 </Style>
         </Window.Styles>
         
-        <Grid ColumnDefinitions="250,*" RowDefinitions="Auto,Auto,Auto,Auto"  Margin="4" VerticalAlignment="Top">
+        <Grid ColumnDefinitions="250,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"  Margin="4" VerticalAlignment="Top">
                 <TextBlock Text="How many queues to fetch from namespace" Grid.Row="0" Grid.Column="0" Classes="left"/>
                 <NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding AppSettings.QueueListFetchCount}" Classes="right" />
                 
@@ -39,5 +39,13 @@
                 
                 <TextBlock Text="How many messages to fetch from topic" Grid.Row="3" Grid.Column="0" Classes="left"/>
                 <NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding AppSettings.TopicMessageFetchCount}" Classes="right" />
+                
+                <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                        Click="OnClose" IsCancel="True"
+                        HorizontalAlignment="Right"
+                        Width="200"
+                        Content="Close" 
+                        HotKey="Escape">
+                </Button>
         </Grid>
 </Window>

@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace PurpleExplorer.Views;
@@ -17,5 +18,10 @@ public partial class AppSettingsWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+    
+    public void OnClose(object? sender, RoutedEventArgs args)
+    {
+        this.Close();
     }
 }

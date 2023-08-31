@@ -75,6 +75,7 @@
                     </TextBlock.Text>
                 </TextBlock>   
                 <Button HorizontalAlignment="Right" Command="{Binding ShowSettings}"
+                        HotKey="Meta+,"
                         Classes="topButton">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center">Settings</TextBlock>
