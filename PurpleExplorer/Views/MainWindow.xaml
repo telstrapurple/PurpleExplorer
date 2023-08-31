@@ -22,10 +22,13 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0" Grid.Row="0" Dock="Left" Background="#380f14">
             <Button HorizontalAlignment="Left" Command="{Binding ConnectionBtnPopupCommand}"
+                    HotKey="Meta+O"
                     Classes="topButton">
                 <StackPanel Orientation="Horizontal">
                     <i:Icon Value="fa-plug" />
-                    <TextBlock VerticalAlignment="Center">Connect</TextBlock>
+                    <TextBlock VerticalAlignment="Center">C</TextBlock>
+                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" FontStyle="Italic">o</TextBlock>
+                    <TextBlock VerticalAlignment="Center">nnect</TextBlock>
                 </StackPanel>
             </Button>
             <Button Name="RefreshButton" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
