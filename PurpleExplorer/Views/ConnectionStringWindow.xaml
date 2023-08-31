@@ -71,7 +71,7 @@
                 </StackPanel>
             </Button>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Click="OnCancel" IsCancel="True"
+                <Button Click="OnClose" IsCancel="True"
                         Width="200"
                         Content="Close" 
                         HotKey="Escape">
