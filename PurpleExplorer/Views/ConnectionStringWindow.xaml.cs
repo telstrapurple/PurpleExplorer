@@ -5,6 +5,7 @@ using PurpleExplorer.Helpers;
 using PurpleExplorer.ViewModels;
 using System.Linq;
 using Avalonia;
+using Avalonia.Input;
 
 namespace PurpleExplorer.Views;
 
@@ -21,7 +22,9 @@ public class ConnectionStringWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+        SetFocus(this.FindControl<TextBox>("Name"));
     }
+    
     public async void btnSendClick(object sender, RoutedEventArgs e)
     {
         var dataContext = DataContext as ConnectionStringWindowViewModel;
@@ -69,5 +72,16 @@ public class ConnectionStringWindow : Window
     public void OnClose(object? sender, RoutedEventArgs args)
     {
         this.Close();
+    }
+    
+    /// <summary>This method sets the focus to the control at start time.
+    /// I would prefer to do it only in xaml,
+    /// like in this issue: <see cref="https://github.com/AvaloniaUI/Avalonia/issues/4835#issuecomment-707590940"/>
+    /// but I cannot get the code to work. Possibly because the present version of Avalonia is 11 but I am working a 0.10.
+    /// </summary>
+    /// <param name="ctrl"></param>
+    private static void SetFocus(IInputElement ctrl)
+    {
+        ctrl.AttachedToVisualTree += (_,_) => ctrl.Focus();
     }
 }
