@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -5,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
+using Splat;
 
 namespace PurpleExplorer.Views;
 
@@ -21,6 +23,13 @@ public class MainWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    public override async void Show()
+    {
+        base.Show();
+        var appState = Locator.Current.GetService<IAppState>() as AppState ?? throw new Exception("Unknown AppState");
+        await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow>(appState);
     }
 
     private async void MessagesGrid_DoubleTapped(object sender, RoutedEventArgs e)
