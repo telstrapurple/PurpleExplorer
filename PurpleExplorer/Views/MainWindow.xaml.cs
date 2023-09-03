@@ -24,12 +24,12 @@ public class MainWindow : Window
     {
         AvaloniaXamlLoader.Load(this);
     }
-
-    public override async void Show()
+    
+    protected override async void OnOpened(EventArgs e)
     {
-        base.Show();
         var appState = Locator.Current.GetService<IAppState>() as AppState ?? throw new Exception("Unknown AppState");
         await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow>(appState);
+        base.OnOpened(e);
     }
 
     private async void MessagesGrid_DoubleTapped(object sender, RoutedEventArgs e)
