@@ -84,7 +84,7 @@
         <DockPanel Grid.Column="0" Grid.Row="1" Dock="Left">
             <TabControl Width="300">
                 <TabItem Header="{Binding TopicTabHeader}">
-                    <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Name="tvTopics">
+                    <TreeView SelectionChanged="TreeView_SelectionChanged" ItemsSource="{Binding ConnectedServiceBuses}" Name="tvTopics">
                         <TreeView.DataTemplates>
                             <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Topics}">
                                 <StackPanel Orientation="Horizontal">
@@ -122,7 +122,7 @@
                     </TreeView>
                 </TabItem>
                 <TabItem Header="{Binding QueueTabHeader}">
-                    <TreeView SelectionChanged="TreeView_SelectionChanged" Items="{Binding ConnectedServiceBuses}" Name="tvQueues">
+                    <TreeView SelectionChanged="TreeView_SelectionChanged" ItemsSource="{Binding ConnectedServiceBuses}" Name="tvQueues">
                         <TreeView.DataTemplates>
                             <TreeDataTemplate DataType="models:ServiceBusResource" ItemsSource="{Binding Queues}">
                                 <StackPanel Orientation="Horizontal">
@@ -157,7 +157,7 @@
 
             <TabControl>
                 <TabItem Header="{Binding MessagesTabHeader}" VerticalContentAlignment="Center">
-                    <DataGrid Items="{Binding Messages}" Tapped="MessagesGrid_Tapped"
+                    <DataGrid ItemsSource="{Binding Messages}" Tapped="MessagesGrid_Tapped"
                               DoubleTapped="MessagesGrid_DoubleTapped"
                               IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                             <DataGrid.Columns>
@@ -172,7 +172,7 @@
                         </DataGrid>
                     </TabItem>
                     <TabItem Header="{Binding DlqTabHeader}" VerticalContentAlignment="Center">
-                        <DataGrid Items="{Binding DlqMessages}" Tapped="MessagesGrid_Tapped"
+                        <DataGrid ItemsSource="{Binding DlqMessages}" Tapped="MessagesGrid_Tapped"
                               DoubleTapped="MessagesGrid_DoubleTapped" IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Sequence Number" Binding="{Binding SequenceNumber}" />

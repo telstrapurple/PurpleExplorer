@@ -8,7 +8,7 @@ using PurpleExplorer.Models;
 using PurpleExplorer.Views;
 using ReactiveUI;
 using System.Threading.Tasks;
-using MessageBox.Avalonia.Enums;
+using MsBox.Avalonia.Enums;
 using Microsoft.Azure.ServiceBus;
 using PurpleExplorer.Services;
 using Splat;
