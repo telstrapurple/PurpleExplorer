@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Avalonia.Controls;
-using MessageBox.Avalonia.Enums;
+using MsBox.Avalonia.Enums;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.Services;

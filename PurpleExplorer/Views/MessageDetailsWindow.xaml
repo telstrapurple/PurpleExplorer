@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="780" d:DesignHeight="630"
         x:Class="PurpleExplorer.Views.MessageDetailsWindow"
         xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
@@ -46,7 +47,7 @@
                         Command="{Binding DeleteMessage}"
                         CommandParameter="{Binding $parent[Window]}">
                     <StackPanel Orientation="Horizontal">
-                        <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
+                        <i:Icon Value="fa-trash" />
                         <TextBlock VerticalAlignment="Center">Delete message</TextBlock>
                     </StackPanel>
                 </Button>
@@ -54,7 +55,7 @@
                         IsVisible="{Binding !Message.IsDlq}"
                         Classes="topButton">
                     <StackPanel Orientation="Horizontal">
-                        <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
+                        <i:Icon Value="fa-envelope" />
                         <TextBlock VerticalAlignment="Center">Send to dead-letter</TextBlock>
                     </StackPanel>
                 </Button>
@@ -62,7 +63,7 @@
                         IsVisible="{Binding !!Message.IsDlq}"
                         Classes="topButton">
                     <StackPanel Orientation="Horizontal">
-                        <DrawingPresenter Drawing="{DynamicResource Material.EmailSend}" />
+                        <i:Icon Value="fa-envelope" />
                         <TextBlock VerticalAlignment="Center">Resubmit back to topic</TextBlock>
                     </StackPanel>
                 </Button>

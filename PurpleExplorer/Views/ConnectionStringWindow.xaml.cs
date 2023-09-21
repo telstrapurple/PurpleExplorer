@@ -80,7 +80,7 @@ public class ConnectionStringWindow : Window
     /// but I cannot get the code to work. Possibly because the present version of Avalonia is 11 but I am working a 0.10.
     /// </summary>
     /// <param name="ctrl"></param>
-    private static void SetFocus(IInputElement ctrl)
+    private static void SetFocus(InputElement ctrl)
     {
         ctrl.AttachedToVisualTree += (_,_) => ctrl.Focus();
     }

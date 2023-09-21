@@ -51,7 +51,7 @@
         </DockPanel>
 
         <DataGrid Grid.Row="6" Name="lsbSavedConnectionString" Margin="5, 0, 5, 0"
-                  Items="{Binding Path=SavedConnectionStrings, Mode=TwoWay}"
+                  ItemsSource="{Binding Path=SavedConnectionStrings, Mode=TwoWay}"
                   Height="300"
                   SelectionChanged="lsbConnectionStringSelectionChanged">
             <DataGrid.Columns>
