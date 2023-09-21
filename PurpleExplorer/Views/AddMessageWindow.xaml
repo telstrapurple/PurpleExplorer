@@ -47,7 +47,7 @@
                      TextWrapping="Wrap" Text="{Binding Path=Title, Mode=TwoWay}" Watermark="Save message with title:" />
         </StackPanel>
         
-        <DataGrid Grid.Row="2" Name="dgSavedMessages" Items="{Binding Path=SavedMessages, Mode=TwoWay}"
+        <DataGrid Grid.Row="2" Name="dgSavedMessages" ItemsSource="{Binding Path=SavedMessages, Mode=TwoWay}"
                   SelectionChanged="messageSelectionChanged"
                   IsReadOnly="True">
             <DataGrid.Columns>
