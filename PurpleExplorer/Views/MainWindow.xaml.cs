@@ -28,7 +28,8 @@ public class MainWindow : Window
     protected override async void OnOpened(EventArgs e)
     {
         var appState = Locator.Current.GetService<IAppState>() as AppState ?? throw new Exception("Unknown AppState");
-        await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow>(appState);
+        var viewModel = new ConnectionStringWindowViewModel(appState);
+        await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow>(viewModel);
         base.OnOpened(e);
     }
 

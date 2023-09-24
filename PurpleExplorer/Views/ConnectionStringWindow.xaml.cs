@@ -75,9 +75,17 @@ public class ConnectionStringWindow : Window
     }
     
     /// <summary>This method sets the focus to the control at start time.
-    /// I would prefer to do it only in xaml,
+    /// I would prefer to do it *in xaml*,
     /// like in this issue: <see cref="https://github.com/AvaloniaUI/Avalonia/issues/4835#issuecomment-707590940"/>
-    /// but I cannot get the code to work. Possibly because the present version of Avalonia is 11 but I am working a 0.10.
+    /// but I cannot get the code to work.
+    /// I added
+    /// "Avalonia.Xaml.Behaviors" Version="11.0.2" 
+    /// "Avalonia.Xaml.Interactions" Version="11.0.2" 
+    /// "Avalonia.Xaml.Interactions.Responsive" Version="11.0.2" 
+    /// "Avalonia.Xaml.Interactivity" Version="11.0.2"
+    /// and updated the xaml as the link says; but to no avail.
+    ///
+    /// I keep this information here for future me, or someone else, to stumble over and implement.
     /// </summary>
     /// <param name="ctrl"></param>
     private static void SetFocus(InputElement ctrl)
