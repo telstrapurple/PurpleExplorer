@@ -25,7 +25,7 @@ public class ConnectionStringWindow : Window
         SetFocus(this.FindControl<TextBox>("Name"));
     }
     
-    public async void btnSendClick(object sender, RoutedEventArgs e)
+    public async void btnConnectClick(object sender, RoutedEventArgs e)
     {
         var dataContext = DataContext as ConnectionStringWindowViewModel;
         if (string.IsNullOrEmpty(dataContext.ConnectionString))
