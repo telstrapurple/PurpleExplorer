@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using PurpleExplorer.Helpers;
@@ -22,19 +23,23 @@ public class ConnectionStringWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-        SetFocus(this.FindControl<TextBox>("Name"));
+        var ctrl = this.FindControl<TextBox>("Name")
+            ?? throw new Exception("Control not found.");
+        SetFocus(ctrl);
     }
     
     public async void btnConnectClick(object sender, RoutedEventArgs e)
     {
-        var dataContext = DataContext as ConnectionStringWindowViewModel;
+        var dataContext = DataContext as ConnectionStringWindowViewModel
+            ?? throw new NullReferenceException("DataContext must not be null.");
         if (string.IsNullOrEmpty(dataContext.ConnectionString))
-            await MessageBoxHelper.ShowError("Please enter a service bus connection string.");
-        else
         {
-            dataContext.Cancel = false;
-            Close();
+            await MessageBoxHelper.ShowError("Please enter a service bus connection string.");
+            return;
         }
+
+        dataContext.Cancel = false;
+        Close();
     }
 
     public async void btnSaveConnectionString(object sender, RoutedEventArgs e)
@@ -71,7 +76,7 @@ public class ConnectionStringWindow : Window
     
     public void OnClose(object? sender, RoutedEventArgs args)
     {
-        this.Close();
+        Close();
     }
     
     /// <summary>This method sets the focus to the control at start time.
