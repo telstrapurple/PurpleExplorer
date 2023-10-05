@@ -159,6 +159,11 @@ public class MainWindowViewModel : ViewModelBase
 
     public async void ConnectionBtnPopupCommand()
     {
+        ShowConnectionStringWindow();
+    }
+
+    internal async void ShowConnectionStringWindow()
+    {
         var viewModel = new ConnectionStringWindowViewModel();
 
         var returnedViewModel =
