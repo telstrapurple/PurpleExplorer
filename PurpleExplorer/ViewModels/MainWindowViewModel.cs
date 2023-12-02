@@ -30,7 +30,6 @@ public class MainWindowViewModel : ViewModelBase
     private ServiceBusQueue _currentQueue;
     private Message _currentMessage;
     private IObservable<bool> _queueLevelActionEnabled;
-    private MessageCollection _currentMessageCollection;
     private IAppState _appState;
         
     public ObservableCollection<Message> Messages { get; }
