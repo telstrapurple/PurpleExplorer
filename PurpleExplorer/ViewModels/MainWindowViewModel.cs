@@ -99,6 +99,7 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public ILoggingService LoggingService => _loggingService;
+
     public Version AppVersion => Assembly.GetExecutingAssembly().GetName().Version;
     public string AppVersionText { get; set; }
 
@@ -134,26 +135,6 @@ public class MainWindowViewModel : ViewModelBase
 #pragma warning disable 4014
         CheckForNewVersion();
 #pragma warning restore 4014
-    }
-
-    private async Task CheckForNewVersion()
-    {
-        var latestRelease = await AppVersionHelper.GetLatestRelease();
-        var latestReleaseVersion = new Version(latestRelease.Name);
-        if (latestReleaseVersion > AppVersion)
-        {
-            AppVersionText = $"new v{latestReleaseVersion} is available";
-            this.RaisePropertyChanged(nameof(AppVersionText));
-
-            var message =
-                $"New version v{latestReleaseVersion} is available. \n Download today at {latestRelease.HtmlUrl}";
-            LoggingService.Log(message);
-            await MessageBoxHelper.ShowMessage("New version available", message);
-        }
-        else
-        {
-            LoggingService.Log($"v{AppVersion} is the latest released version");
-        }
     }
 
     public async void ConnectionBtnPopupCommand()
@@ -524,5 +505,25 @@ public class MainWindowViewModel : ViewModelBase
         Messages.Clear();
         DlqMessages.Clear();
         RefreshTabHeaders();
+    }
+    
+    private async Task CheckForNewVersion()
+    {
+        var latestRelease = await AppVersionHelper.GetLatestRelease();
+        var latestReleaseVersion = new Version(latestRelease.Name);
+        if (latestReleaseVersion > AppVersion)
+        {
+            AppVersionText = $"new v{latestReleaseVersion} is available";
+            this.RaisePropertyChanged(nameof(AppVersionText));
+
+            var message =
+                $"New version v{latestReleaseVersion} is available. \n Download today at {latestRelease.HtmlUrl}";
+            LoggingService.Log(message);
+            await MessageBoxHelper.ShowMessage("New version available", message);
+        }
+        else
+        {
+            LoggingService.Log($"v{AppVersion} is the latest released version");
+        }
     }
 }
