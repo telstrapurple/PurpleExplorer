@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using MsBox.Avalonia.Enums;
 using Microsoft.Azure.ServiceBus;
 using PurpleExplorer.Services;
-using Splat;
 using Message = PurpleExplorer.Models.Message;
 
 namespace PurpleExplorer.ViewModels;
@@ -109,12 +108,13 @@ public class MainWindowViewModel : ViewModelBase
         get => _queueLevelActionEnabled;
         set => this.RaiseAndSetIfChanged(ref _queueLevelActionEnabled, value);
     }
-    public MainWindowViewModel()
+
+    public MainWindowViewModel(ILoggingService loggingService, ITopicHelper topicHelper, IQueueHelper queueHelper, IAppState appState)
     {
-        _loggingService = Locator.Current.GetService<ILoggingService>();
-        _topicHelper = Locator.Current.GetService<ITopicHelper>();
-        _queueHelper = Locator.Current.GetService<IQueueHelper>();
-        _appState = Locator.Current.GetService<IAppState>();
+        _loggingService = loggingService ?? throw new ArgumentNullException(nameof(loggingService));
+        _topicHelper = topicHelper ?? throw new ArgumentNullException(nameof(topicHelper));
+        _queueHelper = queueHelper ?? throw new ArgumentNullException(nameof(queueHelper));
+        _appState = appState ?? throw new ArgumentNullException(nameof(appState));
 
         Messages = new ObservableCollection<Message>();
         DlqMessages = new ObservableCollection<Message>();

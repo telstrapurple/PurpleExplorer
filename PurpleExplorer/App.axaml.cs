@@ -38,7 +38,15 @@ public class App : Application
         Locator.CurrentMutable.Register(() => new TopicHelper(state.AppSettings), typeof(ITopicHelper));
         Locator.CurrentMutable.Register(() => new QueueHelper(state.AppSettings), typeof(IQueueHelper));
 
-        new MainWindow { DataContext = new MainWindowViewModel() }.Show();
+        new MainWindow
+        {
+            DataContext = new MainWindowViewModel(
+                Locator.Current.GetService<ILoggingService>()!,
+                Locator.Current.GetService<ITopicHelper>()!,
+                Locator.Current.GetService<IQueueHelper>()!,
+                Locator.Current.GetService<IAppState>()!
+            )
+        }.Show();
         base.OnFrameworkInitializationCompleted();
     }
 }
