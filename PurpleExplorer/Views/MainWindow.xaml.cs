@@ -6,14 +6,19 @@ using Avalonia.Markup.Xaml;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
 using PurpleExplorer.ViewModels;
-using Splat;
 
 namespace PurpleExplorer.Views;
 
 public class MainWindow : Window
 {
-    public MainWindow()
+    private readonly IApplicationService _applicationService;
+    private readonly IModalWindowService _modalWindowService;
+
+    public MainWindow(IApplicationService applicationService, IModalWindowService modalWindowService)
     {
+        _applicationService = applicationService;
+        _modalWindowService = modalWindowService;
+
         InitializeComponent();
 #if DEBUG
         this.AttachDevTools();
@@ -52,7 +57,7 @@ public class MainWindow : Window
             Queue = mainWindowViewModel.CurrentQueue
         };
 
-        await ModalWindowHelper.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal);
+        await _modalWindowService.ShowModalWindow<MessageDetailsWindow, MessageDetailsWindowViewModel>(viewModal);
     }
 
     private void MessagesGrid_Tapped(object sender, TappedEventArgs e)

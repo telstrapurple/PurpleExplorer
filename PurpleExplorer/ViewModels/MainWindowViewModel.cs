@@ -31,7 +31,9 @@ public class MainWindowViewModel : ViewModelBase
     private Message _currentMessage;
     private IObservable<bool> _queueLevelActionEnabled;
     private IAppState _appState;
-        
+    private readonly IApplicationService _applicationService;
+    private readonly IModalWindowService _modalWindowService;
+
     public ObservableCollection<Message> Messages { get; }
     public ObservableCollection<Message> DlqMessages { get; }
     public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
@@ -109,12 +111,14 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _queueLevelActionEnabled, value);
     }
 
-    public MainWindowViewModel(ILoggingService loggingService, ITopicHelper topicHelper, IQueueHelper queueHelper, IAppState appState)
+    public MainWindowViewModel(ILoggingService loggingService, ITopicHelper topicHelper, IQueueHelper queueHelper, IAppState appState, IApplicationService applicationService, IModalWindowService modalWindowService)
     {
         _loggingService = loggingService ?? throw new ArgumentNullException(nameof(loggingService));
         _topicHelper = topicHelper ?? throw new ArgumentNullException(nameof(topicHelper));
         _queueHelper = queueHelper ?? throw new ArgumentNullException(nameof(queueHelper));
         _appState = appState ?? throw new ArgumentNullException(nameof(appState));
+        _applicationService = applicationService;
+        _modalWindowService = modalWindowService;
 
         Messages = new ObservableCollection<Message>();
         DlqMessages = new ObservableCollection<Message>();
@@ -144,11 +148,12 @@ public class MainWindowViewModel : ViewModelBase
 
     internal async void ShowConnectionStringWindow()
     {
-        var viewModel = new ConnectionStringWindowViewModel();
+        var viewModel = new ConnectionStringWindowViewModel(_appState);
 
         var returnedViewModel =
-            await ModalWindowHelper.ShowModalWindow<ConnectionStringWindow, ConnectionStringWindowViewModel>(
-                viewModel);
+            await _modalWindowService.ShowModalWindow
+                <ConnectionStringWindow, ConnectionStringWindowViewModel>(
+                    viewModel);
 
         if (returnedViewModel.Cancel)
         {
@@ -314,7 +319,7 @@ public class MainWindowViewModel : ViewModelBase
         var viewModal = new AddMessageWindowViewModal();
 
         var returnedViewModal =
-            await ModalWindowHelper.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
+            await _modalWindowService.ShowModalWindow<AddMessageWindow, AddMessageWindowViewModal>(viewModal);
 
         if (returnedViewModal.Cancel)
         {
@@ -493,7 +498,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public async Task ShowSettings()
     {
-        await ModalWindowHelper.ShowModalWindow<AppSettingsWindow>(_appState as AppState);
+        await _modalWindowService.ShowModalWindow<AppSettingsWindow>(_appState as AppState);
     }
         
     public void ClearAllSelections()

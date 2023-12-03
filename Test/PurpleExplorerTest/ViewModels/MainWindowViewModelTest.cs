@@ -13,7 +13,7 @@ public class MainWindowViewModelTest
     public void Constructor_sets_up_public_properties()
     {
         //  Act.
-        var sut = CreateSut(out var loggingService);
+        var sut = CreateSut(out var loggingService, out _, out _, out _, out _);
         
         //  Assert.
         sut.AppVersion.Major.Should().Be(1);
@@ -43,19 +43,57 @@ public class MainWindowViewModelTest
         sut.ConnectedServiceBuses.Count().Should().Be(0);
     }
 
+    #region ConnectionBtnPopCommand
+
+    [Fact]
+    public void ConnectionBtnPopupCommand_does_not_change_connectionstring_When_user_cancels()
+    {
+        var myOriginalConnectionString = new ServiceBusConnectionString();
+
+        var sut = CreateSut(out _, out var appState, out var modalWindowService, out var topicHelper, out var queueHelper)
+            .With(s => s.ConnectionString = myOriginalConnectionString);
+
+        modalWindowService.Setup_ShowModalWindow(
+            new ConnectionStringWindowViewModel(appState.Object)
+                .With(c=> c.Cancel = true)
+        );
+        
+        //  Act.
+        sut.ConnectionBtnPopupCommand();
+        
+        //  Assert.
+        sut.ConnectionString.Should().Be(myOriginalConnectionString);
+        // Verify no call is made to any topic or queue to verify nothing was done
+        // when the user chose Cancel. A bit crude, but I found no better way.
+        topicHelper.VerifyAll();
+        queueHelper.VerifyAll();
+    }
+
+    #endregion
+
     private static MainWindowViewModel CreateSut(
-        out Mock<ILoggingService> loggingServiceMock
+        out Mock<ILoggingService> loggingServiceMock,
+        out Mock<IAppState> appStateMock, 
+        out Mock<IModalWindowService> modalWindowServiceMock,
+        out Mock<ITopicHelper> topicHelperMock,
+        out Mock<IQueueHelper> queueHelperMock
     )
     {
         var loggingService = new Mock<ILoggingService>();
         var topicHelper = new Mock<ITopicHelper>();
         var queueHelper = new Mock<IQueueHelper>();
         var appState = new Mock<IAppState>();
-
+        var applicationService = new Mock<IApplicationService>();
+        var modalWindowService = new Mock<IModalWindowService>();
+        
         var sut = new MainWindowViewModel(loggingService.Object, topicHelper.Object, queueHelper.Object,
-            appState.Object);
+            appState.Object, applicationService.Object, modalWindowService.Object);
 
         loggingServiceMock = loggingService;
+        appStateMock = appState;
+        modalWindowServiceMock = modalWindowService;
+        topicHelperMock = topicHelper;
+        queueHelperMock = queueHelper;
         return sut;
     }
 }
