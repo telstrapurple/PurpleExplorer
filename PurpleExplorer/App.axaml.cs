@@ -37,14 +37,19 @@ public class App : Application
         Locator.CurrentMutable.RegisterLazySingleton(() => new LoggingService(), typeof(ILoggingService));
         Locator.CurrentMutable.Register(() => new TopicHelper(state.AppSettings), typeof(ITopicHelper));
         Locator.CurrentMutable.Register(() => new QueueHelper(state.AppSettings), typeof(IQueueHelper));
+        Locator.CurrentMutable.Register(() => new ApplicationService(), typeof(IApplicationService));
+        Locator.CurrentMutable.Register(() => new ModalWindowService(
+            Locator.Current.GetService<IApplicationService>()!), typeof(IModalWindowService));
 
-        new MainWindow
+        new MainWindow(Locator.Current.GetService<IApplicationService>()!, Locator.Current.GetService<IModalWindowService>()!)
         {
             DataContext = new MainWindowViewModel(
                 Locator.Current.GetService<ILoggingService>()!,
                 Locator.Current.GetService<ITopicHelper>()!,
                 Locator.Current.GetService<IQueueHelper>()!,
-                Locator.Current.GetService<IAppState>()!
+                Locator.Current.GetService<IAppState>()!,
+                Locator.Current.GetService<IApplicationService>()!,
+                Locator.Current.GetService<IModalWindowService>()
             )
         }.Show();
         base.OnFrameworkInitializationCompleted();

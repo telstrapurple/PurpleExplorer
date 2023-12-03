@@ -1,7 +1,6 @@
 ﻿using ReactiveUI;
 using System.Collections.ObjectModel;
 using PurpleExplorer.Models;
-using Splat;
 
 namespace PurpleExplorer.ViewModels;
 
@@ -10,7 +9,7 @@ public class ConnectionStringWindowViewModel : DialogViewModelBase
     private string _name;
     private string _connectionString;
     private bool _useManagedIdentity;
-    private readonly IAppState _appState;
+
     public ObservableCollection<ServiceBusConnectionString> SavedConnectionStrings { get; set; }
 
     public string Name
@@ -31,10 +30,8 @@ public class ConnectionStringWindowViewModel : DialogViewModelBase
         set => this.RaiseAndSetIfChanged(ref _useManagedIdentity, value);
     }
 
-    public ConnectionStringWindowViewModel(IAppState appState = null)
+    public ConnectionStringWindowViewModel(IAppState appState)
     {
-        _appState = appState ?? Locator.Current.GetService<IAppState>();
-        SavedConnectionStrings = _appState.SavedConnectionStrings;
+        SavedConnectionStrings = appState.SavedConnectionStrings;
     }
-
 }
