@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using FluentAssertions;
 using Moq;
 using PurpleExplorer.Helpers;
@@ -53,6 +54,9 @@ public class MainWindowViewModelTest
         var sut = CreateSut(out _, out var appState, out var modalWindowService, out var topicHelper, out var queueHelper)
             .With(s => s.ConnectionString = myOriginalConnectionString);
 
+        appState.Setup(p => p.SavedConnectionStrings)
+            .Returns(new ObservableCollection<ServiceBusConnectionString>());
+
         modalWindowService.Setup_ShowModalWindow(
             new ConnectionStringWindowViewModel(appState.Object)
                 .With(c=> c.Cancel = true)
@@ -69,7 +73,59 @@ public class MainWindowViewModelTest
         queueHelper.VerifyAll();
     }
 
+    [Fact]
+    public void ConnectionBtnPopupCommand_sets_connectionstring_and_nothing_else_When_ok_but_no_connectionstring_value()
+    {
+        var myOriginalConnectionString = new ServiceBusConnectionString();
+        var myNewConnectionString = new ServiceBusConnectionString
+        {
+            Name = string.Empty,
+            ConnectionString = string.Empty,
+            UseManagedIdentity = true,
+        };
+
+        var sut = CreateSut(out _, out var appState, out var modalWindowService, out var topicHelper, out var queueHelper)
+            .With(s => s.ConnectionString = myOriginalConnectionString);
+
+        appState.Setup(p => p.SavedConnectionStrings)
+            .Returns(new ObservableCollection<ServiceBusConnectionString>());
+
+        modalWindowService.Setup_ShowModalWindow(
+            new ConnectionStringWindowViewModel(appState.Object)
+                .With(c=> c.Cancel = false)
+                .With(c => c.ConnectionString = myNewConnectionString.ConnectionString)
+                .With(c => c.UseManagedIdentity = myNewConnectionString.UseManagedIdentity)
+        );
+        
+        //  Act
+        sut.ConnectionBtnPopupCommand();
+        
+        //  Assert.
+        sut.ConnectionString.Should().NotBe(myOriginalConnectionString);
+        Assert.True(AreEqual((myNewConnectionString.ConnectionString, myNewConnectionString.UseManagedIdentity),
+            sut.ConnectionString));
+
+        // Verify no call is made to any topic or queue to verify nothing was done
+        // when the user chose Cancel. A bit crude, but I found no better way.
+        topicHelper.VerifyAll();
+        queueHelper.VerifyAll();
+    }
+
     #endregion
+
+    /// <summary>Returns true if the expected and actual contains the same values.*
+    /// False otherwise.
+    /// *)Note that Name is not compared as this is an implementation for a special case.
+    /// </summary>
+    /// <param name="expected"></param>
+    /// <param name="actual"></param>
+    /// <returns></returns>
+    static bool AreEqual((string connectionString, bool useManagedIdentity) expected,
+        ServiceBusConnectionString actual)
+    {
+        return expected.connectionString == actual.ConnectionString &&
+               expected.useManagedIdentity == actual.UseManagedIdentity;
+    } 
 
     private static MainWindowViewModel CreateSut(
         out Mock<ILoggingService> loggingServiceMock,
@@ -80,11 +136,11 @@ public class MainWindowViewModelTest
     )
     {
         var loggingService = new Mock<ILoggingService>();
-        var topicHelper = new Mock<ITopicHelper>();
-        var queueHelper = new Mock<IQueueHelper>();
-        var appState = new Mock<IAppState>();
-        var applicationService = new Mock<IApplicationService>();
-        var modalWindowService = new Mock<IModalWindowService>();
+        var topicHelper = new Mock<ITopicHelper>(MockBehavior.Strict);
+        var queueHelper = new Mock<IQueueHelper>(MockBehavior.Strict);
+        var appState = new Mock<IAppState>(MockBehavior.Strict);
+        var applicationService = new Mock<IApplicationService>(MockBehavior.Strict);
+        var modalWindowService = new Mock<IModalWindowService>(MockBehavior.Strict);
         
         var sut = new MainWindowViewModel(loggingService.Object, topicHelper.Object, queueHelper.Object,
             appState.Object, applicationService.Object, modalWindowService.Object);
