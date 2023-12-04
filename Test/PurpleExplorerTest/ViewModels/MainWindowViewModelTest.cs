@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using FluentAssertions;
+using Microsoft.Azure.ServiceBus.Management;
 using Moq;
 using PurpleExplorer.Helpers;
 using PurpleExplorer.Models;
@@ -102,13 +103,70 @@ public class MainWindowViewModelTest
         
         //  Assert.
         sut.ConnectionString.Should().NotBe(myOriginalConnectionString);
-        Assert.True(AreEqual((myNewConnectionString.ConnectionString, myNewConnectionString.UseManagedIdentity),
-            sut.ConnectionString));
+        Assert.True(AreSameExceptName(myNewConnectionString, sut.ConnectionString));
 
         // Verify no call is made to any topic or queue to verify nothing was done
         // when the user chose Cancel. A bit crude, but I found no better way.
         topicHelper.VerifyAll();
         queueHelper.VerifyAll();
+    }
+
+    [Fact]
+    public void ConnectionBtnPopupCommand_sets_ConnectedServiceBuses_When_ok_with_connectionstring_value()
+    {
+        var myOriginalConnectionString = new ServiceBusConnectionString();
+        var myNewConnectionString = new ServiceBusConnectionString
+        {
+            Name = string.Empty,
+            ConnectionString = "MyNewConnectionString",
+            UseManagedIdentity = true,
+        };
+        var myNameSpaceInfo = new NamespaceInfo
+        {
+            Name = "MyNameSpaceInfoName",
+            CreatedTime = new DateTime(1906, 12, 09),
+        };
+
+        var sut = CreateSut(out _, out var appState, out var modalWindowService, out var topicHelper, out var queueHelper)
+            .With(s => s.ConnectionString = myOriginalConnectionString);
+
+        appState.Setup(p => p.SavedConnectionStrings)
+            .Returns(new ObservableCollection<ServiceBusConnectionString>());
+
+        modalWindowService.Setup_ShowModalWindow(
+            new ConnectionStringWindowViewModel(appState.Object)
+                .With(c=> c.Cancel = false)
+                .With(c => c.ConnectionString = myNewConnectionString.ConnectionString)
+                .With(c => c.UseManagedIdentity = myNewConnectionString.UseManagedIdentity)
+        );
+
+        topicHelper.Setup(m => m.GetNamespaceInfo(It_Is_SameExceptName(myNewConnectionString)))
+            .ReturnsAsync(myNameSpaceInfo);
+
+        topicHelper.Setup(m => m.GetTopicsAndSubscriptions(It_Is_SameExceptName(myNewConnectionString)))
+            .ReturnsAsync(new List<ServiceBusTopic>());
+
+        queueHelper.Setup(m => m.GetQueues(It_Is_SameExceptName(myNewConnectionString)))
+            .ReturnsAsync(new List<ServiceBusQueue>());
+        
+        //  Act
+        sut.ConnectionBtnPopupCommand();
+        
+        //  Assert.
+        sut.ConnectionString.Should().NotBe(myOriginalConnectionString);
+        Assert.True(AreSameExceptName(myNewConnectionString, sut.ConnectionString));
+
+        sut.ConnectedServiceBuses.Single().Name.Should().Be(myNameSpaceInfo.Name);
+        sut.ConnectedServiceBuses.Single().CreatedTime.Should().Be(myNameSpaceInfo.CreatedTime);
+        
+        AreSameExceptName(myNewConnectionString, sut.ConnectedServiceBuses.Single().ConnectionString);
+        
+        // Without rewriting a lot we cannot test `ServiceBusQueue` nor `ServiceBusTopic` 
+        // as they cannot be constructed outside Microsoft's own framework due to
+        // constructor visibility.
+        // So we just check there is something. Something empty.
+        sut.ConnectedServiceBuses.Single().Queues.Should().BeEmpty();
+        sut.ConnectedServiceBuses.Single().Topics.Should().BeEmpty();
     }
 
     #endregion
@@ -117,14 +175,13 @@ public class MainWindowViewModelTest
     /// False otherwise.
     /// *)Note that Name is not compared as this is an implementation for a special case.
     /// </summary>
-    /// <param name="expected"></param>
-    /// <param name="actual"></param>
     /// <returns></returns>
-    static bool AreEqual((string connectionString, bool useManagedIdentity) expected,
+    static bool AreSameExceptName(
+        ServiceBusConnectionString expected,
         ServiceBusConnectionString actual)
     {
-        return expected.connectionString == actual.ConnectionString &&
-               expected.useManagedIdentity == actual.UseManagedIdentity;
+        return expected.ConnectionString == actual.ConnectionString &&
+               expected.UseManagedIdentity == actual.UseManagedIdentity;
     } 
 
     private static MainWindowViewModel CreateSut(
@@ -151,5 +208,13 @@ public class MainWindowViewModelTest
         topicHelperMock = topicHelper;
         queueHelperMock = queueHelper;
         return sut;
+    }
+
+    private static ServiceBusConnectionString It_Is_SameExceptName(ServiceBusConnectionString myNewConnectionString)
+    {
+        // // We do not compare name as for this case it is not interesting.
+        return It.Is<ServiceBusConnectionString>(x => 
+            AreSameExceptName(x, myNewConnectionString)
+        );
     }
 }
