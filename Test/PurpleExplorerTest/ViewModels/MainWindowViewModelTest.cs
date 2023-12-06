@@ -171,6 +171,25 @@ public class MainWindowViewModelTest
 
     #endregion
 
+    #region RefreshTabHeaders tests.
+
+    [Fact]
+    public void RefreshTabHeaders_sets_tab_headers_When_no_currentmessage_and_no_topics_nor_queues()
+    {
+        var sut = CreateSut(out _, out _, out _, out _, out _);
+        
+        //  Act.
+        sut.RefreshTabHeaders();
+        
+        //  Assert.
+        sut.MessagesTabHeader.Should().Be("Messages");
+        sut.DlqTabHeader.Should().Be("Dead-letter");
+        sut.TopicTabHeader.Should().Be("Topics");
+        sut.QueueTabHeader.Should().Be("Queues");
+    }
+
+    #endregion
+
     /// <summary>Returns true if the expected and actual contains the same values.*
     /// False otherwise.
     /// *)Note that Name is not compared as this is an implementation for a special case.
