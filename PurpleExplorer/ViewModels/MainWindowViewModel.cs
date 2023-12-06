@@ -212,78 +212,17 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public async Task FetchSubscriptionMessages()
-    {
-        if (CurrentSubscription == null)
-        {
-            return;
-        }
-            
-        Messages.Clear();
-        CurrentSubscription.ClearMessages();
-        var messages =
-            await _topicHelper.GetMessagesBySubscription(CurrentSubscription.Topic.ServiceBus.ConnectionString,
-                CurrentSubscription.Topic.Name,
-                CurrentSubscription.Name);
-        CurrentSubscription.AddMessages(messages);
-        Messages.AddRange(messages);
-    }
-
-    public async Task FetchSubscriptionDlqMessages()
-    {
-        if (CurrentSubscription == null)
-        {
-            return;
-        }
-            
-        DlqMessages.Clear();
-        CurrentSubscription.ClearDlqMessages();
-        var dlqMessages =
-            await _topicHelper.GetDlqMessages(CurrentSubscription.Topic.ServiceBus.ConnectionString,
-                CurrentSubscription.Topic.Name, CurrentSubscription.Name);
-        CurrentSubscription.AddDlqMessages(dlqMessages);
-        DlqMessages.AddRange(dlqMessages);
-    }
-        
-    public async Task FetchQueueMessages()
-    {
-        if (CurrentQueue == null)
-        {
-            return;
-        }
-            
-        Messages.Clear();
-        CurrentQueue.ClearMessages();
-        var messages = await _queueHelper.GetMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
-        CurrentQueue.AddMessages(messages);
-        Messages.AddRange(messages);
-    }
-        
-    public async Task FetchQueueDlqMessages()
-    {
-        if (CurrentQueue == null)
-        {
-            return;
-        }
-            
-        DlqMessages.Clear();
-        CurrentQueue.ClearDlqMessages();
-        var messages = await _queueHelper.GetDlqMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
-        CurrentQueue.AddDlqMessages(messages);
-        DlqMessages.AddRange(messages);
-    }
-        
     public void RefreshTabHeaders()
     {
-        if (CurrentMessageCollection != null)
-        {
-            MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount})";
-            DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount})";
-        }
-        else
+        if (CurrentMessageCollection is null)
         {
             MessagesTabHeader = "Messages";
             DlqTabHeader = "Dead-letter";
+        }
+        else
+        {
+            MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount})";
+            DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount})";
         }
 
         var topicCount = ConnectedServiceBuses.Sum(x => x.Topics.Count);
@@ -530,5 +469,66 @@ public class MainWindowViewModel : ViewModelBase
         {
             LoggingService.Log($"v{AppVersion} is the latest released version");
         }
+    }
+
+    private async Task FetchSubscriptionMessages()
+    {
+        if (CurrentSubscription == null)
+        {
+            return;
+        }
+            
+        Messages.Clear();
+        CurrentSubscription.ClearMessages();
+        var messages =
+            await _topicHelper.GetMessagesBySubscription(CurrentSubscription.Topic.ServiceBus.ConnectionString,
+                CurrentSubscription.Topic.Name,
+                CurrentSubscription.Name);
+        CurrentSubscription.AddMessages(messages);
+        Messages.AddRange(messages);
+    }
+
+    private async Task FetchSubscriptionDlqMessages()
+    {
+        if (CurrentSubscription == null)
+        {
+            return;
+        }
+            
+        DlqMessages.Clear();
+        CurrentSubscription.ClearDlqMessages();
+        var dlqMessages =
+            await _topicHelper.GetDlqMessages(CurrentSubscription.Topic.ServiceBus.ConnectionString,
+                CurrentSubscription.Topic.Name, CurrentSubscription.Name);
+        CurrentSubscription.AddDlqMessages(dlqMessages);
+        DlqMessages.AddRange(dlqMessages);
+    }
+        
+    private async Task FetchQueueMessages()
+    {
+        if (CurrentQueue == null)
+        {
+            return;
+        }
+            
+        Messages.Clear();
+        CurrentQueue.ClearMessages();
+        var messages = await _queueHelper.GetMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
+        CurrentQueue.AddMessages(messages);
+        Messages.AddRange(messages);
+    }
+        
+    private async Task FetchQueueDlqMessages()
+    {
+        if (CurrentQueue == null)
+        {
+            return;
+        }
+            
+        DlqMessages.Clear();
+        CurrentQueue.ClearDlqMessages();
+        var messages = await _queueHelper.GetDlqMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
+        CurrentQueue.AddDlqMessages(messages);
+        DlqMessages.AddRange(messages);
     }
 }

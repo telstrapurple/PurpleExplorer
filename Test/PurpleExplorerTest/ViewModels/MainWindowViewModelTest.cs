@@ -171,6 +171,48 @@ public class MainWindowViewModelTest
 
     #endregion
 
+    #region RefreshTabHeaders tests.
+
+    [Fact]
+    public void RefreshTabHeaders_sets_tab_headers_When_no_currentmessage_and_no_topics_nor_queues()
+    {
+        var sut = CreateSut(out _, out _, out _, out _, out _);
+        
+        //  Act.
+        sut.RefreshTabHeaders();
+        
+        //  Assert.
+        sut.MessagesTabHeader.Should().Be("Messages");
+        sut.DlqTabHeader.Should().Be("Dead-letter");
+        sut.TopicTabHeader.Should().Be("Topics");
+        sut.QueueTabHeader.Should().Be("Queues");
+    }
+
+    [Fact]
+    public void RefreshTabHeaders_sets_tab_headers_When_no_currentmessage_but_topics_and_queues()
+    {
+        var sut = CreateSut(out _, out _, out _, out _, out _);
+        sut.ConnectedServiceBuses.Add(new ServiceBusResource()
+            // Add a topic. We test it is set later.
+            .With(sb => sb.AddTopics( new ServiceBusTopic()))
+            // Due to innards of `ServiceBugQueue` we cannot create them
+            // and have to create en empty list - which might, or might not, 
+            // happen in real life.
+            .With(sb => sb.AddQueues( Array.Empty<ServiceBusQueue>()))
+        );
+
+        //  Act.
+        sut.RefreshTabHeaders();
+        
+        //  Assert.
+        sut.MessagesTabHeader.Should().Be("Messages");
+        sut.DlqTabHeader.Should().Be("Dead-letter");
+        sut.TopicTabHeader.Should().Be("Topics (1)");
+        sut.QueueTabHeader.Should().Be("Queues (0)");
+    }
+
+    #endregion
+
     /// <summary>Returns true if the expected and actual contains the same values.*
     /// False otherwise.
     /// *)Note that Name is not compared as this is an implementation for a special case.
