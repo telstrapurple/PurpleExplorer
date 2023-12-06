@@ -214,15 +214,15 @@ public class MainWindowViewModel : ViewModelBase
 
     public void RefreshTabHeaders()
     {
-        if (CurrentMessageCollection != null)
-        {
-            MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount})";
-            DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount})";
-        }
-        else
+        if (CurrentMessageCollection is null)
         {
             MessagesTabHeader = "Messages";
             DlqTabHeader = "Dead-letter";
+        }
+        else
+        {
+            MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount})";
+            DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount})";
         }
 
         var topicCount = ConnectedServiceBuses.Sum(x => x.Topics.Count);
