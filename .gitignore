@@ -422,6 +422,7 @@ $RECYCLE.BIN/
 # JetBrains Rider
 .idea/
 *.sln.iml
+*.sln.DotSettings
 
 ##
 ## Visual Studio Code
