@@ -221,8 +221,8 @@ public class MainWindowViewModel : ViewModelBase
         }
         else
         {
-            MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount})";
-            DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount})";
+            MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount} / {CurrentMessageCollection.TotalMessageCount})";
+            DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount} / {CurrentMessageCollection.TotalDlqCount})";
         }
 
         var topicCount = ConnectedServiceBuses.Sum(x => x.Topics.Count);
