@@ -29,8 +29,8 @@
         
         <Grid ColumnDefinitions="250,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"  Margin="4" VerticalAlignment="Top">
                 <TextBlock Text="How many queues to fetch from namespace" Grid.Row="0" Grid.Column="0" Classes="left"/>
-                <NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding AppSettings.QueueListFetchCount}" Classes="right" />
-                
+                <NumericUpDown Name="QueueListFetchCount" Grid.Row="0" Grid.Column="1" Value="{Binding AppSettings.QueueListFetchCount}" Classes="right" />
+
                 <TextBlock Text="How many messages to fetch from queue" Grid.Row="1" Grid.Column="0" Classes="left"/>
                 <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding AppSettings.QueueMessageFetchCount}" Classes="right" />
                 
