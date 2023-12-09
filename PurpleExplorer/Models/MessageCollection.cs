@@ -44,6 +44,8 @@ public abstract class MessageCollection : ReactiveObject
         private set => this.RaiseAndSetIfChanged(ref _totalDlqCount, value);
     }
 
+    public long TotalTotalMessageCount => _totalMessageCount + _totalDlqCount;
+
     protected MessageCollection()
     {
         Messages = new ObservableCollection<Message>();

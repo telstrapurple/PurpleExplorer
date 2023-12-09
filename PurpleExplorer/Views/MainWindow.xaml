@@ -108,10 +108,11 @@
                                     <i:Icon Value="fa-microchip" />
                                     <TextBlock Margin="3,4">
                                         <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0}({1},{2})">
+                                            <MultiBinding StringFormat="{}{0} ({1},{2}) ∑{3}">
                                                 <Binding Path="Name" />
                                                 <Binding Path="TotalMessageCount" />
                                                 <Binding Path="TotalDlqCount" />
+                                                <Binding Path="TotalTotalMessageCount"/>
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
