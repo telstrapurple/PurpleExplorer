@@ -93,15 +93,19 @@ public class MessageDetailsWindowViewModel : ViewModelBase
     {
         _loggingService.Log($"Resending DLQ message: {Message.MessageId}");
 
-        if (Subscription != null)
+        if (Subscription is not null)
         {
             await _topicHelper.ResubmitDlqMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
                 Message);
+            Subscription.SetTotalMessageCount(Subscription.TotalMessageCount + 1);
+            Subscription.SetTotalDlqMessageCount(Subscription.TotalDlqCount - 1);
         }
 
-        if (Queue != null)
+        if (Queue is not null)
         {
             await _queueHelper.ResubmitDlqMessage(ConnectionString, Queue.Name, Message);
+            Queue.SetTotalMessageCount(Queue.TotalMessageCount + 1);
+            Queue.SetTotalDlqMessageCount(Queue.TotalDlqCount - 1);
         }
 
         _loggingService.Log($"Resent DLQ message: {Message.MessageId}");
@@ -126,15 +130,19 @@ public class MessageDetailsWindowViewModel : ViewModelBase
         _loggingService.Log($"User accepted to receive messages in order to send message {Message.MessageId} to dead-letter. This is going to increases the DeliveryCount of the messages before it.");
         _loggingService.Log($"Sending message: {Message.MessageId} to dead-letter");
 
-        if (Subscription != null)
+        if (Subscription is not null)
         {
             await _topicHelper.DeadletterMessage(ConnectionString, Subscription.Topic.Name, Subscription.Name,
                 Message);
+            Subscription.SetTotalMessageCount(Subscription.TotalMessageCount - 1);
+            Subscription.SetTotalDlqMessageCount(Subscription.TotalDlqCount + 1);
         }
 
-        if (Queue != null)
+        if (Queue is not null)
         {
             await _queueHelper.DeadletterMessage(ConnectionString, Queue.Name, Message);
+            Queue.SetTotalMessageCount(Queue.TotalMessageCount - 1);
+            Queue.SetTotalDlqMessageCount(Queue.TotalDlqCount + 1);
         }
 
         _loggingService.Log($"Sent message: {Message.MessageId} to dead-letter");
