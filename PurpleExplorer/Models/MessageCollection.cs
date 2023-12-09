@@ -69,6 +69,11 @@ public abstract class MessageCollection : ReactiveObject
         Messages.Remove(Messages.Single(msg => msg.MessageId.Equals(messageId)));
         MessageCount = Messages.Count;
     }
+
+    public void SetTotalMessageCount(long n)
+    {
+        TotalMessageCount = n;
+    }
         
     public void ClearMessages()
     {
@@ -86,6 +91,11 @@ public abstract class MessageCollection : ReactiveObject
     {
         DlqMessages.Remove(DlqMessages.Single(msg => msg.MessageId.Equals(messageId)));
         DlqCount = DlqMessages.Count;
+    }
+
+    public void SetTotalDlqMessageCount(long n)
+    {
+        TotalDlqCount = n;
     }
         
     public void ClearDlqMessages()
